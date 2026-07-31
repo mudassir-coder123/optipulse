@@ -1,10 +1,250 @@
-<!-- JAVASCRIPT LOGIC WITH SUPABASE INTEGRATION -->
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-neutral-950 text-stone-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OptiPulse - Optical Management System</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Three.js for 3D Background Canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Supabase JS Client library CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    .gold-border { border-color: #d4af37; }
+    .gold-text { color: #d4af37; }
+  </style>
+</head>
+<body class="h-full font-sans antialiased bg-neutral-950 text-stone-100 selection:bg-amber-500 selection:text-neutral-950">
+
+  <!-- ================= WELCOME / INITIAL LOADING SCREEN ================= -->
+  <div id="step-welcome" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 bg-neutral-950">
+    <div id="login-canvas-container" class="absolute inset-0 opacity-40 pointer-events-none"></div>
+    
+    <div class="relative z-10 text-center max-w-md w-full space-y-6">
+      <h1 class="text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600">
+        OPTIPULSE
+      </h1>
+      <p class="text-sm text-stone-400">Optical Practice & Customer Management System</p>
+
+      <div id="welcome-loading-box" class="w-full bg-neutral-900 h-2 rounded-full overflow-hidden border border-neutral-800">
+        <div id="loading-bar" class="bg-amber-500 h-full w-0 transition-all duration-300"></div>
+      </div>
+
+      <button id="btn-welcome-continue" onclick="nextStep('welcome', 'owner-login')" class="hidden w-full py-3.5 px-6 rounded-xl font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-neutral-950 shadow-lg shadow-amber-500/10 transition-all">
+        Enter System Portal
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= OWNER LOGIN / REGISTER (OTP) ================= -->
+  <div id="step-owner-login" class="hidden min-h-screen flex items-center justify-center p-6 bg-neutral-950">
+    <div class="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl">
+      <div>
+        <h2 class="text-2xl font-bold text-stone-100">Shop Authentication</h2>
+        <p class="text-xs text-stone-400 mt-1">Enter your details to log in or register your optical store.</p>
+      </div>
+
+      <form onsubmit="handleOwnerRegister(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Shop / Practice Name</label>
+          <input id="owner-shop" type="text" required placeholder="e.g. Vision Care Optics" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Mobile Contact</label>
+          <input id="owner-mobile" type="text" required placeholder="+92 300 1234567" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Owner Email</label>
+          <input id="owner-email" type="email" required placeholder="owner@optipulse.com" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Shop Address</label>
+          <input id="owner-address" type="text" required placeholder="Shop #12, Commercial Area" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+        </div>
+
+        <button id="btn-send-otp" type="submit" class="w-full py-3.5 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-neutral-950 transition-all text-sm uppercase tracking-wider">
+          Send Email Verification OTP
+        </button>
+      </form>
+
+      <!-- OTP Box -->
+      <div id="otp-verification-box" class="hidden border-t border-neutral-800 pt-6 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-amber-400 mb-1">Enter 6-Digit OTP Code</label>
+          <input id="otp-input" type="text" maxlength="6" placeholder="123456" class="w-full text-center tracking-widest text-lg font-bold px-4 py-3 rounded-xl bg-neutral-950 border border-amber-500/50 text-stone-100 focus:outline-none focus:border-amber-500">
+        </div>
+        <button id="btn-verify-otp" onclick="verifyOTP()" class="w-full py-3 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all text-xs uppercase tracking-wider">
+          Verify & Enter Portal
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN APP DASHBOARD ================= -->
+  <div id="step-app-dashboard" class="hidden min-h-screen flex flex-col bg-neutral-950">
+    <!-- Header -->
+    <header class="border-b border-neutral-800 bg-neutral-900/80 backdrop-blur sticky top-0 z-40 px-4 md:px-8 py-4 flex justify-between items-center">
+      <div>
+        <h2 id="disp-shop-title" class="text-xl font-black tracking-wider text-amber-400">OPTIPULSE</h2>
+        <p id="disp-managing-badge" class="text-xs text-stone-400">Managing Practice</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <span id="badge-curr" class="px-3 py-1 rounded-full bg-neutral-800 text-amber-400 text-xs font-bold border border-neutral-700">PKR</span>
+        <button onclick="handleLogout()" class="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-300 text-xs font-semibold">Logout</button>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="border-b border-neutral-800 bg-neutral-900 px-4 md:px-8 pt-4">
+      <div class="flex gap-6">
+        <button id="tab-dashboard" onclick="switchAppTab('dashboard')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold">Dashboard</button>
+        <button id="tab-new-customer" onclick="switchAppTab('new-customer')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold">+ New Order</button>
+        <button id="tab-history" onclick="switchAppTab('history')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold">Customer Database</button>
+      </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto space-y-6">
+      
+      <!-- TAB 1: DASHBOARD VIEW -->
+      <div id="view-tab-dashboard" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
+            <p class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Active Pending Orders</p>
+            <h3 id="stat-active-count" class="text-3xl font-black text-amber-400 mt-2">0</h3>
+          </div>
+          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
+            <p class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Total Outstanding Dues</p>
+            <h3 id="stat-total-due" class="text-3xl font-black text-stone-100 mt-2">PKR 0</h3>
+          </div>
+          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
+            <p class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Completed Orders</p>
+            <h3 id="stat-delivered-count" class="text-3xl font-black text-emerald-400 mt-2">0</h3>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-stone-300">Current Active Orders</h3>
+          <div id="dashboard-active-list" class="space-y-3">
+            <!-- Active order items render dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: NEW CUSTOMER / ORDER FORM -->
+      <div id="view-tab-new-customer" class="hidden bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6">
+        <h3 class="text-lg font-bold text-stone-100">Patient Prescription & Order Entry</h3>
+        <form id="customer-form" onsubmit="handleSaveCustomer(event)" class="space-y-6">
+          <input type="hidden" id="editing-cust-id">
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-400 mb-1">Customer Full Name *</label>
+              <input id="cust-name" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-400 mb-1">Phone / Mobile *</label>
+              <input id="cust-phone" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-400 mb-1">Email (Optional)</label>
+              <input id="cust-email" type="email" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-400 mb-1">Age</label>
+              <input id="cust-age" type="number" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-400 mb-1">Gender</label>
+              <select id="cust-gender" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-400 mb-1">Address</label>
+              <input id="cust-address" type="text" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+            </div>
+          </div>
+
+          <!-- Prescription Section -->
+          <div class="border-t border-neutral-800 pt-6 space-y-4">
+            <h4 class="text-sm font-bold text-amber-400 uppercase tracking-wider">Prescription Details (Rx)</h4>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+              <div><label class="text-[10px] text-stone-400 uppercase">OD SPH</label><input id="rx-od-sph" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OD CYL</label><input id="rx-od-cyl" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OD AXIS</label><input id="rx-od-axis" type="text" placeholder="180" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OD ADD</label><input id="rx-od-add" type="text" placeholder="+1.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">PD (mm)</label><input id="rx-pd" type="text" placeholder="63" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              
+              <div><label class="text-[10px] text-stone-400 uppercase">OS SPH</label><input id="rx-os-sph" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OS CYL</label><input id="rx-os-cyl" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OS AXIS</label><input id="rx-os-axis" type="text" placeholder="180" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OS ADD</label><input id="rx-os-add" type="text" placeholder="+1.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">Prescribed By</label><input id="rx-doctor" type="text" placeholder="Dr. Name" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+            </div>
+          </div>
+
+          <!-- Billing Section -->
+          <div class="border-t border-neutral-800 pt-6 space-y-4">
+            <h4 class="text-sm font-bold text-amber-400 uppercase tracking-wider">Order & Billing Details</h4>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Item Description</label>
+                <input id="order-item" type="text" placeholder="Frame + Anti-Reflective Lenses" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Total Amount</label>
+                <input id="order-total" type="number" oninput="calcBalance()" placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Amount Paid</label>
+                <input id="order-paid" type="number" oninput="calcBalance()" placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Status</label>
+                <select id="order-status" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+                  <option value="In Progress">In Progress</option>
+                  <option value="Ready for Pickup">Ready for Pickup</option>
+                  <option value="Delivered">Delivered</option>
+                </select>
+              </div>
+            </div>
+            <p class="text-xs text-stone-400">Remaining Balance: <strong id="order-due-display" class="text-amber-400">PKR 0</strong></p>
+          </div>
+
+          <div class="flex justify-end gap-3 pt-4">
+            <button type="button" onclick="switchAppTab('dashboard')" class="px-6 py-3 rounded-xl bg-neutral-800 text-stone-300 font-semibold text-xs">Cancel</button>
+            <button type="submit" class="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider">Save Customer Record</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- TAB 3: CUSTOMER HISTORY -->
+      <div id="view-tab-history" class="hidden space-y-4">
+        <input id="history-search-input" type="text" onkeyup="filterCustomerHistory()" placeholder="Search by patient name or phone number..." class="w-full px-4 py-3 rounded-2xl bg-neutral-900 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+        <div id="history-results-list" class="space-y-4">
+          <!-- Filtered records render here -->
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
   <script>
-    // Initialize Supabase Client with explicit headers
+    // Initialize Supabase Client safely
     const SUPABASE_URL = 'https://qcdjyhxzswcwcxzwjcws.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_ej-63argNI2JcwZDXnAV0w_oYANtClg';
 
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    const supabaseLib = window.supabase || supabase;
+    const supabaseClient = supabaseLib.createClient(SUPABASE_URL, SUPABASE_KEY, {
       global: {
         headers: {
           'apikey': SUPABASE_KEY
@@ -85,7 +325,7 @@
             renderDashboard();
             return;
           }
-        } catch(e) { /* fall through to normal flow */ }
+        } catch(e) {}
       }
 
       init3DLogo();
@@ -104,20 +344,6 @@
     function nextStep(current, next) {
       document.getElementById(`step-${current}`).classList.add('hidden');
       document.getElementById(`step-${next}`).classList.remove('hidden');
-    }
-
-    function changeLanguage(lang) {
-      appConfig.lang = lang;
-      if (lang === 'ur' || lang === 'ar') document.body.style.direction = 'rtl';
-      else document.body.style.direction = 'ltr';
-    }
-
-    function changeCurrency(curr) {
-      appConfig.currency = curr;
-      appConfig.currSymbol = curr;
-      document.getElementById('badge-curr').innerText = curr;
-      document.querySelectorAll('.curr-sym').forEach(el => el.innerText = curr);
-      renderDashboard();
     }
 
     /* ---- 1. SEND 6-DIGIT OTP VIA SUPABASE ---- */
@@ -221,17 +447,7 @@
       const total = Number(document.getElementById('order-total').value || 0);
       const paid = Number(document.getElementById('order-paid').value || 0);
       const due = Math.max(0, total - paid);
-      document.getElementById('order-due-display').innerHTML = `<span class="curr-sym mr-1">${appConfig.currSymbol}</span> ${due.toLocaleString()}`;
-    }
-
-    let photoBase64 = "";
-    function previewPhoto(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) { photoBase64 = e.target.result; };
-        reader.readAsDataURL(file);
-      }
+      document.getElementById('order-due-display').innerText = `${appConfig.currSymbol} ${due.toLocaleString()}`;
     }
 
     function deliverOrder(custId, orderId) {
@@ -259,7 +475,7 @@
 
       const newPurchase = {
         orderId: Date.now(),
-        date: document.getElementById('rx-date').value || new Date().toISOString().split('T')[0],
+        date: new Date().toISOString().split('T')[0],
         item: document.getElementById('order-item').value || 'Eyewear Frame & Lenses',
         total: total,
         paid: paid,
@@ -274,7 +490,6 @@
           osAxis: document.getElementById('rx-os-axis').value,
           osAdd: document.getElementById('rx-os-add').value,
           pd: document.getElementById('rx-pd').value,
-          date: document.getElementById('rx-date').value,
           doctor: document.getElementById('rx-doctor').value
         }
       };
@@ -288,7 +503,6 @@
           cust.age = document.getElementById('cust-age').value;
           cust.gender = document.getElementById('cust-gender').value;
           cust.address = document.getElementById('cust-address').value;
-          if (photoBase64) cust.photo = photoBase64;
           cust.purchases.push(newPurchase);
         }
       } else {
@@ -300,7 +514,6 @@
           age: document.getElementById('cust-age').value,
           gender: document.getElementById('cust-gender').value,
           address: document.getElementById('cust-address').value,
-          photo: photoBase64,
           purchases: [newPurchase]
         });
       }
@@ -314,7 +527,6 @@
     function resetCustomerForm() {
       document.getElementById('customer-form').reset();
       document.getElementById('editing-cust-id').value = '';
-      photoBase64 = '';
       calcBalance();
     }
 
@@ -351,7 +563,7 @@
             itemCard.className = "flex flex-col md:flex-row justify-between items-start md:items-center p-4 rounded-xl bg-neutral-900 border border-neutral-800 gap-4";
             itemCard.innerHTML = `
               <div class="flex items-center gap-4">
-                ${cust.photo ? `<img src="${cust.photo}" class="w-12 h-12 rounded-full object-cover border gold-border">` : `<div class="w-12 h-12 rounded-full bg-neutral-800 border gold-border flex items-center justify-center font-bold text-amber-400 text-sm">${cust.name.charAt(0)}</div>`}
+                <div class="w-12 h-12 rounded-full bg-neutral-800 border gold-border flex items-center justify-center font-bold text-amber-400 text-sm">${cust.name.charAt(0)}</div>
                 <div>
                   <h4 class="font-bold text-stone-100 text-sm">${cust.name} <span class="text-xs text-stone-400 font-normal">(${cust.phone})</span></h4>
                   <p class="text-xs text-amber-400 font-medium">${purchase.item}</p>
@@ -427,7 +639,7 @@
         custCard.innerHTML = `
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div class="flex items-center gap-4">
-              ${cust.photo ? `<img src="${cust.photo}" class="w-12 h-12 rounded-full object-cover border gold-border">` : `<div class="w-12 h-12 rounded-full bg-neutral-800 border gold-border flex items-center justify-center font-bold text-amber-400 text-sm">${cust.name.charAt(0)}</div>`}
+              <div class="w-12 h-12 rounded-full bg-neutral-800 border gold-border flex items-center justify-center font-bold text-amber-400 text-sm">${cust.name.charAt(0)}</div>
               <div>
                 <h4 class="font-bold text-stone-100">${cust.name}</h4>
                 <p class="text-xs text-stone-400">Mobile: ${cust.phone} ${cust.email ? `| ${cust.email}` : ''}</p>
@@ -447,3 +659,5 @@
       });
     }
   </script>
+</body>
+</html>
