@@ -1,0 +1,449 @@
+<!-- JAVASCRIPT LOGIC WITH SUPABASE INTEGRATION -->
+  <script>
+    // Initialize Supabase Client with explicit headers
+    const SUPABASE_URL = 'https://qcdjyhxzswcwcxzwjcws.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_ej-63argNI2JcwZDXnAV0w_oYANtClg';
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      global: {
+        headers: {
+          'apikey': SUPABASE_KEY
+        }
+      }
+    });
+
+    /* ---- 3D Animation Background ---- */
+    function init3DLogo() {
+      const container = document.getElementById('login-canvas-container');
+      if (!container || typeof THREE === 'undefined') return;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(renderer.domElement);
+
+      const geometry = new THREE.TorusGeometry(1.8, 0.4, 16, 100);
+      const material = new THREE.MeshBasicMaterial({ color: 0xd4af37, wireframe: true });
+      const torus = new THREE.Mesh(geometry, material);
+      scene.add(torus);
+
+      camera.position.z = 4.5;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        torus.rotation.x += 0.01;
+        torus.rotation.y += 0.01;
+        renderer.render(scene, camera);
+      }
+      animate();
+    }
+
+    /* ---- Persistent Storage Helpers ---- */
+    async function sget(key) {
+      try {
+        const val = localStorage.getItem(key);
+        return val ? val : null;
+      } catch(e) { return null; }
+    }
+    
+    async function sset(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch(e) { console.error('Storage set failed', e); }
+    }
+
+    function persistConfig() { sset('app-config', JSON.stringify(appConfig)); }
+    function persistCustomers() { sset('customer-database', JSON.stringify(customerDatabase)); }
+
+    let appConfig = {
+      lang: 'en',
+      currency: 'PKR',
+      currSymbol: 'PKR',
+      owner: {}
+    };
+
+    let customerDatabase = [];
+
+    // Application Initialization
+    window.addEventListener('DOMContentLoaded', async () => {
+      const savedConfigRaw = await sget('app-config');
+      if (savedConfigRaw) {
+        try {
+          const savedConfig = JSON.parse(savedConfigRaw);
+          if (savedConfig && savedConfig.owner && savedConfig.owner.shop) {
+            appConfig = savedConfig;
+            const savedCustomersRaw = await sget('customer-database');
+            if (savedCustomersRaw) { try { customerDatabase = JSON.parse(savedCustomersRaw); } catch(e){} }
+
+            document.getElementById('step-welcome').classList.add('hidden');
+            document.getElementById('step-app-dashboard').classList.remove('hidden');
+            document.getElementById('disp-shop-title').innerText = appConfig.owner.shop.toUpperCase();
+            document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop}`;
+            document.getElementById('badge-curr').innerText = appConfig.currSymbol;
+            renderDashboard();
+            return;
+          }
+        } catch(e) { /* fall through to normal flow */ }
+      }
+
+      init3DLogo();
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 25;
+        document.getElementById('loading-bar').style.width = progress + '%';
+        if (progress >= 100) {
+          clearInterval(interval);
+          document.getElementById('welcome-loading-box').classList.add('hidden');
+          document.getElementById('btn-welcome-continue').classList.remove('hidden');
+        }
+      }, 250);
+    });
+
+    function nextStep(current, next) {
+      document.getElementById(`step-${current}`).classList.add('hidden');
+      document.getElementById(`step-${next}`).classList.remove('hidden');
+    }
+
+    function changeLanguage(lang) {
+      appConfig.lang = lang;
+      if (lang === 'ur' || lang === 'ar') document.body.style.direction = 'rtl';
+      else document.body.style.direction = 'ltr';
+    }
+
+    function changeCurrency(curr) {
+      appConfig.currency = curr;
+      appConfig.currSymbol = curr;
+      document.getElementById('badge-curr').innerText = curr;
+      document.querySelectorAll('.curr-sym').forEach(el => el.innerText = curr);
+      renderDashboard();
+    }
+
+    /* ---- 1. SEND 6-DIGIT OTP VIA SUPABASE ---- */
+    async function handleOwnerRegister(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('owner-email').value;
+      const btn = document.getElementById('btn-send-otp');
+      
+      if (!email) {
+        alert("Please enter a valid email address.");
+        return;
+      }
+
+      btn.innerText = "SENDING CODE...";
+      btn.disabled = true;
+
+      const { error } = await supabaseClient.auth.signInWithOtp({
+        email: email,
+        options: {
+          shouldCreateUser: true
+        }
+      });
+
+      btn.innerText = "Send Email Verification OTP";
+      btn.disabled = false;
+
+      if (error) {
+        alert("Error sending OTP: " + error.message);
+      } else {
+        alert("A 6-digit OTP code has been sent to " + email + ". Check your inbox!");
+        appConfig.owner = {
+          shop: document.getElementById('owner-shop').value,
+          mobile: document.getElementById('owner-mobile').value,
+          email: email,
+          address: document.getElementById('owner-address').value,
+        };
+        document.getElementById('otp-verification-box').classList.remove('hidden');
+      }
+    }
+
+    /* ---- 2. VERIFY 6-DIGIT OTP CODE ---- */
+    async function verifyOTP() {
+      const otp = document.getElementById('otp-input').value.trim();
+      const email = document.getElementById('owner-email').value;
+      const verifyBtn = document.getElementById('btn-verify-otp');
+
+      if (!otp) {
+        alert("Please enter the 6-digit code sent to your email.");
+        return;
+      }
+
+      verifyBtn.innerText = "VERIFYING...";
+      verifyBtn.disabled = true;
+
+      const { data, error } = await supabaseClient.auth.verifyOtp({
+        email: email,
+        token: otp,
+        type: 'email'
+      });
+
+      verifyBtn.innerText = "Verify & Enter Portal";
+      verifyBtn.disabled = false;
+
+      if (error) {
+        alert("Invalid or expired OTP: " + error.message);
+        return;
+      }
+
+      document.getElementById('disp-shop-title').innerText = appConfig.owner.shop.toUpperCase();
+      document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop}`;
+      nextStep('owner-login', 'app-dashboard');
+      persistConfig();
+      renderDashboard();
+    }
+
+    async function handleLogout() {
+      await supabaseClient.auth.signOut();
+      localStorage.clear();
+      location.reload();
+    }
+
+    /* ---- DASHBOARD & CUSTOMER MANAGEMENT LOGIC ---- */
+    function switchAppTab(tabName) {
+      document.getElementById('view-tab-dashboard').classList.add('hidden');
+      document.getElementById('view-tab-new-customer').classList.add('hidden');
+      document.getElementById('view-tab-history').classList.add('hidden');
+
+      document.getElementById('tab-dashboard').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold";
+      document.getElementById('tab-new-customer').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold";
+      document.getElementById('tab-history').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold";
+
+      document.getElementById(`view-tab-${tabName}`).classList.remove('hidden');
+      const activeTabBtn = document.getElementById(`tab-${tabName}`);
+      activeTabBtn.className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold";
+
+      if (tabName === 'history') renderHistory();
+    }
+
+    function calcBalance() {
+      const total = Number(document.getElementById('order-total').value || 0);
+      const paid = Number(document.getElementById('order-paid').value || 0);
+      const due = Math.max(0, total - paid);
+      document.getElementById('order-due-display').innerHTML = `<span class="curr-sym mr-1">${appConfig.currSymbol}</span> ${due.toLocaleString()}`;
+    }
+
+    let photoBase64 = "";
+    function previewPhoto(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) { photoBase64 = e.target.result; };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function deliverOrder(custId, orderId) {
+      const cust = customerDatabase.find(c => c.id === custId);
+      if (cust) {
+        const order = cust.purchases.find(p => p.orderId === orderId);
+        if (order) {
+          order.status = 'Delivered';
+          persistCustomers();
+          renderDashboard();
+        }
+      }
+    }
+
+    function handleSaveCustomer(e) {
+      e.preventDefault();
+
+      const nameEl = document.getElementById('cust-name');
+      const phoneEl = document.getElementById('cust-phone');
+      if (!nameEl.value.trim() || !phoneEl.value.trim()) return;
+
+      const existingId = document.getElementById('editing-cust-id').value;
+      const total = Number(document.getElementById('order-total').value || 0);
+      const paid = Number(document.getElementById('order-paid').value || 0);
+
+      const newPurchase = {
+        orderId: Date.now(),
+        date: document.getElementById('rx-date').value || new Date().toISOString().split('T')[0],
+        item: document.getElementById('order-item').value || 'Eyewear Frame & Lenses',
+        total: total,
+        paid: paid,
+        status: document.getElementById('order-status').value,
+        rx: {
+          odSph: document.getElementById('rx-od-sph').value,
+          odCyl: document.getElementById('rx-od-cyl').value,
+          odAxis: document.getElementById('rx-od-axis').value,
+          odAdd: document.getElementById('rx-od-add').value,
+          osSph: document.getElementById('rx-os-sph').value,
+          osCyl: document.getElementById('rx-os-cyl').value,
+          osAxis: document.getElementById('rx-os-axis').value,
+          osAdd: document.getElementById('rx-os-add').value,
+          pd: document.getElementById('rx-pd').value,
+          date: document.getElementById('rx-date').value,
+          doctor: document.getElementById('rx-doctor').value
+        }
+      };
+
+      if (existingId) {
+        const cust = customerDatabase.find(c => c.id === Number(existingId));
+        if (cust) {
+          cust.name = nameEl.value;
+          cust.phone = phoneEl.value;
+          cust.email = document.getElementById('cust-email').value;
+          cust.age = document.getElementById('cust-age').value;
+          cust.gender = document.getElementById('cust-gender').value;
+          cust.address = document.getElementById('cust-address').value;
+          if (photoBase64) cust.photo = photoBase64;
+          cust.purchases.push(newPurchase);
+        }
+      } else {
+        customerDatabase.push({
+          id: Date.now(),
+          name: nameEl.value,
+          phone: phoneEl.value,
+          email: document.getElementById('cust-email').value,
+          age: document.getElementById('cust-age').value,
+          gender: document.getElementById('cust-gender').value,
+          address: document.getElementById('cust-address').value,
+          photo: photoBase64,
+          purchases: [newPurchase]
+        });
+      }
+
+      persistCustomers();
+      resetCustomerForm();
+      switchAppTab('dashboard');
+      renderDashboard();
+    }
+
+    function resetCustomerForm() {
+      document.getElementById('customer-form').reset();
+      document.getElementById('editing-cust-id').value = '';
+      photoBase64 = '';
+      calcBalance();
+    }
+
+    function prepareNewPurchaseForCustomer(custId) {
+      resetCustomerForm();
+      const cust = customerDatabase.find(c => c.id === custId);
+      if (cust) {
+        document.getElementById('editing-cust-id').value = cust.id;
+        document.getElementById('cust-name').value = cust.name;
+        document.getElementById('cust-phone').value = cust.phone;
+        document.getElementById('cust-email').value = cust.email || '';
+        document.getElementById('cust-age').value = cust.age || '';
+        document.getElementById('cust-gender').value = cust.gender || 'Male';
+        document.getElementById('cust-address').value = cust.address || '';
+        switchAppTab('new-customer');
+      }
+    }
+
+    function renderDashboard() {
+      let activeCount = 0;
+      let totalDue = 0;
+      let deliveredCount = 0;
+      const activeListContainer = document.getElementById('dashboard-active-list');
+      activeListContainer.innerHTML = '';
+
+      customerDatabase.forEach(cust => {
+        cust.purchases.forEach(purchase => {
+          const due = Math.max(0, purchase.total - purchase.paid);
+          if (purchase.status !== 'Delivered') {
+            activeCount++;
+            totalDue += due;
+
+            const itemCard = document.createElement('div');
+            itemCard.className = "flex flex-col md:flex-row justify-between items-start md:items-center p-4 rounded-xl bg-neutral-900 border border-neutral-800 gap-4";
+            itemCard.innerHTML = `
+              <div class="flex items-center gap-4">
+                ${cust.photo ? `<img src="${cust.photo}" class="w-12 h-12 rounded-full object-cover border gold-border">` : `<div class="w-12 h-12 rounded-full bg-neutral-800 border gold-border flex items-center justify-center font-bold text-amber-400 text-sm">${cust.name.charAt(0)}</div>`}
+                <div>
+                  <h4 class="font-bold text-stone-100 text-sm">${cust.name} <span class="text-xs text-stone-400 font-normal">(${cust.phone})</span></h4>
+                  <p class="text-xs text-amber-400 font-medium">${purchase.item}</p>
+                  <p class="text-[11px] text-stone-400">Date: ${purchase.date} | Status: <span class="text-amber-400 font-semibold">${purchase.status}</span></p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                <div class="text-right">
+                  <p class="text-xs text-stone-400">Due: <span class="font-bold text-amber-400">${appConfig.currSymbol} ${due.toLocaleString()}</span></p>
+                  <p class="text-[10px] text-stone-500">Total: ${appConfig.currSymbol} ${purchase.total.toLocaleString()}</p>
+                </div>
+                <button onclick="deliverOrder(${cust.id}, ${purchase.orderId})" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider">
+                  Mark Delivered
+                </button>
+              </div>
+            `;
+            activeListContainer.appendChild(itemCard);
+          } else {
+            deliveredCount++;
+          }
+        });
+      });
+
+      if (activeCount === 0) {
+        activeListContainer.innerHTML = `<p class="text-xs text-stone-500 py-4 text-center">No active orders right now.</p>`;
+      }
+
+      document.getElementById('stat-active-count').innerText = activeCount;
+      document.getElementById('stat-total-due').innerText = `${appConfig.currSymbol} ${totalDue.toLocaleString()}`;
+      document.getElementById('stat-delivered-count').innerText = deliveredCount;
+    }
+
+    function renderHistory() {
+      filterCustomerHistory();
+    }
+
+    function filterCustomerHistory() {
+      const query = (document.getElementById('history-search-input').value || '').toLowerCase();
+      const container = document.getElementById('history-results-list');
+      container.innerHTML = '';
+
+      const filtered = customerDatabase.filter(c => 
+        c.name.toLowerCase().includes(query) || c.phone.toLowerCase().includes(query)
+      );
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p class="text-xs text-stone-500 py-6 text-center">No customer record found.</p>`;
+        return;
+      }
+
+      filtered.forEach(cust => {
+        const custCard = document.createElement('div');
+        custCard.className = "p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-4";
+
+        let purchasesHTML = cust.purchases.map(p => `
+          <div class="p-3 rounded-xl bg-neutral-950 border border-neutral-800 text-xs space-y-2">
+            <div class="flex justify-between items-center border-b border-neutral-800 pb-2">
+              <span class="font-bold text-amber-400">${p.item}</span>
+              <span class="text-stone-400">${p.date} | <span class="${p.status === 'Delivered' ? 'text-emerald-400' : 'text-amber-400'}">${p.status}</span></span>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[11px] text-stone-300">
+              <div>OD: ${p.rx.odSph || '-'} / ${p.rx.odCyl || '-'} x ${p.rx.odAxis || '-'}</div>
+              <div>OS: ${p.rx.osSph || '-'} / ${p.rx.osCyl || '-'} x ${p.rx.osAxis || '-'}</div>
+              <div>PD: ${p.rx.pd || '-'}</div>
+              <div>Doctor: ${p.rx.doctor || 'N/A'}</div>
+            </div>
+            <div class="text-right text-stone-400 text-[11px] pt-1 border-t border-neutral-900">
+              Total: ${appConfig.currSymbol} ${p.total} | Paid: ${appConfig.currSymbol} ${p.paid} | Due: <span class="text-amber-400 font-bold">${appConfig.currSymbol} ${Math.max(0, p.total - p.paid)}</span>
+            </div>
+          </div>
+        `).join('');
+
+        custCard.innerHTML = `
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="flex items-center gap-4">
+              ${cust.photo ? `<img src="${cust.photo}" class="w-12 h-12 rounded-full object-cover border gold-border">` : `<div class="w-12 h-12 rounded-full bg-neutral-800 border gold-border flex items-center justify-center font-bold text-amber-400 text-sm">${cust.name.charAt(0)}</div>`}
+              <div>
+                <h4 class="font-bold text-stone-100">${cust.name}</h4>
+                <p class="text-xs text-stone-400">Mobile: ${cust.phone} ${cust.email ? `| ${cust.email}` : ''}</p>
+                <p class="text-[11px] text-stone-500">${cust.gender || ''} ${cust.age ? `| Age: ${cust.age}` : ''} ${cust.address ? `| Address: ${cust.address}` : ''}</p>
+              </div>
+            </div>
+            <button onclick="prepareNewPurchaseForCustomer(${cust.id})" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 text-neutral-950 font-bold text-xs uppercase">
+              + New Order
+            </button>
+          </div>
+          <div class="space-y-2 pt-2">
+            <h5 class="text-[10px] uppercase font-bold text-stone-400 tracking-wider">Purchase & Prescription History</h5>
+            ${purchasesHTML}
+          </div>
+        `;
+        container.appendChild(custCard);
+      });
+    }
+  </script>
