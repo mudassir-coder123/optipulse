@@ -159,7 +159,7 @@
       <div class="flex gap-6 overflow-x-auto">
         <button id="tab-dashboard" onclick="switchAppTab('dashboard')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold whitespace-nowrap">Dashboard</button>
         <button id="tab-new-customer" onclick="switchAppTab('new-customer')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">+ New Order</button>
-        <button id="tab-history" onclick="switchAppTab('history')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">Customer Database</button>
+        <button id="tab-history" onclick="switchAppTab('history')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">Customer Database & History</button>
         <button id="tab-account" onclick="switchAppTab('account')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">Profile & Settings</button>
       </div>
     </div>
@@ -202,7 +202,7 @@
           <!-- Primary Account Holder Info -->
           <div class="space-y-2">
             <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Primary Account Holder Info</h4>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label id="lbl-cust-name" class="block text-xs font-semibold text-stone-400 mb-1">Primary Customer Name *</label>
                 <input id="cust-name" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
@@ -250,7 +250,7 @@
               </div>
 
               <div id="family-name-box" class="hidden">
-                <label class="block text-xs font-semibold text-stone-400 mb-1">Family Member Name</label>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Family Member Name *</label>
                 <input id="family-member-name" type="text" placeholder="e.g. Ali / Sara" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
               </div>
 
@@ -265,7 +265,7 @@
           <div class="border-t border-neutral-800 pt-6 space-y-4">
             <div class="flex justify-between items-center">
               <h4 id="hdr-rx-details" class="text-sm font-bold text-amber-400 uppercase tracking-wider">Prescription Details (Rx / Eyesight Numbers)</h4>
-              <span class="text-[11px] text-stone-400">Updates here are saved to the patient profile</span>
+              <span class="text-[11px] text-stone-400">Prescriptions saved per person in customer ID</span>
             </div>
             
             <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -283,7 +283,7 @@
             </div>
           </div>
 
-          <!-- Billing Section -->
+          <!-- Order & Billing Section -->
           <div class="border-t border-neutral-800 pt-6 space-y-4">
             <h4 id="hdr-order-billing" class="text-sm font-bold text-amber-400 uppercase tracking-wider">Order & Billing Details</h4>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -318,9 +318,9 @@
         </form>
       </div>
 
-      <!-- TAB 3: CUSTOMER HISTORY -->
+      <!-- TAB 3: CUSTOMER HISTORY & COMPLETE DATABASE -->
       <div id="view-tab-history" class="hidden space-y-4">
-        <input id="history-search-input" type="text" onkeyup="filterCustomerHistory()" placeholder="Search by patient name, family member, or phone number..." class="w-full px-4 py-3 rounded-2xl bg-neutral-900 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+        <input id="history-search-input" type="text" onkeyup="filterCustomerHistory()" placeholder="Search by primary customer, family member name, or phone..." class="w-full px-4 py-3 rounded-2xl bg-neutral-900 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
         <div id="history-results-list" class="space-y-4">
           <!-- Filtered records render here -->
         </div>
@@ -360,25 +360,23 @@
           </form>
         </div>
 
-        <!-- Danger Zone Data Clearing Controls -->
+        <!-- Danger Zone Controls -->
         <div class="bg-neutral-900 border border-red-900/30 rounded-2xl p-6 md:p-8 space-y-4">
           <h3 class="text-lg font-bold text-red-400">Database & Dashboard Clear Options</h3>
-          <p class="text-xs text-stone-400">Manage data retention for your account. Perform backups if necessary before clearing.</p>
+          <p class="text-xs text-stone-400">Manage data retention for your account.</p>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-            <!-- Clear Dashboard Orders Only -->
             <div class="p-4 rounded-xl bg-neutral-950 border border-neutral-800 space-y-3">
-              <h4 class="text-sm font-bold text-stone-200">1. Clear Dashboard Data Only</h4>
-              <p class="text-xs text-stone-400">Deletes all pending/active orders & customer database records, but keeps your login profile intact.</p>
+              <h4 class="text-sm font-bold text-stone-200">1. Clear Orders Data Only</h4>
+              <p class="text-xs text-stone-400">Deletes active orders & customer history, but keeps shop profile settings.</p>
               <button onclick="clearDashboardDataOnly()" class="w-full py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold text-xs uppercase tracking-wider">
-                Clear Dashboard Data Only
+                Clear Orders Data Only
               </button>
             </div>
 
-            <!-- Clear Entire Account Database -->
             <div class="p-4 rounded-xl bg-neutral-950 border border-neutral-800 space-y-3">
-              <h4 class="text-sm font-bold text-red-400">2. Wipe Entire Database & App Data</h4>
-              <p class="text-xs text-stone-400">Permanently clears all customers, prescriptions, settings, and profile details associated with this Gmail.</p>
+              <h4 class="text-sm font-bold text-red-400">2. Wipe Entire Database</h4>
+              <p class="text-xs text-stone-400">Permanently clears all customers, family members, prescriptions, and settings.</p>
               <button onclick="clearEntireAccountDatabase()" class="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider">
                 Wipe Entire Database
               </button>
@@ -404,13 +402,13 @@
 
     const translations = {
       en: {
-        welcomeSub: "Optical Practice & Customer Management System", enterPortal: "Enter System Portal", settingsTitle: "Preferences", settingsSubtitle: "Select your preferred language and local currency.", selectLang: "Language", selectCurr: "Currency", btnContinueAuth: "Continue to Authentication", authTitle: "Shop Authentication", authSubtitle: "Enter your details to log in or register your optical store.", lblShopName: "Shop / Practice Name", lblMobile: "Mobile Contact", lblEmail: "Owner Email", lblAddress: "Shop Address", btnSendOtp: "Send Email Verification OTP", lblEnterOtp: "Enter 6-Digit OTP Code", btnVerifyOtp: "Verify & Enter Portal", tabDashboard: "Dashboard", tabNewOrder: "+ New Order", tabDatabase: "Customer Database", tabAccount: "Profile & Settings", lblActiveOrders: "Active Pending Orders", lblOutstandingDues: "Total Outstanding Dues", lblCompletedOrders: "Completed Orders", hdrCurrentActive: "Current Active Orders", hdrPatientEntry: "Patient Prescription & Order Entry", lblCustName: "Customer Full Name *", lblCustPhone: "Phone / Mobile *", lblCustEmail: "Email (Optional)", lblCustAge: "Age", lblCustAddress: "Address", hdrRxDetails: "Prescription Details (Rx)", lblPrescribedBy: "Prescribed By", hdrOrderBilling: "Order & Billing Details", lblItemDesc: "Item Description", lblTotalAmount: "Total Amount", lblAmountPaid: "Amount Paid", lblOrderStatus: "Status", lblRemainingBal: "Remaining Balance", btnFormCancel: "Cancel", btnFormSave: "Save Customer Record", searchPlaceholder: "Search by patient name, family member, or phone number...", btnMarkDelivered: "Mark Delivered", btnEditRecord: "Edit Record", btnLogout: "Logout"
+        welcomeSub: "Optical Practice & Customer Management System", enterPortal: "Enter System Portal", settingsTitle: "Preferences", settingsSubtitle: "Select your preferred language and local currency.", selectLang: "Language", selectCurr: "Currency", btnContinueAuth: "Continue to Authentication", authTitle: "Shop Authentication", authSubtitle: "Enter your details to log in or register your optical store.", lblShopName: "Shop / Practice Name", lblMobile: "Mobile Contact", lblEmail: "Owner Email", lblAddress: "Shop Address", btnSendOtp: "Send Email Verification OTP", lblEnterOtp: "Enter 6-Digit OTP Code", btnVerifyOtp: "Verify & Enter Portal", tabDashboard: "Dashboard", tabNewOrder: "+ New Order", tabDatabase: "Customer Database & History", tabAccount: "Profile & Settings", lblActiveOrders: "Active Pending Orders", lblOutstandingDues: "Total Outstanding Dues", lblCompletedOrders: "Completed Orders", hdrCurrentActive: "Current Active Orders", hdrPatientEntry: "Patient Prescription & Order Entry", lblCustName: "Customer Full Name *", lblCustPhone: "Phone / Mobile *", lblCustEmail: "Email (Optional)", lblCustAge: "Age", lblCustAddress: "Address", hdrRxDetails: "Prescription Details (Rx)", lblPrescribedBy: "Prescribed By", hdrOrderBilling: "Order & Billing Details", lblItemDesc: "Item Description", lblTotalAmount: "Total Amount", lblAmountPaid: "Amount Paid", lblOrderStatus: "Status", lblRemainingBal: "Remaining Balance", btnFormCancel: "Cancel", btnFormSave: "Save Customer Record", searchPlaceholder: "Search by primary customer, family member name, or phone...", btnMarkDelivered: "Mark Delivered", btnEditRecord: "Edit Record", btnLogout: "Logout"
       },
       ur: {
-        welcomeSub: "آپٹیکل پریکٹس اور کسٹمر منیجمنٹ سسٹم", enterPortal: "سسٹم پورٹل میں داخل ہوں", settingsTitle: "ترجیحات", settingsSubtitle: "اپنی پسندیدہ زبان اور مقامی کرنسی کا انتخاب کریں۔", selectLang: "زبان", selectCurr: "کرنسی", btnContinueAuth: "آتھینٹیکیشن پر آگے بڑھیں", authTitle: "دوکان کی تصدیق", authSubtitle: "لاگ ان کرنے یا اپنی آپٹیکل شاپ کو رجسٹر کرنے کے لیے تفصیلات درج کریں۔", lblShopName: "دوکان / پریکٹس کا نام", lblMobile: "موبائل نمبر", lblEmail: "آنر کا ای میل", lblAddress: "دوکان کا پتہ", btnSendOtp: "ای میل تصدیق کا OTP بھیجیں", lblEnterOtp: "6 ہندسوں کا OTP کوڈ درج کریں", btnVerifyOtp: "تصدیق کریں اور پورٹل میں داخل ہوں", tabDashboard: "ڈیش بورڈ", tabNewOrder: "+ نیا آرڈر", tabDatabase: "کسٹمر ڈیٹا بیس", tabAccount: "پروفائل اور ترتیبات", lblActiveOrders: "فعال زیر التوا آرڈرز", lblOutstandingDues: "کل واجب الادا رقم", lblCompletedOrders: "مکمل شدہ آرڈرز", hdrCurrentActive: "موجودہ فعال آرڈرز", hdrPatientEntry: "مریض کا نسخہ اور آرڈر کا اندراج", lblCustName: "گاہک کا پورا نام *", lblCustPhone: "فون / موبائل *", lblCustEmail: "ای میل (اختیاری)", lblCustAge: "عمر", lblCustAddress: "پتہ", hdrRxDetails: "نسخے کی تفصیلات (Rx)", lblPrescribedBy: "تجویز کردہ از ڈاکٹر", hdrOrderBilling: "آرڈر اور بلنگ کی تفصیلات", lblItemDesc: "آئٹم کی تفصیل", lblTotalAmount: "کل رقم", lblAmountPaid: "ادا شدہ رقم", lblOrderStatus: "حیثیت (سٹیٹس)", lblRemainingBal: "بقیہ رقم", btnFormCancel: "منسوخ کریں", btnFormSave: "کسٹمر ریکارڈ محفوظ کریں", searchPlaceholder: "مریض کا نام، فیملی ممبر یا فون نمبر سے تلاش کریں...", btnMarkDelivered: "ڈیلیور نشان زد کریں", btnEditRecord: "ترمیم کریں", btnLogout: "لاگ آؤٹ"
+        welcomeSub: "آپٹیکل پریکٹس اور کسٹمر منیجمنٹ سسٹم", enterPortal: "سسٹم پورٹل میں داخل ہوں", settingsTitle: "ترجیحات", settingsSubtitle: "اپنی پسندیدہ زبان اور مقامی کرنسی کا انتخاب کریں۔", selectLang: "زبان", selectCurr: "کرنسی", btnContinueAuth: "آتھینٹیکیشن پر آگے بڑھیں", authTitle: "دوکان کی تصدیق", authSubtitle: "لاگ ان کرنے یا اپنی آپٹیکل شاپ کو رجسٹر کرنے کے لیے تفصیلات درج کریں۔", lblShopName: "دوکان / پریکٹس کا نام", lblMobile: "موبائل نمبر", lblEmail: "آنر کا ای میل", lblAddress: "دوکان کا پتہ", btnSendOtp: "ای میل تصدیق کا OTP بھیجیں", lblEnterOtp: "6 ہندسوں کا OTP کوڈ درج کریں", btnVerifyOtp: "تصدیق کریں اور پورٹل میں داخل ہوں", tabDashboard: "ڈیش بورڈ", tabNewOrder: "+ نیا آرڈر", tabDatabase: "کسٹمر ڈیٹا بیس اور ہسٹری", tabAccount: "پروفائل اور ترتیبات", lblActiveOrders: "فعال زیر التوا آرڈرز", lblOutstandingDues: "کل واجب الادا رقم", lblCompletedOrders: "مکمل شدہ آرڈرز", hdrCurrentActive: "موجودہ فعال آرڈرز", hdrPatientEntry: "مریض کا نسخہ اور آرڈر کا اندراج", lblCustName: "گاہک کا پورا نام *", lblCustPhone: "فون / موبائل *", lblCustEmail: "ای میل (اختیاری)", lblCustAge: "عمر", lblCustAddress: "پتہ", hdrRxDetails: "نسخے کی تفصیلات (Rx)", lblPrescribedBy: "تجویز کردہ از ڈاکٹر", hdrOrderBilling: "آرڈر اور بلنگ کی تفصیلات", lblItemDesc: "آئٹم کی تفصیل", lblTotalAmount: "کل رقم", lblAmountPaid: "ادا شدہ رقم", lblOrderStatus: "حیثیت (سٹیٹس)", lblRemainingBal: "بقیہ رقم", btnFormCancel: "منسوخ کریں", btnFormSave: "کسٹمر ریکارڈ محفوظ کریں", searchPlaceholder: "گاہک کا نام، فیملی ممبر یا فون نمبر سے تلاش کریں...", btnMarkDelivered: "ڈیلیور نشان زد کریں", btnEditRecord: "ترمیم کریں", btnLogout: "لاگ آؤٹ"
       },
       ar: {
-        welcomeSub: "نظام إدارة الممارسة البصرية والعملاء", enterPortal: "الدخول إلى البوابة", settingsTitle: "التفضيلات", settingsSubtitle: "حدد لغتك المفضلة والعملة المحلية.", selectLang: "اللغة", selectCurr: "العملة", btnContinueAuth: "الانتقال إلى المصادقة", authTitle: "مصادقة المتجر", authSubtitle: "أدخل بياناتك لتسجيل الدخول أو تسجيل متجر البصريات الخاص بك.", lblShopName: "اسم المتجر / العيادة", lblMobile: "رقم الهاتف المحمول", lblEmail: "البريد الإلكتروني للمالك", lblAddress: "عنوان المتجر", btnSendOtp: "إرسال رمز التحقق (OTP) إلى البريد", lblEnterOtp: "أدخل رمز OTP المكون من 6 أرقام", btnVerifyOtp: "التحقق والدخول إلى البوابة", tabDashboard: "لوحة التحكم", tabNewOrder: "+ طلب جديد", tabDatabase: "قاعدة بيانات العملاء", tabAccount: "الملف الشخصي والإعدادات", lblActiveOrders: "الطلبات النشطة المعلقة", lblOutstandingDues: "إجمالي المبالغ المستحقة", lblCompletedOrders: "الطلبات المكتملة", hdrCurrentActive: "الطلبات النشطة الحالية", hdrPatientEntry: "وصفة المريض وإدخال الطلب", lblCustName: "اسم العميل الكامل *", lblCustPhone: "الهاتف / المحمول *", lblCustEmail: "البريد الإلكتروني (اختياري)", lblCustAge: "العمر", lblCustAddress: "العنوان", hdrRxDetails: "تفاصيل الوصفة الطبية (Rx)", lblPrescribedBy: "تم الوصف بواسطة الطبيب", hdrOrderBilling: "تفاصيل الطلب والفلترة", lblItemDesc: "وصف العنصر", lblTotalAmount: "المبلغ الإجمالي", lblAmountPaid: "المبلغ المدفوع", lblOrderStatus: "الحالة", lblRemainingBal: "الرصيد المتبقي", btnFormCancel: "إلغاء", btnFormSave: "حفظ سجل العميل", searchPlaceholder: "البحث باسم المريض أو الفرد الأسري...", btnMarkDelivered: "تحديد كتم التسليم", btnEditRecord: "تعديل السجل", btnLogout: "تسجيل الخروج"
+        welcomeSub: "نظام إدارة الممارسة البصرية والعملاء", enterPortal: "الدخول إلى البوابة", settingsTitle: "التفضيلات", settingsSubtitle: "حدد لغتك المفضلة والعملة المحلية.", selectLang: "اللغة", selectCurr: "العملة", btnContinueAuth: "الانتقال إلى المصادقة", authTitle: "مصادقة المتجر", authSubtitle: "أدخل بياناتك لتسجيل الدخول أو تسجيل متجر البصريات الخاص بك.", lblShopName: "اسم المتجر / العيادة", lblMobile: "رقم الهاتف المحمول", lblEmail: "البريد الإلكتروني للمالك", lblAddress: "عنوان المتجر", btnSendOtp: "إرسال رمز التحقق (OTP) إلى البريد", lblEnterOtp: "أدخل رمز OTP المكون من 6 أرقام", btnVerifyOtp: "التحقق والدخول إلى البوابة", tabDashboard: "لوحة التحكم", tabNewOrder: "+ طلب جديد", tabDatabase: "قاعدة بيانات العملاء والسجل", tabAccount: "الملف الشخصي والإعدادات", lblActiveOrders: "الطلبات النشطة المعلقة", lblOutstandingDues: "إجمالي المبالغ المستحقة", lblCompletedOrders: "الطلبات المكتملة", hdrCurrentActive: "الطلبات النشطة الحالية", hdrPatientEntry: "وصفة المريض وإدخال الطلب", lblCustName: "اسم العميل الكامل *", lblCustPhone: "الهاتف / المحمول *", lblCustEmail: "البريد الإلكتروني (اختياري)", lblCustAge: "العمر", lblCustAddress: "العنوان", hdrRxDetails: "تفاصيل الوصفة الطبية (Rx)", lblPrescribedBy: "تم الوصف بواسطة الطبيب", hdrOrderBilling: "تفاصيل الطلب والفلترة", lblItemDesc: "وصف العنصر", lblTotalAmount: "المبلغ الإجمالي", lblAmountPaid: "المبلغ المدفوع", lblOrderStatus: "الحالة", lblRemainingBal: "الرصيد المتبقي", btnFormCancel: "إلغاء", btnFormSave: "حفظ سجل العميل", searchPlaceholder: "البحث باسم العميل أو أفراد الأسرة...", btnMarkDelivered: "تحديد كتم التسليم", btnEditRecord: "تعديل السجل", btnLogout: "تسجيل الخروج"
       }
     };
 
@@ -491,16 +489,16 @@
     }
 
     function clearDashboardDataOnly() {
-      if (confirm("Are you sure you want to clear all dashboard and customer order data? Your account profile will remain saved.")) {
+      if (confirm("Are you sure you want to clear all order records? Profile settings will stay.")) {
         customerDatabase = [];
         persistCustomers();
         renderDashboard();
-        alert("Dashboard and order data cleared successfully.");
+        alert("Customer orders cleared successfully.");
       }
     }
 
     function clearEntireAccountDatabase() {
-      if (confirm("WARNING: This will permanently delete ALL data, orders, and shop settings for this account. Continue?")) {
+      if (confirm("WARNING: This will permanently delete ALL customer IDs, family records, prescriptions, and settings for this account. Continue?")) {
         localStorage.removeItem(getUserStorageKey('config'));
         localStorage.removeItem(getUserStorageKey('customers'));
         alert("Entire account database wiped successfully.");
@@ -819,59 +817,83 @@
       const familyRel = document.getElementById('family-relation').value;
       const familyName = document.getElementById('family-member-name').value.trim();
 
-      const patientDisplayName = forType === 'Family Member' && familyName ? `${familyName} (${familyRel})` : nameEl.value;
+      const patientDisplayName = forType === 'Family Member' && familyName ? `${familyName} (${familyRel})` : `${nameEl.value} (Self)`;
+
+      const rxData = {
+        odSph: document.getElementById('rx-od-sph').value,
+        odCyl: document.getElementById('rx-od-cyl').value,
+        odAxis: document.getElementById('rx-od-axis').value,
+        odAdd: document.getElementById('rx-od-add').value,
+        osSph: document.getElementById('rx-os-sph').value,
+        osCyl: document.getElementById('rx-os-cyl').value,
+        osAxis: document.getElementById('rx-os-axis').value,
+        osAdd: document.getElementById('rx-os-add').value,
+        pd: document.getElementById('rx-pd').value,
+        doctor: document.getElementById('rx-doctor').value,
+        updatedDate: new Date().toISOString().split('T')[0]
+      };
 
       const purchaseData = {
         orderId: existingOrderId ? Number(existingOrderId) : Date.now(),
         date: new Date().toISOString().split('T')[0],
         forType: forType,
         familyRelation: familyRel,
-        patientName: familyName || nameEl.value,
+        patientName: forType === 'Family Member' ? familyName : nameEl.value,
         patientDisplayName: patientDisplayName,
         patientAge: document.getElementById('cust-age').value,
         item: document.getElementById('order-item').value || 'Eyewear Frame & Lenses',
         total: total,
         paid: paid,
         status: document.getElementById('order-status').value,
-        rx: {
-          odSph: document.getElementById('rx-od-sph').value,
-          odCyl: document.getElementById('rx-od-cyl').value,
-          odAxis: document.getElementById('rx-od-axis').value,
-          odAdd: document.getElementById('rx-od-add').value,
-          osSph: document.getElementById('rx-os-sph').value,
-          osCyl: document.getElementById('rx-os-cyl').value,
-          osAxis: document.getElementById('rx-os-axis').value,
-          osAdd: document.getElementById('rx-os-add').value,
-          pd: document.getElementById('rx-pd').value,
-          doctor: document.getElementById('rx-doctor').value
-        }
+        rx: rxData
       };
 
+      let cust = null;
       if (existingCustId) {
-        const cust = customerDatabase.find(c => c.id === Number(existingCustId));
-        if (cust) {
-          cust.name = nameEl.value;
-          cust.phone = phoneEl.value;
-          cust.email = document.getElementById('cust-email').value;
-          cust.address = document.getElementById('cust-address').value;
+        cust = customerDatabase.find(c => c.id === Number(existingCustId));
+      }
 
-          if (existingOrderId) {
-            const orderIndex = cust.purchases.findIndex(p => p.orderId === Number(existingOrderId));
-            if (orderIndex !== -1) cust.purchases[orderIndex] = purchaseData;
-            else cust.purchases.push(purchaseData);
-          } else {
-            cust.purchases.push(purchaseData);
-          }
-        }
-      } else {
-        customerDatabase.push({
+      if (!cust) {
+        cust = {
           id: Date.now(),
           name: nameEl.value,
           phone: phoneEl.value,
           email: document.getElementById('cust-email').value,
           address: document.getElementById('cust-address').value,
-          purchases: [purchaseData]
-        });
+          familyMembers: [],
+          purchases: []
+        };
+        customerDatabase.push(cust);
+      } else {
+        cust.name = nameEl.value;
+        cust.phone = phoneEl.value;
+        cust.email = document.getElementById('cust-email').value;
+        cust.address = document.getElementById('cust-address').value;
+      }
+
+      if (!cust.familyMembers) cust.familyMembers = [];
+      if (forType === 'Family Member' && familyName) {
+        let fam = cust.familyMembers.find(f => f.name.toLowerCase() === familyName.toLowerCase());
+        if (!fam) {
+          cust.familyMembers.push({
+            name: familyName,
+            relation: familyRel,
+            rx: rxData
+          });
+        } else {
+          fam.rx = rxData;
+          fam.relation = familyRel;
+        }
+      } else {
+        cust.selfRx = rxData;
+      }
+
+      if (existingOrderId) {
+        const orderIndex = cust.purchases.findIndex(p => p.orderId === Number(existingOrderId));
+        if (orderIndex !== -1) cust.purchases[orderIndex] = purchaseData;
+        else cust.purchases.push(purchaseData);
+      } else {
+        cust.purchases.push(purchaseData);
       }
 
       persistCustomers();
@@ -917,7 +939,7 @@
             totalDue += due;
 
             const isFamily = purchase.forType === 'Family Member';
-            const displayTag = isFamily ? `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[10px] uppercase ml-1">${purchase.patientDisplayName}</span>` : '';
+            const displayTag = `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[10px] uppercase ml-1">${purchase.patientDisplayName}</span>`;
 
             const itemCard = document.createElement('div');
             itemCard.className = "flex flex-col md:flex-row justify-between items-start md:items-center p-4 rounded-xl bg-neutral-900 border border-neutral-800 gap-4";
@@ -971,6 +993,7 @@
       const filtered = customerDatabase.filter(c => 
         c.name.toLowerCase().includes(query) || 
         c.phone.toLowerCase().includes(query) ||
+        (c.familyMembers && c.familyMembers.some(f => f.name.toLowerCase().includes(query))) ||
         c.purchases.some(p => p.patientName && p.patientName.toLowerCase().includes(query))
       );
 
@@ -983,37 +1006,45 @@
         const custCard = document.createElement('div');
         custCard.className = "p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-4";
         
-        let purchasesHtml = cust.purchases.map(p => `
+        let familyPills = '';
+        if (cust.familyMembers && cust.familyMembers.length > 0) {
+          familyPills = cust.familyMembers.map(f => `<span class="px-2 py-1 rounded-lg bg-neutral-800 text-amber-400 text-xs font-semibold border border-neutral-700">${f.name} (${f.relation})</span>`).join(' ');
+        }
+
+        let purchasesHtml = cust.purchases.map(p => {
+          const due = Math.max(0, p.total - p.paid);
+          return `
           <div class="border-t border-neutral-800 pt-3 mt-3 space-y-2 text-xs">
             <div class="flex justify-between items-center">
               <div>
-                <p class="font-bold text-amber-400">${p.item} (${p.date})</p>
-                <p class="text-[11px] text-stone-300 font-medium">Patient: <span class="text-stone-100 font-semibold">${p.patientDisplayName || cust.name}</span> ${p.patientAge ? '| Age: ' + p.patientAge : ''}</p>
+                <p class="font-bold text-amber-400">${p.item} <span class="text-stone-400 font-normal">(${p.date})</span></p>
+                <p class="text-[11px] text-stone-300 font-medium">Recipient: <span class="text-stone-100 font-semibold">${p.patientDisplayName || cust.name}</span> ${p.patientAge ? '| Age: ' + p.patientAge : ''}</p>
               </div>
               <div class="text-right">
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.status === 'Delivered' ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-400'}">${p.status}</span>
-                <p class="text-stone-300 font-semibold mt-1">${appConfig.currSymbol} ${p.total.toLocaleString()}</p>
+                <p class="text-stone-300 font-semibold mt-1">Total: ${appConfig.currSymbol} ${p.total.toLocaleString()} | Paid: ${appConfig.currSymbol} ${p.paid.toLocaleString()} | <span class="text-amber-400">Due: ${appConfig.currSymbol} ${due.toLocaleString()}</span></p>
               </div>
             </div>
-            <div class="bg-neutral-950 p-2.5 rounded-xl border border-neutral-800 font-mono text-[11px] text-stone-300 grid grid-cols-2 gap-2">
+            <div class="bg-neutral-950 p-2.5 rounded-xl border border-neutral-800 font-mono text-[11px] text-stone-300 grid grid-cols-1 md:grid-cols-2 gap-2">
               <div>OD (Right): SPH ${p.rx.odSph || '-'}, CYL ${p.rx.odCyl || '-'}, AXIS ${p.rx.odAxis || '-'}, ADD ${p.rx.odAdd || '-'}</div>
               <div>OS (Left): SPH ${p.rx.osSph || '-'}, CYL ${p.rx.osCyl || '-'}, AXIS ${p.rx.osAxis || '-'}, ADD ${p.rx.osAdd || '-'}</div>
             </div>
           </div>
-        `).join('');
+        `}).join('');
 
         custCard.innerHTML = `
-          <div class="flex justify-between items-start">
+          <div class="flex justify-between items-start flex-wrap gap-3">
             <div>
-              <h4 class="font-bold text-stone-100 text-base">${cust.name} <span class="text-xs font-mono text-amber-400/80">(Primary ID)</span></h4>
+              <h4 class="font-bold text-stone-100 text-base">${cust.name} <span class="text-xs font-mono text-amber-400/80">(Account ID: #${cust.id})</span></h4>
               <p class="text-xs text-stone-400">${cust.phone} ${cust.email ? '| ' + cust.email : ''}</p>
               <p class="text-xs text-stone-500">${cust.address || 'No address provided'}</p>
+              ${familyPills ? `<div class="flex flex-wrap gap-1.5 mt-2"><span class="text-[11px] text-stone-400 font-medium">Saved Family Profiles:</span> ${familyPills}</div>` : ''}
             </div>
             <button onclick="prepareNewPurchaseForCustomer(${cust.id})" class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-semibold text-xs">
               + New Order for Family/Self
             </button>
           </div>
-          <div>${purchasesHtml}</div>
+          <div class="pt-2"><h5 class="text-xs font-bold uppercase tracking-wider text-stone-400">Order & Prescription History Log</h5>${purchasesHtml}</div>
         `;
         container.appendChild(custCard);
       });
