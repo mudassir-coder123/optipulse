@@ -1,305 +1,825 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="html-root" class="h-full bg-neutral-950 text-stone-100">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OptiPulse - Optical Management System</title>
   
-  <!-- Supabase JS Client library v2 -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
   
+  <!-- Three.js for 3D Background Canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Supabase JS Client library CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    :root {
-      --primary: #0284c7;
-      --primary-hover: #0369a1;
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --text: #0f172a;
-      --border: #e2e8f0;
-      --danger: #ef4444;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 20px; }
-    .container { max-width: 1000px; margin: 0 auto; }
-    
-    header { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 15px 25px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px; }
-    h1 { font-size: 1.5rem; color: var(--primary); }
-    
-    .auth-box, .app-content { background: var(--surface); padding: 25px; border-radius: 8px; border: 1px solid var(--border); }
-    .hidden { display: none !important; }
-    
-    form { display: grid; gap: 15px; margin-top: 15px; }
-    .form-group { display: flex; flex-direction: column; gap: 5px; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-
-    input, select, button { padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.95rem; }
-    button { background: var(--primary); color: white; font-weight: 600; cursor: pointer; border: none; }
-    button:hover { background: var(--primary-hover); }
-    button.secondary { background: #64748b; }
-    button.danger { background: var(--danger); }
-
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
-    th { background-color: var(--bg); }
-
-    .rx-box { background: #f1f5f9; padding: 15px; border-radius: 6px; }
-    .rx-title { font-weight: bold; margin-bottom: 10px; }
-    .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-    .nav-tabs button { background: transparent; color: var(--text); border: 1px solid var(--border); }
-    .nav-tabs button.active { background: var(--primary); color: white; }
+    .gold-border { border-color: #d4af37; }
+    .gold-text { color: #d4af37; }
   </style>
 </head>
-<body>
+<body class="h-full font-sans antialiased bg-neutral-950 text-stone-100 selection:bg-amber-500 selection:text-neutral-950">
 
-<div class="container">
-  <!-- Header -->
-  <header>
-    <h1>OptiPulse</h1>
-    <div id="user-info" class="hidden">
-      Logged in as: <strong id="user-email-display"></strong>
-      <button onclick="handleSignOut()" class="secondary" style="margin-left: 10px; padding: 6px 12px;">Sign Out</button>
-    </div>
-  </header>
-
-  <!-- Step 1: Authentication View -->
-  <div id="auth-section" class="auth-box">
-    <h2>Login / Verification</h2>
-    <p style="color: #64748b; margin-top: 5px;">Enter your Gmail to receive a 6-digit OTP code.</p>
+  <!-- ================= STEP 1: WELCOME / INITIAL LOADING SCREEN ================= -->
+  <div id="step-welcome" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 bg-neutral-950">
+    <div id="login-canvas-container" class="absolute inset-0 opacity-40 pointer-events-none"></div>
     
-    <!-- Email Step -->
-    <div id="email-step">
-      <div class="form-group" style="margin-top: 15px;">
-        <label>Gmail Address</label>
-        <input type="email" id="auth-email" placeholder="your.name@gmail.com" required>
-      </div>
-      <button onclick="handleSendOTP()" style="margin-top: 10px;">Send 6-Digit OTP</button>
-    </div>
+    <div class="relative z-10 text-center max-w-md w-full space-y-6">
+      <h1 class="text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600">
+        OPTIPULSE
+      </h1>
+      <p id="welcome-subtext" class="text-sm text-stone-400">Optical Practice & Customer Management System</p>
 
-    <!-- OTP Step -->
-    <div id="otp-step" class="hidden">
-      <div class="form-group" style="margin-top: 15px;">
-        <label>Enter 6-Digit OTP Code</label>
-        <input type="text" id="auth-otp" maxlength="6" placeholder="123456" pattern="\d{6}">
+      <div id="welcome-loading-box" class="w-full bg-neutral-900 h-2 rounded-full overflow-hidden border border-neutral-800">
+        <div id="loading-bar" class="bg-amber-500 h-full w-0 transition-all duration-300"></div>
       </div>
-      <div style="display: flex; gap: 10px; margin-top: 10px;">
-        <button onclick="handleVerifyOTP()">Verify Code & Log In</button>
-        <button onclick="resetAuthView()" class="secondary">Back</button>
+
+      <button id="btn-welcome-continue" onclick="nextStep('welcome', 'settings')" class="hidden w-full py-3.5 px-6 rounded-xl font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-neutral-950 shadow-lg shadow-amber-500/10 transition-all">
+        Enter System Portal
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= STEP 2: LANGUAGE & CURRENCY SETTINGS ================= -->
+  <div id="step-settings" class="hidden min-h-screen flex items-center justify-center p-6 bg-neutral-950">
+    <div class="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl">
+      <div>
+        <h2 id="settings-title" class="text-2xl font-bold text-stone-100">Preferences</h2>
+        <p id="settings-subtitle" class="text-xs text-stone-400 mt-1">Select your preferred language and local currency.</p>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label id="lbl-select-lang" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Language</label>
+          <select id="select-lang" onchange="changeLanguage(this.value)" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+            <option value="en">English</option>
+            <option value="ur">اردو (Urdu)</option>
+            <option value="ar">العربية (Arabic)</option>
+          </select>
+        </div>
+
+        <div>
+          <label id="lbl-select-curr" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Currency</label>
+          <select id="select-curr" onchange="changeCurrency(this.value)" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+            <option value="PKR">PKR - Pakistani Rupee</option>
+            <option value="USD">USD - US Dollar ($)</option>
+            <option value="INR">INR - Indian Rupee (₹)</option>
+            <option value="OMR">OMR - Omani Rial</option>
+            <option value="SAR">SAR - Saudi Riyal</option>
+            <option value="QAR">QAR - Qatari Riyal</option>
+            <option value="AED">AED - UAE Dirham</option>
+          </select>
+        </div>
+
+        <button id="btn-settings-continue" onclick="nextStep('settings', 'owner-login')" class="w-full py-3.5 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-neutral-950 transition-all text-sm uppercase tracking-wider mt-4">
+          Continue to Authentication
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Step 2: Main Application View -->
-  <div id="app-section" class="app-content hidden">
-    <div class="nav-tabs">
-      <button id="tab-dashboard-btn" class="active" onclick="switchTab('dashboard')">Customer Directory</button>
-      <button id="tab-form-btn" onclick="switchTab('form')">+ New Customer Record</button>
-    </div>
+  <!-- ================= STEP 3: OWNER LOGIN / REGISTER (OTP) ================= -->
+  <div id="step-owner-login" class="hidden min-h-screen flex items-center justify-center p-6 bg-neutral-950">
+    <div class="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl">
+      <div>
+        <h2 id="auth-title" class="text-2xl font-bold text-stone-100">Shop Authentication</h2>
+        <p id="auth-subtitle" class="text-xs text-stone-400 mt-1">Enter your details to log in or register your optical store.</p>
+      </div>
 
-    <!-- Tab 1: Dashboard / Orders List -->
-    <div id="tab-dashboard">
-      <h3>Customer Orders</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>Customer Name</th>
-            <th>Phone</th>
-            <th>Item</th>
-            <th>Total ($)</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="orders-table-body">
-          <tr><td colspan="6" style="text-align: center;">Loading data from Supabase...</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Tab 2: New/Edit Customer Form -->
-    <div id="tab-form" class="hidden">
-      <h3 id="form-title">New Customer Entry</h3>
-      <form onsubmit="handleSaveCustomer(event)" id="customer-form">
-        <input type="hidden" id="editing-order-id">
-        
-        <div class="grid-2">
-          <div class="form-group">
-            <label>Customer Name *</label>
-            <input type="text" id="cust-name" required>
-          </div>
-          <div class="form-group">
-            <label>Phone Number *</label>
-            <input type="tel" id="cust-phone" required>
-          </div>
+      <form onsubmit="handleOwnerRegister(event)" class="space-y-4">
+        <div>
+          <label id="lbl-shop-name" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Shop / Practice Name</label>
+          <input id="owner-shop" type="text" required placeholder="e.g. Vision Care Optics" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+        </div>
+        <div>
+          <label id="lbl-mobile" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Mobile Contact</label>
+          <input id="owner-mobile" type="text" required placeholder="+92 300 1234567" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+        </div>
+        <div>
+          <label id="lbl-email" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Owner Email</label>
+          <input id="owner-email" type="email" required placeholder="owner@optipulse.com" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+        </div>
+        <div>
+          <label id="lbl-address" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Shop Address</label>
+          <input id="owner-address" type="text" required placeholder="Shop #12, Commercial Area" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
         </div>
 
-        <div class="grid-2">
-          <div class="form-group">
-            <label>Customer Email</label>
-            <input type="email" id="cust-email">
-          </div>
-          <div class="form-group">
-            <label>Age</label>
-            <input type="number" id="cust-age">
-          </div>
-        </div>
-
-        <!-- Prescription Section -->
-        <div class="rx-box">
-          <div class="rx-title">Eye Prescription (Rx)</div>
-          <div style="margin-bottom: 8px; font-weight: 500;">Right Eye (OD)</div>
-          <div class="grid-4">
-            <input type="text" id="rx-od-sph" placeholder="SPH">
-            <input type="text" id="rx-od-cyl" placeholder="CYL">
-            <input type="text" id="rx-od-axis" placeholder="AXIS">
-            <input type="text" id="rx-od-add" placeholder="ADD">
-          </div>
-          <div style="margin: 10px 0 8px; font-weight: 500;">Left Eye (OS)</div>
-          <div class="grid-4">
-            <input type="text" id="rx-os-sph" placeholder="SPH">
-            <input type="text" id="rx-os-cyl" placeholder="CYL">
-            <input type="text" id="rx-os-axis" placeholder="AXIS">
-            <input type="text" id="rx-os-add" placeholder="ADD">
-          </div>
-        </div>
-
-        <!-- Billing -->
-        <div class="grid-2">
-          <div class="form-group">
-            <label>Item Description</label>
-            <input type="text" id="order-item" placeholder="Single Vision Lens + Frame" required>
-          </div>
-          <div class="form-group">
-            <label>Total Price ($)</label>
-            <input type="number" step="0.01" id="order-total" required>
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 10px;">
-          <button type="submit">Save Record Permanently to Cloud</button>
-          <button type="button" class="secondary" onclick="switchTab('dashboard')">Cancel</button>
-        </div>
+        <button id="btn-send-otp" type="submit" class="w-full py-3.5 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-neutral-950 transition-all text-sm uppercase tracking-wider">
+          Send Email Verification OTP
+        </button>
       </form>
+
+      <!-- OTP Box -->
+      <div id="otp-verification-box" class="hidden border-t border-neutral-800 pt-6 space-y-4">
+        <div>
+          <label id="lbl-otp-input" class="block text-xs font-semibold uppercase tracking-wider text-amber-400 mb-1">Enter 6-Digit OTP Code</label>
+          <input id="otp-input" type="text" maxlength="6" placeholder="123456" class="w-full text-center tracking-widest text-lg font-bold px-4 py-3 rounded-xl bg-neutral-950 border border-amber-500/50 text-stone-100 focus:outline-none focus:border-amber-500">
+        </div>
+        <button id="btn-verify-otp" onclick="verifyOTP()" class="w-full py-3 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all text-xs uppercase tracking-wider">
+          Verify & Enter Portal
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-  // -------------------------------------------------------------
-  // 1. SUPABASE CONFIGURATION
-  // Replace these with your actual Supabase Project Credentials:
-  // -------------------------------------------------------------
-  const SUPABASE_URL = "YOUR_SUPABASE_URL_HERE"; 
-  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY_HERE";
-  
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <!-- ================= STEP 4: MAIN APP DASHBOARD ================= -->
+  <div id="step-app-dashboard" class="hidden min-h-screen flex flex-col bg-neutral-950">
+    <!-- Header -->
+    <header class="border-b border-neutral-800 bg-neutral-900/80 backdrop-blur sticky top-0 z-40 px-4 md:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
+      <div>
+        <h2 id="disp-shop-title" class="text-xl font-black tracking-wider text-amber-400">OPTIPULSE</h2>
+        <p id="disp-managing-badge" class="text-xs text-stone-400">Managing Practice</p>
+      </div>
 
-  let currentUserEmail = null;
-  let ordersList = [];
+      <!-- Quick Language & Currency Switcher -->
+      <div class="flex items-center gap-3">
+        <select id="dash-select-lang" onchange="changeLanguage(this.value)" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 border border-neutral-700 text-amber-400 text-xs font-semibold focus:outline-none">
+          <option value="en">English</option>
+          <option value="ur">اردو</option>
+          <option value="ar">العربية</option>
+        </select>
 
-  // Auto-restore session when opening or refreshing the browser page
-  window.addEventListener('DOMContentLoaded', async () => {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (session && session.user) {
-      currentUserEmail = session.user.email;
-      showAppScreen();
-    }
-  });
+        <select id="dash-select-curr" onchange="changeCurrency(this.value)" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 border border-neutral-700 text-amber-400 text-xs font-bold focus:outline-none">
+          <option value="PKR">PKR</option>
+          <option value="USD">USD ($)</option>
+          <option value="INR">INR (₹)</option>
+          <option value="OMR">OMR</option>
+          <option value="SAR">SAR</option>
+          <option value="QAR">QAR</option>
+          <option value="AED">AED</option>
+        </select>
 
-  // -------------------------------------------------------------
-  // 2. AUTHENTICATION (6-DIGIT OTP OVER EMAIL)
-  // -------------------------------------------------------------
-  async function handleSendOTP() {
-    const email = document.getElementById('auth-email').value.trim();
-    if (!email) return alert("Please enter your Gmail address.");
+        <button id="btn-logout" onclick="handleLogout()" class="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-300 text-xs font-semibold">Logout</button>
+      </div>
+    </header>
 
-    const { error } = await supabaseClient.auth.signInWithOtp({ email });
-    if (error) {
-      alert("Error sending OTP: " + error.message);
-    } else {
-      currentUserEmail = email;
-      document.getElementById('email-step').classList.add('hidden');
-      document.getElementById('otp-step').classList.remove('hidden');
-      alert("6-digit OTP code sent to " + email);
-    }
-  }
+    <!-- Navigation Tabs -->
+    <div class="border-b border-neutral-800 bg-neutral-900 px-4 md:px-8 pt-4">
+      <div class="flex gap-6 overflow-x-auto">
+        <button id="tab-dashboard" onclick="switchAppTab('dashboard')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold whitespace-nowrap">Dashboard</button>
+        <button id="tab-new-customer" onclick="switchAppTab('new-customer')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">+ New Order</button>
+        <button id="tab-history" onclick="switchAppTab('history')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">Customer Database & History</button>
+        <button id="tab-account" onclick="switchAppTab('account')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">Profile & Settings</button>
+      </div>
+    </div>
 
-  async function handleVerifyOTP() {
-    const token = document.getElementById('auth-otp').value.trim();
-    if (token.length !== 6) return alert("Please enter a valid 6-digit OTP code.");
+    <!-- Main Content Container -->
+    <main class="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto space-y-6">
+      
+      <!-- TAB 1: DASHBOARD VIEW -->
+      <div id="view-tab-dashboard" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
+            <p id="lbl-active-orders" class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Active Pending Orders</p>
+            <h3 id="stat-active-count" class="text-3xl font-black text-amber-400 mt-2">0</h3>
+          </div>
+          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
+            <p id="lbl-outstanding-dues" class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Total Outstanding Dues</p>
+            <h3 id="stat-total-due" class="text-3xl font-black text-stone-100 mt-2">PKR 0</h3>
+          </div>
+          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
+            <p id="lbl-completed-orders" class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Completed Orders</p>
+            <h3 id="stat-delivered-count" class="text-3xl font-black text-emerald-400 mt-2">0</h3>
+          </div>
+        </div>
 
-    const { data, error } = await supabaseClient.auth.verifyOtp({
-      email: currentUserEmail,
-      token: token,
-      type: 'email'
+        <div class="space-y-4">
+          <h3 id="hdr-current-active" class="text-sm font-bold uppercase tracking-wider text-stone-300">Current Active Orders</h3>
+          <div id="dashboard-active-list" class="space-y-3">
+            <!-- Active order items render dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: NEW CUSTOMER / ORDER FORM -->
+      <div id="view-tab-new-customer" class="hidden bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6">
+        <h3 id="hdr-patient-entry" class="text-lg font-bold text-stone-100">Patient Prescription & Order Entry</h3>
+        <form id="customer-form" onsubmit="handleSaveCustomer(event)" class="space-y-6">
+          <input type="hidden" id="editing-cust-id">
+          <input type="hidden" id="editing-order-id">
+          
+          <!-- Primary Account Holder Info -->
+          <div class="space-y-2">
+            <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Primary Account Holder Info</h4>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label id="lbl-cust-name" class="block text-xs font-semibold text-stone-400 mb-1">Primary Customer Name *</label>
+                <input id="cust-name" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label id="lbl-cust-phone" class="block text-xs font-semibold text-stone-400 mb-1">Phone / Mobile *</label>
+                <input id="cust-phone" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label id="lbl-cust-email" class="block text-xs font-semibold text-stone-400 mb-1">Email (Optional)</label>
+                <input id="cust-email" type="email" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label id="lbl-cust-address" class="block text-xs font-semibold text-stone-400 mb-1">Address</label>
+                <input id="cust-address" type="text" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+            </div>
+          </div>
+
+          <!-- Family Member / Patient Section -->
+          <div class="border-t border-neutral-800 pt-6 space-y-4">
+            <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Order Recipient Details (Self or Family Member)</h4>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Order For *</label>
+                <select id="order-for-type" onchange="toggleFamilyMemberFields(this.value)" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                  <option value="Self">Self (Primary Customer)</option>
+                  <option value="Family Member">Family Member</option>
+                </select>
+              </div>
+
+              <div id="family-rel-box" class="hidden">
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Relationship</label>
+                <select id="family-relation" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                  <option value="Son">Son</option>
+                  <option value="Daughter">Daughter</option>
+                  <option value="Wife">Wife</option>
+                  <option value="Husband">Husband</option>
+                  <option value="Mother">Mother</option>
+                  <option value="Father">Father</option>
+                  <option value="Brother">Brother</option>
+                  <option value="Sister">Sister</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div id="family-name-box" class="hidden">
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Family Member Name *</label>
+                <input id="family-member-name" type="text" placeholder="e.g. Ali / Sara" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+
+              <div>
+                <label id="lbl-cust-age" class="block text-xs font-semibold text-stone-400 mb-1">Patient Age</label>
+                <input id="cust-age" type="number" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+            </div>
+          </div>
+
+          <!-- Prescription Section -->
+          <div class="border-t border-neutral-800 pt-6 space-y-4">
+            <div class="flex justify-between items-center">
+              <h4 id="hdr-rx-details" class="text-sm font-bold text-amber-400 uppercase tracking-wider">Prescription Details (Rx / Eyesight Numbers)</h4>
+              <span class="text-[11px] text-stone-400">Prescriptions saved per person in customer ID</span>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+              <div><label class="text-[10px] text-stone-400 uppercase">OD SPH</label><input id="rx-od-sph" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OD CYL</label><input id="rx-od-cyl" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OD AXIS</label><input id="rx-od-axis" type="text" placeholder="180" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OD ADD</label><input id="rx-od-add" type="text" placeholder="+1.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">PD (mm)</label><input id="rx-pd" type="text" placeholder="63" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              
+              <div><label class="text-[10px] text-stone-400 uppercase">OS SPH</label><input id="rx-os-sph" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OS CYL</label><input id="rx-os-cyl" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OS AXIS</label><input id="rx-os-axis" type="text" placeholder="180" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OS ADD</label><input id="rx-os-add" type="text" placeholder="+1.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label id="lbl-prescribed-by" class="text-[10px] text-stone-400 uppercase">Prescribed By</label><input id="rx-doctor" type="text" placeholder="Dr. Name" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+            </div>
+          </div>
+
+          <!-- Order & Billing Section -->
+          <div class="border-t border-neutral-800 pt-6 space-y-4">
+            <h4 id="hdr-order-billing" class="text-sm font-bold text-amber-400 uppercase tracking-wider">Order & Billing Details</h4>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label id="lbl-item-desc" class="block text-xs font-semibold text-stone-400 mb-1">Item Description</label>
+                <input id="order-item" type="text" placeholder="Frame + Anti-Reflective Lenses" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+              </div>
+              <div>
+                <label id="lbl-total-amount" class="block text-xs font-semibold text-stone-400 mb-1">Total Amount</label>
+                <input id="order-total" type="number" oninput="calcBalance()" placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+              </div>
+              <div>
+                <label id="lbl-amount-paid" class="block text-xs font-semibold text-stone-400 mb-1">Amount Paid</label>
+                <input id="order-paid" type="number" oninput="calcBalance()" placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+              </div>
+              <div>
+                <label id="lbl-order-status" class="block text-xs font-semibold text-stone-400 mb-1">Status</label>
+                <select id="order-status" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+                  <option value="In Progress">In Progress</option>
+                  <option value="Ready for Pickup">Ready for Pickup</option>
+                  <option value="Delivered">Delivered</option>
+                </select>
+              </div>
+            </div>
+            <p class="text-xs text-stone-400"><span id="lbl-remaining-bal">Remaining Balance</span>: <strong id="order-due-display" class="text-amber-400">PKR 0</strong></p>
+          </div>
+
+          <div class="flex justify-end gap-3 pt-4">
+            <button id="btn-form-cancel" type="button" onclick="switchAppTab('dashboard')" class="px-6 py-3 rounded-xl bg-neutral-800 text-stone-300 font-semibold text-xs">Cancel</button>
+            <button id="btn-form-save" type="submit" class="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider">Save Customer Record</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- TAB 3: CUSTOMER HISTORY & COMPLETE DATABASE -->
+      <div id="view-tab-history" class="hidden space-y-4">
+        <input id="history-search-input" type="text" onkeyup="filterCustomerHistory()" placeholder="Search by primary customer, family member name, or phone..." class="w-full px-4 py-3 rounded-2xl bg-neutral-900 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+        <div id="history-results-list" class="space-y-4">
+          <!-- Filtered records render here -->
+        </div>
+      </div>
+
+      <!-- TAB 4: ACCOUNT PROFILE & DATA MANAGEMENT -->
+      <div id="view-tab-account" class="hidden space-y-6">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6">
+          <div>
+            <h3 class="text-lg font-bold text-stone-100">Logged-in Profile & App Info</h3>
+            <p class="text-xs text-stone-400 mt-1">Review or update your shop details connected to this email account.</p>
+          </div>
+
+          <form onsubmit="handleUpdateProfile(event)" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Logged-In Gmail / Email</label>
+                <input id="profile-email-disp" type="text" disabled class="w-full px-4 py-2.5 rounded-xl bg-neutral-950/60 border border-neutral-800 text-amber-400 text-sm font-mono cursor-not-allowed">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Shop / Practice Name</label>
+                <input id="profile-shop-input" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Mobile Contact</label>
+                <input id="profile-mobile-input" type="text" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Shop Address</label>
+                <input id="profile-address-input" type="text" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+            </div>
+
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider">
+              Update Profile Details
+            </button>
+          </form>
+        </div>
+
+        <!-- Danger Zone Controls -->
+        <div class="bg-neutral-900 border border-red-900/30 rounded-2xl p-6 md:p-8 space-y-4">
+          <h3 class="text-lg font-bold text-red-400">Database & Dashboard Clear Options</h3>
+          <p class="text-xs text-stone-400">Manage data retention for your account.</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div class="p-4 rounded-xl bg-neutral-950 border border-neutral-800 space-y-3">
+              <h4 class="text-sm font-bold text-stone-200">1. Clear Orders Data Only</h4>
+              <p class="text-xs text-stone-400">Deletes active orders & customer history, but keeps shop profile settings.</p>
+              <button onclick="clearDashboardDataOnly()" class="w-full py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold text-xs uppercase tracking-wider">
+                Clear Orders Data Only
+              </button>
+            </div>
+
+            <div class="p-4 rounded-xl bg-neutral-950 border border-neutral-800 space-y-3">
+              <h4 class="text-sm font-bold text-red-400">2. Wipe Entire Database</h4>
+              <p class="text-xs text-stone-400">Permanently clears all customers, family members, prescriptions, and settings.</p>
+              <button onclick="clearEntireAccountDatabase()" class="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider">
+                Wipe Entire Database
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    const SUPABASE_URL = 'https://qcdjyhxzswcwcxzwjcws.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_ej-63argNI2JcwZDXnAV0w_oYANtClg';
+
+    const supabaseLib = window.supabase || supabase;
+    const supabaseClient = supabaseLib.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      global: { headers: { 'apikey': SUPABASE_KEY } }
     });
 
-    if (error) {
-      alert("Verification failed: " + error.message);
-    } else {
-      currentUserEmail = data.user.email;
-      showAppScreen();
-    }
-  }
+    const currencyRates = { USD: 1.0, PKR: 278.50, INR: 83.50, OMR: 0.385, SAR: 3.75, QAR: 3.64, AED: 3.67 };
 
-  function resetAuthView() {
-    document.getElementById('email-step').classList.remove('hidden');
-    document.getElementById('otp-step').classList.add('hidden');
-  }
+    const translations = {
+      en: {
+        welcomeSub: "Optical Practice & Customer Management System", enterPortal: "Enter System Portal", settingsTitle: "Preferences", settingsSubtitle: "Select your preferred language and local currency.", selectLang: "Language", selectCurr: "Currency", btnContinueAuth: "Continue to Authentication", authTitle: "Shop Authentication", authSubtitle: "Enter your details to log in or register your optical store.", lblShopName: "Shop / Practice Name", lblMobile: "Mobile Contact", lblEmail: "Owner Email", lblAddress: "Shop Address", btnSendOtp: "Send Email Verification OTP", lblEnterOtp: "Enter 6-Digit OTP Code", btnVerifyOtp: "Verify & Enter Portal", tabDashboard: "Dashboard", tabNewOrder: "+ New Order", tabDatabase: "Customer Database & History", tabAccount: "Profile & Settings", lblActiveOrders: "Active Pending Orders", lblOutstandingDues: "Total Outstanding Dues", lblCompletedOrders: "Completed Orders", hdrCurrentActive: "Current Active Orders", hdrPatientEntry: "Patient Prescription & Order Entry", lblCustName: "Customer Full Name *", lblCustPhone: "Phone / Mobile *", lblCustEmail: "Email (Optional)", lblCustAge: "Age", lblCustAddress: "Address", hdrRxDetails: "Prescription Details (Rx)", lblPrescribedBy: "Prescribed By", hdrOrderBilling: "Order & Billing Details", lblItemDesc: "Item Description", lblTotalAmount: "Total Amount", lblAmountPaid: "Amount Paid", lblOrderStatus: "Status", lblRemainingBal: "Remaining Balance", btnFormCancel: "Cancel", btnFormSave: "Save Customer Record", searchPlaceholder: "Search by primary customer, family member name, or phone...", btnMarkDelivered: "Mark Delivered", btnEditRecord: "Edit Record", btnLogout: "Logout"
+      },
+      ur: {
+        welcomeSub: "آپٹیکل پریکٹس اور کسٹمر منیجمنٹ سسٹم", enterPortal: "سسٹم پورٹل میں داخل ہوں", settingsTitle: "ترجیحات", settingsSubtitle: "اپنی پسندیدہ زبان اور مقامی کرنسی کا انتخاب کریں۔", selectLang: "زبان", selectCurr: "کرنسی", btnContinueAuth: "آتھینٹیکیشن پر آگے بڑھیں", authTitle: "دوکان کی تصدیق", authSubtitle: "لاگ ان کرنے یا اپنی آپٹیکل شاپ کو رجسٹر کرنے کے لیے تفصیلات درج کریں۔", lblShopName: "دوکان / پریکٹس کا نام", lblMobile: "موبائل نمبر", lblEmail: "آنر کا ای میل", lblAddress: "دوکان کا پتہ", btnSendOtp: "ای میل تصدیق کا OTP بھیجیں", lblEnterOtp: "6 ہندسوں کا OTP کوڈ درج کریں", btnVerifyOtp: "تصدیق کریں اور پورٹل میں داخل ہوں", tabDashboard: "ڈیش بورڈ", tabNewOrder: "+ نیا آرڈر", tabDatabase: "کسٹمر ڈیٹا بیس اور ہسٹری", tabAccount: "پروفائل اور ترتیبات", lblActiveOrders: "فعال زیر التوا آرڈرز", lblOutstandingDues: "کل واجب الادا رقم", lblCompletedOrders: "مکمل شدہ آرڈرز", hdrCurrentActive: "موجودہ فعال آرڈرز", hdrPatientEntry: "مریض کا نسخہ اور آرڈر کا اندراج", lblCustName: "گاہک کا پورا نام *", lblCustPhone: "فون / موبائل *", lblCustEmail: "ای میل (اختیاری)", lblCustAge: "عمر", lblCustAddress: "پتہ", hdrRxDetails: "نسخے کی تفصیلات (Rx)", lblPrescribedBy: "تجویز کردہ از ڈاکٹر", hdrOrderBilling: "آرڈر اور بلنگ کی تفصیلات", lblItemDesc: "آئٹم کی تفصیل", lblTotalAmount: "کل رقم", lblAmountPaid: "ادا شدہ رقم", lblOrderStatus: "حیثیت (سٹیٹس)", lblRemainingBal: "بقیہ رقم", btnFormCancel: "منسوخ کریں", btnFormSave: "کسٹمر ریکارڈ محفوظ کریں", searchPlaceholder: "گاہک کا نام، فیملی ممبر یا فون نمبر سے تلاش کریں...", btnMarkDelivered: "ڈیلیور نشان زد کریں", btnEditRecord: "ترمیم کریں", btnLogout: "لاگ آؤٹ"
+      },
+      ar: {
+        welcomeSub: "نظام إدارة الممارسة البصرية والعملاء", enterPortal: "الدخول إلى البوابة", settingsTitle: "التفضيلات", settingsSubtitle: "حدد لغتك المفضلة والعملة المحلية.", selectLang: "اللغة", selectCurr: "العملة", btnContinueAuth: "الانتقال إلى المصادقة", authTitle: "مصادقة المتجر", authSubtitle: "أدخل بياناتك لتسجيل الدخول أو تسجيل متجر البصريات الخاص بك.", lblShopName: "اسم المتجر / العيادة", lblMobile: "رقم الهاتف المحمول", lblEmail: "البريد الإلكتروني للمالك", lblAddress: "عنوان المتجر", btnSendOtp: "إرسال رمز التحقق (OTP) إلى البريد", lblEnterOtp: "أدخل رمز OTP المكون من 6 أرقام", btnVerifyOtp: "التحقق والدخول إلى البوابة", tabDashboard: "لوحة التحكم", tabNewOrder: "+ طلب جديد", tabDatabase: "قاعدة بيانات العملاء والسجل", tabAccount: "الملف الشخصي والإعدادات", lblActiveOrders: "الطلبات النشطة المعلقة", lblOutstandingDues: "إجمالي المبالغ المستحقة", lblCompletedOrders: "الطلبات المكتملة", hdrCurrentActive: "الطلبات النشطة الحالية", hdrPatientEntry: "وصفة المريض وإدخال الطلب", lblCustName: "اسم العميل الكامل *", lblCustPhone: "الهاتف / المحمول *", lblCustEmail: "البريد الإلكتروني (اختياري)", lblCustAge: "العمر", lblCustAddress: "العنوان", hdrRxDetails: "تفاصيل الوصفة الطبية (Rx)", lblPrescribedBy: "تم الوصف بواسطة الطبيب", hdrOrderBilling: "تفاصيل الطلب والفلترة", lblItemDesc: "وصف العنصر", lblTotalAmount: "المبلغ الإجمالي", lblAmountPaid: "المبلغ المدفوع", lblOrderStatus: "الحالة", lblRemainingBal: "الرصيد المتبقي", btnFormCancel: "إلغاء", btnFormSave: "حفظ سجل العميل", searchPlaceholder: "البحث باسم العميل أو أفراد الأسرة...", btnMarkDelivered: "تحديد كتم التسليم", btnEditRecord: "تعديل السجل", btnLogout: "تسجيل الخروج"
+      }
+    };
 
-  async function handleSignOut() {
-    await supabaseClient.auth.signOut();
-    currentUserEmail = null;
-    document.getElementById('user-info').classList.add('hidden');
-    document.getElementById('app-section').classList.add('hidden');
-    document.getElementById('auth-section').classList.remove('hidden');
-    resetAuthView();
-  }
+    let currentUser = null;
+    let appConfig = { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: {} };
+    let customerDatabase = [];
 
-  function showAppScreen() {
-    document.getElementById('auth-section').classList.add('hidden');
-    document.getElementById('app-section').classList.remove('hidden');
-    document.getElementById('user-info').classList.remove('hidden');
-    document.getElementById('user-email-display').innerText = currentUserEmail;
-    fetchOrdersFromCloud();
-  }
-
-  // -------------------------------------------------------------
-  // 3. PERSISTENT CLOUD DATABASE OPERATIONS (SUPABASE)
-  // -------------------------------------------------------------
-  
-  // FETCH USER DATA FROM CLOUD
-  async function fetchOrdersFromCloud() {
-    if (!currentUserEmail) return;
-
-    const { data, error } = await supabaseClient
-      .from('orders')
-      .select('order_data')
-      .eq('user_email', currentUserEmail);
-
-    if (error) {
-      console.error("Cloud fetch error:", error);
-      alert("Failed to fetch customer data from cloud.");
-      return;
+    function getUserStorageKey(suffix) {
+      if (!currentUser || !currentUser.email) return `guest-${suffix}`;
+      return `user-${currentUser.email.toLowerCase()}-${suffix}`;
     }
 
-    ordersList = data ? data.map(row => row.order_data) : [];
-    renderOrdersTable();
-  }
+    async function persistConfig() {
+      if (currentUser && currentUser.email) {
+        localStorage.setItem(getUserStorageKey('config'), JSON.stringify(appConfig));
+      }
+    }
 
-  // SAVE OR UPDATE RECORD IN CLOUD
-  async function handleSaveCustomer(event) {
-    event.preventDefault();
-    const editingId = document.getElementById('editing-order-id').value;
+    async function persistCustomers() {
+      if (currentUser && currentUser.email) {
+        localStorage.setItem(getUserStorageKey('customers'), JSON.stringify(customerDatabase));
+      }
+    }
 
-    const record = {
-      id: editingId || 'ORD-' + Date.now(),
-      customerName: document.getElementById('cust-name').value,
-      phone: document.getElementById('cust-phone').value,
-      email: document.getElementById('cust-email').value,
-      age: document.getElementById('cust-age').value,
-      rx: {
+    async function loadUserData(userEmail) {
+      currentUser = { email: userEmail };
+      
+      const savedConfig = localStorage.getItem(getUserStorageKey('config'));
+      if (savedConfig) {
+        try { appConfig = JSON.parse(savedConfig); } catch(e){}
+      } else {
+        appConfig = { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: { shop: 'OptiPulse Store', email: userEmail } };
+      }
+
+      const savedCust = localStorage.getItem(getUserStorageKey('customers'));
+      if (savedCust) {
+        try { customerDatabase = JSON.parse(savedCust); } catch(e){}
+      } else {
+        customerDatabase = [];
+      }
+
+      populateProfileFields();
+      changeLanguage(appConfig.lang || 'en');
+      changeCurrency(appConfig.currency || 'PKR');
+    }
+
+    function toggleFamilyMemberFields(val) {
+      const relBox = document.getElementById('family-rel-box');
+      const nameBox = document.getElementById('family-name-box');
+      if (val === 'Family Member') {
+        relBox.classList.remove('hidden');
+        nameBox.classList.remove('hidden');
+      } else {
+        relBox.classList.add('hidden');
+        nameBox.classList.add('hidden');
+      }
+    }
+
+    function populateProfileFields() {
+      document.getElementById('profile-email-disp').value = currentUser ? currentUser.email : '';
+      document.getElementById('profile-shop-input').value = appConfig.owner.shop || '';
+      document.getElementById('profile-mobile-input').value = appConfig.owner.mobile || '';
+      document.getElementById('profile-address-input').value = appConfig.owner.address || '';
+    }
+
+    function handleUpdateProfile(e) {
+      e.preventDefault();
+      appConfig.owner.shop = document.getElementById('profile-shop-input').value;
+      appConfig.owner.mobile = document.getElementById('profile-mobile-input').value;
+      appConfig.owner.address = document.getElementById('profile-address-input').value;
+
+      persistConfig();
+
+      document.getElementById('disp-shop-title').innerText = appConfig.owner.shop.toUpperCase();
+      document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop}`;
+
+      alert("Profile details updated successfully!");
+    }
+
+    function clearDashboardDataOnly() {
+      if (confirm("Are you sure you want to clear all order records? Profile settings will stay.")) {
+        customerDatabase = [];
+        persistCustomers();
+        renderDashboard();
+        alert("Customer orders cleared successfully.");
+      }
+    }
+
+    function clearEntireAccountDatabase() {
+      if (confirm("WARNING: This will permanently delete ALL customer IDs, family records, prescriptions, and settings for this account. Continue?")) {
+        localStorage.removeItem(getUserStorageKey('config'));
+        localStorage.removeItem(getUserStorageKey('customers'));
+        alert("Entire account database wiped successfully.");
+        handleLogout();
+      }
+    }
+
+    function changeLanguage(langCode) {
+      appConfig.lang = langCode;
+      document.getElementById('select-lang').value = langCode;
+      document.getElementById('dash-select-lang').value = langCode;
+
+      const dict = translations[langCode] || translations.en;
+      const htmlRoot = document.getElementById('html-root');
+      htmlRoot.setAttribute('dir', (langCode === 'ar' || langCode === 'ur') ? 'rtl' : 'ltr');
+
+      document.getElementById('welcome-subtext').innerText = dict.welcomeSub;
+      document.getElementById('btn-welcome-continue').innerText = dict.enterPortal;
+      document.getElementById('settings-title').innerText = dict.settingsTitle;
+      document.getElementById('settings-subtitle').innerText = dict.settingsSubtitle;
+      document.getElementById('lbl-select-lang').innerText = dict.selectLang;
+      document.getElementById('lbl-select-curr').innerText = dict.selectCurr;
+      document.getElementById('btn-settings-continue').innerText = dict.btnContinueAuth;
+      document.getElementById('auth-title').innerText = dict.authTitle;
+      document.getElementById('auth-subtitle').innerText = dict.authSubtitle;
+      document.getElementById('lbl-shop-name').innerText = dict.lblShopName;
+      document.getElementById('lbl-mobile').innerText = dict.lblMobile;
+      document.getElementById('lbl-email').innerText = dict.lblEmail;
+      document.getElementById('lbl-address').innerText = dict.lblAddress;
+      document.getElementById('btn-send-otp').innerText = dict.btnSendOtp;
+      document.getElementById('lbl-otp-input').innerText = dict.lblEnterOtp;
+      document.getElementById('btn-verify-otp').innerText = dict.btnVerifyOtp;
+      document.getElementById('tab-dashboard').innerText = dict.tabDashboard;
+      document.getElementById('tab-new-customer').innerText = dict.tabNewOrder;
+      document.getElementById('tab-history').innerText = dict.tabDatabase;
+      document.getElementById('tab-account').innerText = dict.tabAccount || "Profile & Settings";
+      document.getElementById('lbl-active-orders').innerText = dict.lblActiveOrders;
+      document.getElementById('lbl-outstanding-dues').innerText = dict.lblOutstandingDues;
+      document.getElementById('lbl-completed-orders').innerText = dict.lblCompletedOrders;
+      document.getElementById('hdr-current-active').innerText = dict.hdrCurrentActive;
+      document.getElementById('hdr-patient-entry').innerText = dict.hdrPatientEntry;
+      document.getElementById('lbl-cust-name').innerText = dict.lblCustName;
+      document.getElementById('lbl-cust-phone').innerText = dict.lblCustPhone;
+      document.getElementById('lbl-cust-email').innerText = dict.lblCustEmail;
+      document.getElementById('lbl-cust-age').innerText = dict.lblCustAge;
+      document.getElementById('lbl-cust-address').innerText = dict.lblCustAddress;
+      document.getElementById('hdr-rx-details').innerText = dict.hdrRxDetails;
+      document.getElementById('lbl-prescribed-by').innerText = dict.lblPrescribedBy;
+      document.getElementById('hdr-order-billing').innerText = dict.hdrOrderBilling;
+      document.getElementById('lbl-item-desc').innerText = dict.lblItemDesc;
+      document.getElementById('lbl-total-amount').innerText = dict.lblTotalAmount;
+      document.getElementById('lbl-amount-paid').innerText = dict.lblAmountPaid;
+      document.getElementById('lbl-order-status').innerText = dict.lblOrderStatus;
+      document.getElementById('lbl-remaining-bal').innerText = dict.lblRemainingBal;
+      document.getElementById('btn-form-cancel').innerText = dict.btnFormCancel;
+      document.getElementById('btn-form-save').innerText = dict.btnFormSave;
+      document.getElementById('history-search-input').placeholder = dict.searchPlaceholder;
+      document.getElementById('btn-logout').innerText = dict.btnLogout;
+
+      persistConfig();
+      renderDashboard();
+    }
+
+    function changeCurrency(currCode) {
+      const oldCurr = appConfig.currency || 'PKR';
+      if (oldCurr !== currCode) {
+        customerDatabase.forEach(cust => {
+          cust.purchases.forEach(p => {
+            const baseUSDTotal = p.total / (currencyRates[oldCurr] || 1);
+            const baseUSDPaid = p.paid / (currencyRates[oldCurr] || 1);
+            p.total = Math.round(baseUSDTotal * (currencyRates[currCode] || 1));
+            p.paid = Math.round(baseUSDPaid * (currencyRates[currCode] || 1));
+          });
+        });
+      }
+
+      appConfig.currency = currCode;
+      appConfig.currSymbol = currCode;
+
+      document.getElementById('select-curr').value = currCode;
+      document.getElementById('dash-select-curr').value = currCode;
+
+      calcBalance();
+      persistConfig();
+      persistCustomers();
+      renderDashboard();
+    }
+
+    function init3DLogo() {
+      const container = document.getElementById('login-canvas-container');
+      if (!container || typeof THREE === 'undefined') return;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(renderer.domElement);
+
+      const geometry = new THREE.TorusGeometry(1.8, 0.4, 16, 100);
+      const material = new THREE.MeshBasicMaterial({ color: 0xd4af37, wireframe: true });
+      const torus = new THREE.Mesh(geometry, material);
+      scene.add(torus);
+
+      camera.position.z = 4.5;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        torus.rotation.x += 0.01;
+        torus.rotation.y += 0.01;
+        renderer.render(scene, camera);
+      }
+      animate();
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      init3DLogo();
+
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      
+      if (session && session.user) {
+        await loadUserData(session.user.email);
+        document.getElementById('step-welcome').classList.add('hidden');
+        document.getElementById('step-app-dashboard').classList.remove('hidden');
+        document.getElementById('disp-shop-title').innerText = (appConfig.owner.shop || 'OptiPulse').toUpperCase();
+        document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop || session.user.email}`;
+        renderDashboard();
+      } else {
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 25;
+          document.getElementById('loading-bar').style.width = progress + '%';
+          if (progress >= 100) {
+            clearInterval(interval);
+            document.getElementById('welcome-loading-box').classList.add('hidden');
+            document.getElementById('btn-welcome-continue').classList.remove('hidden');
+          }
+        }, 200);
+      }
+    });
+
+    function nextStep(current, next) {
+      document.getElementById(`step-${current}`).classList.add('hidden');
+      document.getElementById(`step-${next}`).classList.remove('hidden');
+    }
+
+    async function handleOwnerRegister(e) {
+      e.preventDefault();
+      const email = document.getElementById('owner-email').value;
+      const btn = document.getElementById('btn-send-otp');
+      
+      if (!email) return alert("Please enter a valid email address.");
+
+      btn.innerText = "...";
+      btn.disabled = true;
+
+      const { error } = await supabaseClient.auth.signInWithOtp({
+        email: email,
+        options: { shouldCreateUser: true }
+      });
+
+      btn.innerText = translations[appConfig.lang].btnSendOtp;
+      btn.disabled = false;
+
+      if (error) {
+        alert("Error sending OTP: " + error.message);
+      } else {
+        alert("A 6-digit OTP code has been sent to " + email + ". Check your inbox!");
+        document.getElementById('otp-verification-box').classList.remove('hidden');
+      }
+    }
+
+    async function verifyOTP() {
+      const otp = document.getElementById('otp-input').value.trim();
+      const email = document.getElementById('owner-email').value;
+      const verifyBtn = document.getElementById('btn-verify-otp');
+
+      if (!otp) return alert("Please enter the 6-digit code sent to your email.");
+
+      verifyBtn.innerText = "...";
+      verifyBtn.disabled = true;
+
+      const { data, error } = await supabaseClient.auth.verifyOtp({
+        email: email,
+        token: otp,
+        type: 'email'
+      });
+
+      verifyBtn.innerText = translations[appConfig.lang].btnVerifyOtp;
+      verifyBtn.disabled = false;
+
+      if (error) {
+        alert("Invalid or expired OTP: " + error.message);
+        return;
+      }
+
+      await loadUserData(email);
+
+      appConfig.owner = {
+        shop: document.getElementById('owner-shop').value || 'Vision Care Optics',
+        mobile: document.getElementById('owner-mobile').value,
+        email: email,
+        address: document.getElementById('owner-address').value
+      };
+
+      persistConfig();
+
+      document.getElementById('disp-shop-title').innerText = appConfig.owner.shop.toUpperCase();
+      document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop}`;
+      
+      nextStep('owner-login', 'app-dashboard');
+      renderDashboard();
+    }
+
+    async function handleLogout() {
+      await supabaseClient.auth.signOut();
+      currentUser = null;
+      customerDatabase = [];
+      location.reload();
+    }
+
+    function switchAppTab(tabName) {
+      document.getElementById('view-tab-dashboard').classList.add('hidden');
+      document.getElementById('view-tab-new-customer').classList.add('hidden');
+      document.getElementById('view-tab-history').classList.add('hidden');
+      document.getElementById('view-tab-account').classList.add('hidden');
+
+      document.getElementById('tab-dashboard').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
+      document.getElementById('tab-new-customer').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
+      document.getElementById('tab-history').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
+      document.getElementById('tab-account').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
+
+      document.getElementById(`view-tab-${tabName}`).classList.remove('hidden');
+      document.getElementById(`tab-${tabName}`).className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold whitespace-nowrap";
+
+      if (tabName === 'history') renderHistory();
+      if (tabName === 'account') populateProfileFields();
+    }
+
+    function calcBalance() {
+      const total = Number(document.getElementById('order-total').value || 0);
+      const paid = Number(document.getElementById('order-paid').value || 0);
+      const due = Math.max(0, total - paid);
+      document.getElementById('order-due-display').innerText = `${appConfig.currSymbol} ${due.toLocaleString()}`;
+    }
+
+    function deliverOrder(custId, orderId) {
+      const cust = customerDatabase.find(c => c.id === custId);
+      if (cust) {
+        const order = cust.purchases.find(p => p.orderId === orderId);
+        if (order) {
+          order.status = 'Delivered';
+          persistCustomers();
+          renderDashboard();
+        }
+      }
+    }
+
+    function editCustomerFromDashboard(custId, orderId) {
+      const cust = customerDatabase.find(c => c.id === custId);
+      if (!cust) return;
+
+      const order = cust.purchases.find(p => p.orderId === orderId);
+
+      document.getElementById('editing-cust-id').value = cust.id;
+      document.getElementById('editing-order-id').value = orderId;
+      
+      document.getElementById('cust-name').value = cust.name;
+      document.getElementById('cust-phone').value = cust.phone;
+      document.getElementById('cust-email').value = cust.email || '';
+      document.getElementById('cust-address').value = cust.address || '';
+
+      if (order) {
+        document.getElementById('order-for-type').value = order.forType || 'Self';
+        toggleFamilyMemberFields(order.forType || 'Self');
+        document.getElementById('family-relation').value = order.familyRelation || 'Son';
+        document.getElementById('family-member-name').value = order.patientName || '';
+        document.getElementById('cust-age').value = order.patientAge || '';
+
+        document.getElementById('order-item').value = order.item || '';
+        document.getElementById('order-total').value = order.total || 0;
+        document.getElementById('order-paid').value = order.paid || 0;
+        document.getElementById('order-status').value = order.status || 'In Progress';
+
+        if (order.rx) {
+          document.getElementById('rx-od-sph').value = order.rx.odSph || '';
+          document.getElementById('rx-od-cyl').value = order.rx.odCyl || '';
+          document.getElementById('rx-od-axis').value = order.rx.odAxis || '';
+          document.getElementById('rx-od-add').value = order.rx.odAdd || '';
+          document.getElementById('rx-os-sph').value = order.rx.osSph || '';
+          document.getElementById('rx-os-cyl').value = order.rx.osCyl || '';
+          document.getElementById('rx-os-axis').value = order.rx.osAxis || '';
+          document.getElementById('rx-os-add').value = order.rx.osAdd || '';
+          document.getElementById('rx-pd').value = order.rx.pd || '';
+          document.getElementById('rx-doctor').value = order.rx.doctor || '';
+        }
+      }
+
+      calcBalance();
+      switchAppTab('new-customer');
+    }
+
+    function handleSaveCustomer(e) {
+      e.preventDefault();
+
+      const nameEl = document.getElementById('cust-name');
+      const phoneEl = document.getElementById('cust-phone');
+      if (!nameEl.value.trim() || !phoneEl.value.trim()) return;
+
+      const existingCustId = document.getElementById('editing-cust-id').value;
+      const existingOrderId = document.getElementById('editing-order-id').value;
+      const total = Number(document.getElementById('order-total').value || 0);
+      const paid = Number(document.getElementById('order-paid').value || 0);
+
+      const forType = document.getElementById('order-for-type').value;
+      const familyRel = document.getElementById('family-relation').value;
+      const familyName = document.getElementById('family-member-name').value.trim();
+
+      const patientDisplayName = forType === 'Family Member' && familyName ? `${familyName} (${familyRel})` : `${nameEl.value} (Self)`;
+
+      const rxData = {
         odSph: document.getElementById('rx-od-sph').value,
         odCyl: document.getElementById('rx-od-cyl').value,
         odAxis: document.getElementById('rx-od-axis').value,
@@ -308,120 +828,227 @@
         osCyl: document.getElementById('rx-os-cyl').value,
         osAxis: document.getElementById('rx-os-axis').value,
         osAdd: document.getElementById('rx-os-add').value,
-      },
-      item: document.getElementById('order-item').value,
-      total: document.getElementById('order-total').value
-    };
+        pd: document.getElementById('rx-pd').value,
+        doctor: document.getElementById('rx-doctor').value,
+        updatedDate: new Date().toISOString().split('T')[0]
+      };
 
-    // Save directly to cloud table
-    const { error } = await supabaseClient
-      .from('orders')
-      .upsert({
-        id: record.id,
-        user_email: currentUserEmail,
-        customer_name: record.customerName,
-        phone: record.phone,
-        order_data: record
+      const purchaseData = {
+        orderId: existingOrderId ? Number(existingOrderId) : Date.now(),
+        date: new Date().toISOString().split('T')[0],
+        forType: forType,
+        familyRelation: familyRel,
+        patientName: forType === 'Family Member' ? familyName : nameEl.value,
+        patientDisplayName: patientDisplayName,
+        patientAge: document.getElementById('cust-age').value,
+        item: document.getElementById('order-item').value || 'Eyewear Frame & Lenses',
+        total: total,
+        paid: paid,
+        status: document.getElementById('order-status').value,
+        rx: rxData
+      };
+
+      let cust = null;
+      if (existingCustId) {
+        cust = customerDatabase.find(c => c.id === Number(existingCustId));
+      }
+
+      if (!cust) {
+        cust = {
+          id: Date.now(),
+          name: nameEl.value,
+          phone: phoneEl.value,
+          email: document.getElementById('cust-email').value,
+          address: document.getElementById('cust-address').value,
+          familyMembers: [],
+          purchases: []
+        };
+        customerDatabase.push(cust);
+      } else {
+        cust.name = nameEl.value;
+        cust.phone = phoneEl.value;
+        cust.email = document.getElementById('cust-email').value;
+        cust.address = document.getElementById('cust-address').value;
+      }
+
+      if (!cust.familyMembers) cust.familyMembers = [];
+      if (forType === 'Family Member' && familyName) {
+        let fam = cust.familyMembers.find(f => f.name.toLowerCase() === familyName.toLowerCase());
+        if (!fam) {
+          cust.familyMembers.push({
+            name: familyName,
+            relation: familyRel,
+            rx: rxData
+          });
+        } else {
+          fam.rx = rxData;
+          fam.relation = familyRel;
+        }
+      } else {
+        cust.selfRx = rxData;
+      }
+
+      if (existingOrderId) {
+        const orderIndex = cust.purchases.findIndex(p => p.orderId === Number(existingOrderId));
+        if (orderIndex !== -1) cust.purchases[orderIndex] = purchaseData;
+        else cust.purchases.push(purchaseData);
+      } else {
+        cust.purchases.push(purchaseData);
+      }
+
+      persistCustomers();
+      resetCustomerForm();
+      switchAppTab('dashboard');
+      renderDashboard();
+    }
+
+    function resetCustomerForm() {
+      document.getElementById('customer-form').reset();
+      document.getElementById('editing-cust-id').value = '';
+      document.getElementById('editing-order-id').value = '';
+      toggleFamilyMemberFields('Self');
+      calcBalance();
+    }
+
+    function prepareNewPurchaseForCustomer(custId) {
+      resetCustomerForm();
+      const cust = customerDatabase.find(c => c.id === custId);
+      if (cust) {
+        document.getElementById('editing-cust-id').value = cust.id;
+        document.getElementById('cust-name').value = cust.name;
+        document.getElementById('cust-phone').value = cust.phone;
+        document.getElementById('cust-email').value = cust.email || '';
+        document.getElementById('cust-address').value = cust.address || '';
+        switchAppTab('new-customer');
+      }
+    }
+
+    function renderDashboard() {
+      let activeCount = 0;
+      let totalDue = 0;
+      let deliveredCount = 0;
+      const dict = translations[appConfig.lang] || translations.en;
+      const activeListContainer = document.getElementById('dashboard-active-list');
+      activeListContainer.innerHTML = '';
+
+      customerDatabase.forEach(cust => {
+        cust.purchases.forEach(purchase => {
+          const due = Math.max(0, purchase.total - purchase.paid);
+          if (purchase.status !== 'Delivered') {
+            activeCount++;
+            totalDue += due;
+
+            const isFamily = purchase.forType === 'Family Member';
+            const displayTag = `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[10px] uppercase ml-1">${purchase.patientDisplayName}</span>`;
+
+            const itemCard = document.createElement('div');
+            itemCard.className = "flex flex-col md:flex-row justify-between items-start md:items-center p-4 rounded-xl bg-neutral-900 border border-neutral-800 gap-4";
+            itemCard.innerHTML = `
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-neutral-800 border gold-border flex items-center justify-center font-bold text-amber-400 text-sm">${cust.name.charAt(0)}</div>
+                <div>
+                  <h4 class="font-bold text-stone-100 text-sm">${cust.name} ${displayTag} <span class="text-xs text-stone-400 font-normal">(${cust.phone})</span></h4>
+                  <p class="text-xs text-amber-400 font-medium">${purchase.item}</p>
+                  <p class="text-[11px] text-stone-400">Date: ${purchase.date} | Status: <span class="text-amber-400 font-semibold">${purchase.status}</span></p>
+                </div>
+              </div>
+              <div class="flex flex-col md:flex-row items-end md:items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+                <div class="text-right">
+                  <p class="text-xs text-stone-400">Due: <span class="font-bold text-amber-400">${appConfig.currSymbol} ${due.toLocaleString()}</span></p>
+                  <p class="text-[10px] text-stone-500">Total: ${appConfig.currSymbol} ${purchase.total.toLocaleString()}</p>
+                </div>
+                <div class="flex flex-col gap-2 w-full md:w-auto">
+                  <button onclick="deliverOrder(${cust.id}, ${purchase.orderId})" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider">
+                    ${dict.btnMarkDelivered}
+                  </button>
+                  <button onclick="editCustomerFromDashboard(${cust.id}, ${purchase.orderId})" class="px-4 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-semibold text-xs border border-amber-500/30">
+                    ${dict.btnEditRecord}
+                  </button>
+                </div>
+              </div>
+            `;
+            activeListContainer.appendChild(itemCard);
+          } else {
+            deliveredCount++;
+          }
+        });
       });
 
-    if (error) {
-      alert("Error saving record to cloud: " + error.message);
-      return;
+      if (activeCount === 0) {
+        activeListContainer.innerHTML = `<p class="text-xs text-stone-500 py-4 text-center">No active orders right now.</p>`;
+      }
+
+      document.getElementById('stat-active-count').innerText = activeCount;
+      document.getElementById('stat-total-due').innerText = `${appConfig.currSymbol} ${totalDue.toLocaleString()}`;
+      document.getElementById('stat-delivered-count').innerText = deliveredCount;
     }
 
-    alert("Record permanently saved to Supabase Cloud!");
-    document.getElementById('customer-form').reset();
-    document.getElementById('editing-order-id').value = '';
-    
-    await fetchOrdersFromCloud();
-    switchTab('dashboard');
-  }
+    function renderHistory() { filterCustomerHistory(); }
 
-  // DELETE RECORD FROM CLOUD
-  async function deleteOrder(orderId) {
-    if (!confirm("Are you sure you want to permanently delete this customer record?")) return;
+    function filterCustomerHistory() {
+      const query = (document.getElementById('history-search-input').value || '').toLowerCase();
+      const container = document.getElementById('history-results-list');
+      container.innerHTML = '';
 
-    const { error } = await supabaseClient
-      .from('orders')
-      .delete()
-      .eq('id', orderId)
-      .eq('user_email', currentUserEmail);
+      const filtered = customerDatabase.filter(c => 
+        c.name.toLowerCase().includes(query) || 
+        c.phone.toLowerCase().includes(query) ||
+        (c.familyMembers && c.familyMembers.some(f => f.name.toLowerCase().includes(query))) ||
+        c.purchases.some(p => p.patientName && p.patientName.toLowerCase().includes(query))
+      );
 
-    if (error) {
-      alert("Could not delete from cloud: " + error.message);
-      return;
+      if (filtered.length === 0) {
+        container.innerHTML = `<p class="text-xs text-stone-500 py-6 text-center">No customer record found.</p>`;
+        return;
+      }
+
+      filtered.forEach(cust => {
+        const custCard = document.createElement('div');
+        custCard.className = "p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-4";
+        
+        let familyPills = '';
+        if (cust.familyMembers && cust.familyMembers.length > 0) {
+          familyPills = cust.familyMembers.map(f => `<span class="px-2 py-1 rounded-lg bg-neutral-800 text-amber-400 text-xs font-semibold border border-neutral-700">${f.name} (${f.relation})</span>`).join(' ');
+        }
+
+        let purchasesHtml = cust.purchases.map(p => {
+          const due = Math.max(0, p.total - p.paid);
+          return `
+          <div class="border-t border-neutral-800 pt-3 mt-3 space-y-2 text-xs">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="font-bold text-amber-400">${p.item} <span class="text-stone-400 font-normal">(${p.date})</span></p>
+                <p class="text-[11px] text-stone-300 font-medium">Recipient: <span class="text-stone-100 font-semibold">${p.patientDisplayName || cust.name}</span> ${p.patientAge ? '| Age: ' + p.patientAge : ''}</p>
+              </div>
+              <div class="text-right">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.status === 'Delivered' ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-400'}">${p.status}</span>
+                <p class="text-stone-300 font-semibold mt-1">Total: ${appConfig.currSymbol} ${p.total.toLocaleString()} | Paid: ${appConfig.currSymbol} ${p.paid.toLocaleString()} | <span class="text-amber-400">Due: ${appConfig.currSymbol} ${due.toLocaleString()}</span></p>
+              </div>
+            </div>
+            <div class="bg-neutral-950 p-2.5 rounded-xl border border-neutral-800 font-mono text-[11px] text-stone-300 grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div>OD (Right): SPH ${p.rx.odSph || '-'}, CYL ${p.rx.odCyl || '-'}, AXIS ${p.rx.odAxis || '-'}, ADD ${p.rx.odAdd || '-'}</div>
+              <div>OS (Left): SPH ${p.rx.osSph || '-'}, CYL ${p.rx.osCyl || '-'}, AXIS ${p.rx.osAxis || '-'}, ADD ${p.rx.osAdd || '-'}</div>
+            </div>
+          </div>
+        `}).join('');
+
+        custCard.innerHTML = `
+          <div class="flex justify-between items-start flex-wrap gap-3">
+            <div>
+              <h4 class="font-bold text-stone-100 text-base">${cust.name} <span class="text-xs font-mono text-amber-400/80">(Account ID: #${cust.id})</span></h4>
+              <p class="text-xs text-stone-400">${cust.phone} ${cust.email ? '| ' + cust.email : ''}</p>
+              <p class="text-xs text-stone-500">${cust.address || 'No address provided'}</p>
+              ${familyPills ? `<div class="flex flex-wrap gap-1.5 mt-2"><span class="text-[11px] text-stone-400 font-medium">Saved Family Profiles:</span> ${familyPills}</div>` : ''}
+            </div>
+            <button onclick="prepareNewPurchaseForCustomer(${cust.id})" class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-semibold text-xs">
+              + New Order for Family/Self
+            </button>
+          </div>
+          <div class="pt-2"><h5 class="text-xs font-bold uppercase tracking-wider text-stone-400">Order & Prescription History Log</h5>${purchasesHtml}</div>
+        `;
+        container.appendChild(custCard);
+      });
     }
-
-    await fetchOrdersFromCloud();
-  }
-
-  // -------------------------------------------------------------
-  // 4. UI RENDER & CONTROLS
-  // -------------------------------------------------------------
-  function renderOrdersTable() {
-    const tbody = document.getElementById('orders-table-body');
-    if (ordersList.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No records saved yet.</td></tr>`;
-      return;
-    }
-
-    tbody.innerHTML = ordersList.map(item => `
-      <tr>
-        <td>${item.id}</td>
-        <td><strong>${item.customerName}</strong></td>
-        <td>${item.phone}</td>
-        <td>${item.item}</td>
-        <td>$${item.total}</td>
-        <td>
-          <button onclick="editOrder('${item.id}')" style="padding: 4px 8px; font-size: 0.8rem;">Edit</button>
-          <button onclick="deleteOrder('${item.id}')" class="danger" style="padding: 4px 8px; font-size: 0.8rem;">Delete</button>
-        </td>
-      </tr>
-    `).join('');
-  }
-
-  function editOrder(orderId) {
-    const item = ordersList.find(o => o.id === orderId);
-    if (!item) return;
-
-    document.getElementById('editing-order-id').value = item.id;
-    document.getElementById('cust-name').value = item.customerName || '';
-    document.getElementById('cust-phone').value = item.phone || '';
-    document.getElementById('cust-email').value = item.email || '';
-    document.getElementById('cust-age').value = item.age || '';
-    
-    if (item.rx) {
-      document.getElementById('rx-od-sph').value = item.rx.odSph || '';
-      document.getElementById('rx-od-cyl').value = item.rx.odCyl || '';
-      document.getElementById('rx-od-axis').value = item.rx.odAxis || '';
-      document.getElementById('rx-od-add').value = item.rx.odAdd || '';
-      document.getElementById('rx-os-sph').value = item.rx.osSph || '';
-      document.getElementById('rx-os-cyl').value = item.rx.osCyl || '';
-      document.getElementById('rx-os-axis').value = item.rx.osAxis || '';
-      document.getElementById('rx-os-add').value = item.rx.osAdd || '';
-    }
-
-    document.getElementById('order-item').value = item.item || '';
-    document.getElementById('order-total').value = item.total || '';
-
-    document.getElementById('form-title').innerText = 'Edit Customer Record';
-    switchTab('form');
-  }
-
-  function switchTab(tabName) {
-    if (tabName === 'dashboard') {
-      document.getElementById('tab-dashboard').classList.remove('hidden');
-      document.getElementById('tab-form').classList.add('hidden');
-      document.getElementById('tab-dashboard-btn').classList.add('active');
-      document.getElementById('tab-form-btn').classList.remove('active');
-    } else {
-      document.getElementById('tab-dashboard').classList.add('hidden');
-      document.getElementById('tab-form').classList.remove('hidden');
-      document.getElementById('tab-dashboard-btn').classList.remove('active');
-      document.getElementById('tab-form-btn').classList.add('active');
-    }
-  }
-</script>
-
+  </script>
 </body>
 </html>
