@@ -126,13 +126,30 @@
   <!-- ================= STEP 4: MAIN APP DASHBOARD ================= -->
   <div id="step-app-dashboard" class="hidden min-h-screen flex flex-col bg-neutral-950">
     <!-- Header -->
-    <header class="border-b border-neutral-800 bg-neutral-900/80 backdrop-blur sticky top-0 z-40 px-4 md:px-8 py-4 flex justify-between items-center">
+    <header class="border-b border-neutral-800 bg-neutral-900/80 backdrop-blur sticky top-0 z-40 px-4 md:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
       <div>
         <h2 id="disp-shop-title" class="text-xl font-black tracking-wider text-amber-400">OPTIPULSE</h2>
         <p id="disp-managing-badge" class="text-xs text-stone-400">Managing Practice</p>
       </div>
-      <div class="flex items-center gap-4">
-        <span id="badge-curr" class="px-3 py-1 rounded-full bg-neutral-800 text-amber-400 text-xs font-bold border border-neutral-700">PKR</span>
+
+      <!-- Quick Language & Currency Switcher on Dashboard -->
+      <div class="flex items-center gap-3">
+        <select id="dash-select-lang" onchange="changeLanguage(this.value)" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 border border-neutral-700 text-amber-400 text-xs font-semibold focus:outline-none">
+          <option value="en">English</option>
+          <option value="ur">اردو</option>
+          <option value="ar">العربية</option>
+        </select>
+
+        <select id="dash-select-curr" onchange="changeCurrency(this.value)" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 border border-neutral-700 text-amber-400 text-xs font-bold focus:outline-none">
+          <option value="PKR">PKR</option>
+          <option value="USD">USD ($)</option>
+          <option value="INR">INR (₹)</option>
+          <option value="OMR">OMR</option>
+          <option value="SAR">SAR</option>
+          <option value="QAR">QAR</option>
+          <option value="AED">AED</option>
+        </select>
+
         <button id="btn-logout" onclick="handleLogout()" class="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-300 text-xs font-semibold">Logout</button>
       </div>
     </header>
@@ -179,6 +196,7 @@
         <h3 id="hdr-patient-entry" class="text-lg font-bold text-stone-100">Patient Prescription & Order Entry</h3>
         <form id="customer-form" onsubmit="handleSaveCustomer(event)" class="space-y-6">
           <input type="hidden" id="editing-cust-id">
+          <input type="hidden" id="editing-order-id">
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -290,6 +308,17 @@
       }
     });
 
+    /* ---- Currency Conversion Rates (Base: USD = 1.0) ---- */
+    const currencyRates = {
+      USD: 1.0,
+      PKR: 278.50,
+      INR: 83.50,
+      OMR: 0.385,
+      SAR: 3.75,
+      QAR: 3.64,
+      AED: 3.67
+    };
+
     /* ---- Dictionary Translations ---- */
     const translations = {
       en: {
@@ -335,6 +364,7 @@
         btnFormSave: "Save Customer Record",
         searchPlaceholder: "Search by patient name or phone number...",
         btnMarkDelivered: "Mark Delivered",
+        btnEditRecord: "Edit Record",
         btnLogout: "Logout"
       },
       ur: {
@@ -380,6 +410,7 @@
         btnFormSave: "کسٹمر ریکارڈ محفوظ کریں",
         searchPlaceholder: "مریض کا نام یا فون نمبر کے ذریعہ تلاش کریں...",
         btnMarkDelivered: "ڈیلیور نشان زد کریں",
+        btnEditRecord: "ریکارڈ میں ترمیم کریں",
         btnLogout: "لاگ آؤٹ"
       },
       ar: {
@@ -425,13 +456,53 @@
         btnFormSave: "حفظ سجل العميل",
         searchPlaceholder: "البحث باسم المريض أو رقم الهاتف...",
         btnMarkDelivered: "تحديد كتم التسليم",
+        btnEditRecord: "تعديل السجل",
         btnLogout: "تسجيل الخروج"
       }
     };
 
-    /* ---- Change Language ---- */
+    /* ---- Persistent Storage Helpers ---- */
+    async function sget(key) {
+      try {
+        const val = localStorage.getItem(key);
+        return val ? val : null;
+      } catch(e) { return null; }
+    }
+    
+    async function sset(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch(e) { console.error('Storage set failed', e); }
+    }
+
+    function persistConfig() { sset('app-config', JSON.stringify(appConfig)); }
+    function persistCustomers() { sset('customer-database', JSON.stringify(customerDatabase)); }
+
+    let appConfig = {
+      lang: 'en',
+      currency: 'PKR',
+      currSymbol: 'PKR',
+      owner: {}
+    };
+
+    let customerDatabase = [];
+
+    /* ---- Dynamic Currency Conversion Helper ---- */
+    function convertCurrencyValue(val, targetCurr) {
+      const num = Number(val || 0);
+      const baseUSD = num / (currencyRates[appConfig.currency] || 1);
+      const converted = baseUSD * (currencyRates[targetCurr] || 1);
+      return Math.round(converted * 100) / 100;
+    }
+
+    /* ---- Change Language Dynamically ---- */
     function changeLanguage(langCode) {
       appConfig.lang = langCode;
+      
+      // Keep dropdown selections in sync
+      document.getElementById('select-lang').value = langCode;
+      document.getElementById('dash-select-lang').value = langCode;
+
       const dict = translations[langCode] || translations.en;
       const htmlRoot = document.getElementById('html-root');
 
@@ -490,13 +561,37 @@
       renderDashboard();
     }
 
-    /* ---- Change Currency ---- */
+    /* ---- Change Currency Dynamically & Recalculate Database Amounts ---- */
     function changeCurrency(currCode) {
+      if (appConfig.currency === currCode) return;
+
+      const oldCurr = appConfig.currency;
+      
+      // Update stored amounts across all orders in database
+      customerDatabase.forEach(cust => {
+        cust.purchases.forEach(p => {
+          const oldTotal = p.total;
+          const oldPaid = p.paid;
+          
+          // Convert from old currency to new target currency
+          const baseUSDTotal = oldTotal / (currencyRates[oldCurr] || 1);
+          const baseUSDPaid = oldPaid / (currencyRates[oldCurr] || 1);
+          
+          p.total = Math.round(baseUSDTotal * (currencyRates[currCode] || 1));
+          p.paid = Math.round(baseUSDPaid * (currencyRates[currCode] || 1));
+        });
+      });
+
       appConfig.currency = currCode;
       appConfig.currSymbol = currCode;
-      document.getElementById('badge-curr').innerText = currCode;
+
+      // Keep dropdown selections in sync
+      document.getElementById('select-curr').value = currCode;
+      document.getElementById('dash-select-curr').value = currCode;
+
       calcBalance();
       persistConfig();
+      persistCustomers();
       renderDashboard();
     }
 
@@ -528,32 +623,6 @@
       animate();
     }
 
-    /* ---- Persistent Storage Helpers ---- */
-    async function sget(key) {
-      try {
-        const val = localStorage.getItem(key);
-        return val ? val : null;
-      } catch(e) { return null; }
-    }
-    
-    async function sset(key, value) {
-      try {
-        localStorage.setItem(key, value);
-      } catch(e) { console.error('Storage set failed', e); }
-    }
-
-    function persistConfig() { sset('app-config', JSON.stringify(appConfig)); }
-    function persistCustomers() { sset('customer-database', JSON.stringify(customerDatabase)); }
-
-    let appConfig = {
-      lang: 'en',
-      currency: 'PKR',
-      currSymbol: 'PKR',
-      owner: {}
-    };
-
-    let customerDatabase = [];
-
     // Application Initialization
     window.addEventListener('DOMContentLoaded', async () => {
       const savedConfigRaw = await sget('app-config');
@@ -563,11 +632,12 @@
           if (savedConfig && savedConfig.owner && savedConfig.owner.shop) {
             appConfig = savedConfig;
             
-            // Set saved lang/currency dropdowns
             document.getElementById('select-lang').value = appConfig.lang || 'en';
+            document.getElementById('dash-select-lang').value = appConfig.lang || 'en';
             document.getElementById('select-curr').value = appConfig.currency || 'PKR';
+            document.getElementById('dash-select-curr').value = appConfig.currency || 'PKR';
+
             changeLanguage(appConfig.lang || 'en');
-            changeCurrency(appConfig.currency || 'PKR');
 
             const savedCustomersRaw = await sget('customer-database');
             if (savedCustomersRaw) { try { customerDatabase = JSON.parse(savedCustomersRaw); } catch(e){} }
@@ -718,6 +788,48 @@
       }
     }
 
+    /* ---- EDIT CUSTOMER / ORDER DIRECTLY FROM DASHBOARD ---- */
+    function editCustomerFromDashboard(custId, orderId) {
+      const cust = customerDatabase.find(c => c.id === custId);
+      if (!cust) return;
+
+      const order = cust.purchases.find(p => p.orderId === orderId);
+
+      // Populate main form elements
+      document.getElementById('editing-cust-id').value = cust.id;
+      document.getElementById('editing-order-id').value = orderId;
+      
+      document.getElementById('cust-name').value = cust.name;
+      document.getElementById('cust-phone').value = cust.phone;
+      document.getElementById('cust-email').value = cust.email || '';
+      document.getElementById('cust-age').value = cust.age || '';
+      document.getElementById('cust-gender').value = cust.gender || 'Male';
+      document.getElementById('cust-address').value = cust.address || '';
+
+      if (order) {
+        document.getElementById('order-item').value = order.item || '';
+        document.getElementById('order-total').value = order.total || 0;
+        document.getElementById('order-paid').value = order.paid || 0;
+        document.getElementById('order-status').value = order.status || 'In Progress';
+
+        if (order.rx) {
+          document.getElementById('rx-od-sph').value = order.rx.odSph || '';
+          document.getElementById('rx-od-cyl').value = order.rx.odCyl || '';
+          document.getElementById('rx-od-axis').value = order.rx.odAxis || '';
+          document.getElementById('rx-od-add').value = order.rx.odAdd || '';
+          document.getElementById('rx-os-sph').value = order.rx.osSph || '';
+          document.getElementById('rx-os-cyl').value = order.rx.osCyl || '';
+          document.getElementById('rx-os-axis').value = order.rx.osAxis || '';
+          document.getElementById('rx-os-add').value = order.rx.osAdd || '';
+          document.getElementById('rx-pd').value = order.rx.pd || '';
+          document.getElementById('rx-doctor').value = order.rx.doctor || '';
+        }
+      }
+
+      calcBalance();
+      switchAppTab('new-customer');
+    }
+
     function handleSaveCustomer(e) {
       e.preventDefault();
 
@@ -725,12 +837,13 @@
       const phoneEl = document.getElementById('cust-phone');
       if (!nameEl.value.trim() || !phoneEl.value.trim()) return;
 
-      const existingId = document.getElementById('editing-cust-id').value;
+      const existingCustId = document.getElementById('editing-cust-id').value;
+      const existingOrderId = document.getElementById('editing-order-id').value;
       const total = Number(document.getElementById('order-total').value || 0);
       const paid = Number(document.getElementById('order-paid').value || 0);
 
-      const newPurchase = {
-        orderId: Date.now(),
+      const purchaseData = {
+        orderId: existingOrderId ? Number(existingOrderId) : Date.now(),
         date: new Date().toISOString().split('T')[0],
         item: document.getElementById('order-item').value || 'Eyewear Frame & Lenses',
         total: total,
@@ -750,8 +863,8 @@
         }
       };
 
-      if (existingId) {
-        const cust = customerDatabase.find(c => c.id === Number(existingId));
+      if (existingCustId) {
+        const cust = customerDatabase.find(c => c.id === Number(existingCustId));
         if (cust) {
           cust.name = nameEl.value;
           cust.phone = phoneEl.value;
@@ -759,7 +872,17 @@
           cust.age = document.getElementById('cust-age').value;
           cust.gender = document.getElementById('cust-gender').value;
           cust.address = document.getElementById('cust-address').value;
-          cust.purchases.push(newPurchase);
+
+          if (existingOrderId) {
+            const orderIndex = cust.purchases.findIndex(p => p.orderId === Number(existingOrderId));
+            if (orderIndex !== -1) {
+              cust.purchases[orderIndex] = purchaseData;
+            } else {
+              cust.purchases.push(purchaseData);
+            }
+          } else {
+            cust.purchases.push(purchaseData);
+          }
         }
       } else {
         customerDatabase.push({
@@ -770,7 +893,7 @@
           age: document.getElementById('cust-age').value,
           gender: document.getElementById('cust-gender').value,
           address: document.getElementById('cust-address').value,
-          purchases: [newPurchase]
+          purchases: [purchaseData]
         });
       }
 
@@ -783,6 +906,7 @@
     function resetCustomerForm() {
       document.getElementById('customer-form').reset();
       document.getElementById('editing-cust-id').value = '';
+      document.getElementById('editing-order-id').value = '';
       calcBalance();
     }
 
@@ -827,14 +951,19 @@
                   <p class="text-[11px] text-stone-400">Date: ${purchase.date} | Status: <span class="text-amber-400 font-semibold">${purchase.status}</span></p>
                 </div>
               </div>
-              <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+              <div class="flex flex-col md:flex-row items-end md:items-center gap-3 w-full md:w-auto justify-between md:justify-end">
                 <div class="text-right">
                   <p class="text-xs text-stone-400">Due: <span class="font-bold text-amber-400">${appConfig.currSymbol} ${due.toLocaleString()}</span></p>
                   <p class="text-[10px] text-stone-500">Total: ${appConfig.currSymbol} ${purchase.total.toLocaleString()}</p>
                 </div>
-                <button onclick="deliverOrder(${cust.id}, ${purchase.orderId})" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider">
-                  ${dict.btnMarkDelivered}
-                </button>
+                <div class="flex flex-col gap-2 w-full md:w-auto">
+                  <button onclick="deliverOrder(${cust.id}, ${purchase.orderId})" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider">
+                    ${dict.btnMarkDelivered}
+                  </button>
+                  <button onclick="editCustomerFromDashboard(${cust.id}, ${purchase.orderId})" class="px-4 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-semibold text-xs border border-amber-500/30">
+                    ${dict.btnEditRecord}
+                  </button>
+                </div>
               </div>
             `;
             activeListContainer.appendChild(itemCard);
