@@ -199,40 +199,75 @@
           <input type="hidden" id="editing-cust-id">
           <input type="hidden" id="editing-order-id">
           
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label id="lbl-cust-name" class="block text-xs font-semibold text-stone-400 mb-1">Customer Full Name *</label>
-              <input id="cust-name" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+          <!-- Primary Account Holder Info -->
+          <div class="space-y-2">
+            <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Primary Account Holder Info</h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label id="lbl-cust-name" class="block text-xs font-semibold text-stone-400 mb-1">Primary Customer Name *</label>
+                <input id="cust-name" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label id="lbl-cust-phone" class="block text-xs font-semibold text-stone-400 mb-1">Phone / Mobile *</label>
+                <input id="cust-phone" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label id="lbl-cust-email" class="block text-xs font-semibold text-stone-400 mb-1">Email (Optional)</label>
+                <input id="cust-email" type="email" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label id="lbl-cust-address" class="block text-xs font-semibold text-stone-400 mb-1">Address</label>
+                <input id="cust-address" type="text" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
             </div>
-            <div>
-              <label id="lbl-cust-phone" class="block text-xs font-semibold text-stone-400 mb-1">Phone / Mobile *</label>
-              <input id="cust-phone" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
-            </div>
-            <div>
-              <label id="lbl-cust-email" class="block text-xs font-semibold text-stone-400 mb-1">Email (Optional)</label>
-              <input id="cust-email" type="email" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
-            </div>
-            <div>
-              <label id="lbl-cust-age" class="block text-xs font-semibold text-stone-400 mb-1">Age</label>
-              <input id="cust-age" type="number" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
-            </div>
-            <div>
-              <label id="lbl-cust-gender" class="block text-xs font-semibold text-stone-400 mb-1">Gender</label>
-              <select id="cust-gender" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-            <div>
-              <label id="lbl-cust-address" class="block text-xs font-semibold text-stone-400 mb-1">Address</label>
-              <input id="cust-address" type="text" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+          </div>
+
+          <!-- Family Member / Patient Section -->
+          <div class="border-t border-neutral-800 pt-6 space-y-4">
+            <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Order Recipient Details (Self or Family Member)</h4>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Order For *</label>
+                <select id="order-for-type" onchange="toggleFamilyMemberFields(this.value)" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                  <option value="Self">Self (Primary Customer)</option>
+                  <option value="Family Member">Family Member</option>
+                </select>
+              </div>
+
+              <div id="family-rel-box" class="hidden">
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Relationship</label>
+                <select id="family-relation" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                  <option value="Son">Son</option>
+                  <option value="Daughter">Daughter</option>
+                  <option value="Wife">Wife</option>
+                  <option value="Husband">Husband</option>
+                  <option value="Mother">Mother</option>
+                  <option value="Father">Father</option>
+                  <option value="Brother">Brother</option>
+                  <option value="Sister">Sister</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div id="family-name-box" class="hidden">
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Family Member Name</label>
+                <input id="family-member-name" type="text" placeholder="e.g. Ali / Sara" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+
+              <div>
+                <label id="lbl-cust-age" class="block text-xs font-semibold text-stone-400 mb-1">Patient Age</label>
+                <input id="cust-age" type="number" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
             </div>
           </div>
 
           <!-- Prescription Section -->
           <div class="border-t border-neutral-800 pt-6 space-y-4">
-            <h4 id="hdr-rx-details" class="text-sm font-bold text-amber-400 uppercase tracking-wider">Prescription Details (Rx)</h4>
+            <div class="flex justify-between items-center">
+              <h4 id="hdr-rx-details" class="text-sm font-bold text-amber-400 uppercase tracking-wider">Prescription Details (Rx / Eyesight Numbers)</h4>
+              <span class="text-[11px] text-stone-400">Updates here are saved to the patient profile</span>
+            </div>
+            
             <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
               <div><label class="text-[10px] text-stone-400 uppercase">OD SPH</label><input id="rx-od-sph" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
               <div><label class="text-[10px] text-stone-400 uppercase">OD CYL</label><input id="rx-od-cyl" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
@@ -285,7 +320,7 @@
 
       <!-- TAB 3: CUSTOMER HISTORY -->
       <div id="view-tab-history" class="hidden space-y-4">
-        <input id="history-search-input" type="text" onkeyup="filterCustomerHistory()" placeholder="Search by patient name or phone number..." class="w-full px-4 py-3 rounded-2xl bg-neutral-900 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+        <input id="history-search-input" type="text" onkeyup="filterCustomerHistory()" placeholder="Search by patient name, family member, or phone number..." class="w-full px-4 py-3 rounded-2xl bg-neutral-900 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
         <div id="history-results-list" class="space-y-4">
           <!-- Filtered records render here -->
         </div>
@@ -369,13 +404,13 @@
 
     const translations = {
       en: {
-        welcomeSub: "Optical Practice & Customer Management System", enterPortal: "Enter System Portal", settingsTitle: "Preferences", settingsSubtitle: "Select your preferred language and local currency.", selectLang: "Language", selectCurr: "Currency", btnContinueAuth: "Continue to Authentication", authTitle: "Shop Authentication", authSubtitle: "Enter your details to log in or register your optical store.", lblShopName: "Shop / Practice Name", lblMobile: "Mobile Contact", lblEmail: "Owner Email", lblAddress: "Shop Address", btnSendOtp: "Send Email Verification OTP", lblEnterOtp: "Enter 6-Digit OTP Code", btnVerifyOtp: "Verify & Enter Portal", tabDashboard: "Dashboard", tabNewOrder: "+ New Order", tabDatabase: "Customer Database", tabAccount: "Profile & Settings", lblActiveOrders: "Active Pending Orders", lblOutstandingDues: "Total Outstanding Dues", lblCompletedOrders: "Completed Orders", hdrCurrentActive: "Current Active Orders", hdrPatientEntry: "Patient Prescription & Order Entry", lblCustName: "Customer Full Name *", lblCustPhone: "Phone / Mobile *", lblCustEmail: "Email (Optional)", lblCustAge: "Age", lblCustGender: "Gender", lblCustAddress: "Address", hdrRxDetails: "Prescription Details (Rx)", lblPrescribedBy: "Prescribed By", hdrOrderBilling: "Order & Billing Details", lblItemDesc: "Item Description", lblTotalAmount: "Total Amount", lblAmountPaid: "Amount Paid", lblOrderStatus: "Status", lblRemainingBal: "Remaining Balance", btnFormCancel: "Cancel", btnFormSave: "Save Customer Record", searchPlaceholder: "Search by patient name or phone number...", btnMarkDelivered: "Mark Delivered", btnEditRecord: "Edit Record", btnLogout: "Logout"
+        welcomeSub: "Optical Practice & Customer Management System", enterPortal: "Enter System Portal", settingsTitle: "Preferences", settingsSubtitle: "Select your preferred language and local currency.", selectLang: "Language", selectCurr: "Currency", btnContinueAuth: "Continue to Authentication", authTitle: "Shop Authentication", authSubtitle: "Enter your details to log in or register your optical store.", lblShopName: "Shop / Practice Name", lblMobile: "Mobile Contact", lblEmail: "Owner Email", lblAddress: "Shop Address", btnSendOtp: "Send Email Verification OTP", lblEnterOtp: "Enter 6-Digit OTP Code", btnVerifyOtp: "Verify & Enter Portal", tabDashboard: "Dashboard", tabNewOrder: "+ New Order", tabDatabase: "Customer Database", tabAccount: "Profile & Settings", lblActiveOrders: "Active Pending Orders", lblOutstandingDues: "Total Outstanding Dues", lblCompletedOrders: "Completed Orders", hdrCurrentActive: "Current Active Orders", hdrPatientEntry: "Patient Prescription & Order Entry", lblCustName: "Customer Full Name *", lblCustPhone: "Phone / Mobile *", lblCustEmail: "Email (Optional)", lblCustAge: "Age", lblCustAddress: "Address", hdrRxDetails: "Prescription Details (Rx)", lblPrescribedBy: "Prescribed By", hdrOrderBilling: "Order & Billing Details", lblItemDesc: "Item Description", lblTotalAmount: "Total Amount", lblAmountPaid: "Amount Paid", lblOrderStatus: "Status", lblRemainingBal: "Remaining Balance", btnFormCancel: "Cancel", btnFormSave: "Save Customer Record", searchPlaceholder: "Search by patient name, family member, or phone number...", btnMarkDelivered: "Mark Delivered", btnEditRecord: "Edit Record", btnLogout: "Logout"
       },
       ur: {
-        welcomeSub: "آپٹیکل پریکٹس اور کسٹمر منیجمنٹ سسٹم", enterPortal: "سسٹم پورٹل میں داخل ہوں", settingsTitle: "ترجیحات", settingsSubtitle: "اپنی پسندیدہ زبان اور مقامی کرنسی کا انتخاب کریں۔", selectLang: "زبان", selectCurr: "کرنسی", btnContinueAuth: "آتھینٹیکیشن پر آگے بڑھیں", authTitle: "دوکان کی تصدیق", authSubtitle: "لاگ ان کرنے یا اپنی آپٹیکل شاپ کو رجسٹر کرنے کے لیے تفصیلات درج کریں۔", lblShopName: "دوکان / پریکٹس کا نام", lblMobile: "موبائل نمبر", lblEmail: "آنر کا ای میل", lblAddress: "دوکان کا پتہ", btnSendOtp: "ای میل تصدیق کا OTP بھیجیں", lblEnterOtp: "6 ہندسوں کا OTP کوڈ درج کریں", btnVerifyOtp: "تصدیق کریں اور پورٹل میں داخل ہوں", tabDashboard: "ڈیش بورڈ", tabNewOrder: "+ نیا آرڈر", tabDatabase: "کسٹمر ڈیٹا بیس", tabAccount: "پروفائل اور ترتیبات", lblActiveOrders: "فعال زیر التوا آرڈرز", lblOutstandingDues: "کل واجب الادا رقم", lblCompletedOrders: "مکمل شدہ آرڈرز", hdrCurrentActive: "موجودہ فعال آرڈرز", hdrPatientEntry: "مریض کا نسخہ اور آرڈر کا اندراج", lblCustName: "گاہک کا پورا نام *", lblCustPhone: "فون / موبائل *", lblCustEmail: "ای میل (اختیاری)", lblCustAge: "عمر", lblCustGender: "جنس", lblCustAddress: "پتہ", hdrRxDetails: "نسخے کی تفصیلات (Rx)", lblPrescribedBy: "تجویز کردہ از ڈاکٹر", hdrOrderBilling: "آرڈر اور بلنگ کی تفصیلات", lblItemDesc: "آئٹم کی تفصیل", lblTotalAmount: "کل رقم", lblAmountPaid: "ادا شدہ رقم", lblOrderStatus: "حیثیت (سٹیٹس)", lblRemainingBal: "بقیہ رقم", btnFormCancel: "منسوخ کریں", btnFormSave: "کسٹمر ریکارڈ محفوظ کریں", searchPlaceholder: "مریض کا نام یا فون نمبر کے ذریعہ تلاش کریں...", btnMarkDelivered: "ڈیلیور نشان زد کریں", btnEditRecord: "ریکارڈ میں ترمیم کریں", btnLogout: "لاگ آؤٹ"
+        welcomeSub: "آپٹیکل پریکٹس اور کسٹمر منیجمنٹ سسٹم", enterPortal: "سسٹم پورٹل میں داخل ہوں", settingsTitle: "ترجیحات", settingsSubtitle: "اپنی پسندیدہ زبان اور مقامی کرنسی کا انتخاب کریں۔", selectLang: "زبان", selectCurr: "کرنسی", btnContinueAuth: "آتھینٹیکیشن پر آگے بڑھیں", authTitle: "دوکان کی تصدیق", authSubtitle: "لاگ ان کرنے یا اپنی آپٹیکل شاپ کو رجسٹر کرنے کے لیے تفصیلات درج کریں۔", lblShopName: "دوکان / پریکٹس کا نام", lblMobile: "موبائل نمبر", lblEmail: "آنر کا ای میل", lblAddress: "دوکان کا پتہ", btnSendOtp: "ای میل تصدیق کا OTP بھیجیں", lblEnterOtp: "6 ہندسوں کا OTP کوڈ درج کریں", btnVerifyOtp: "تصدیق کریں اور پورٹل میں داخل ہوں", tabDashboard: "ڈیش بورڈ", tabNewOrder: "+ نیا آرڈر", tabDatabase: "کسٹمر ڈیٹا بیس", tabAccount: "پروفائل اور ترتیبات", lblActiveOrders: "فعال زیر التوا آرڈرز", lblOutstandingDues: "کل واجب الادا رقم", lblCompletedOrders: "مکمل شدہ آرڈرز", hdrCurrentActive: "موجودہ فعال آرڈرز", hdrPatientEntry: "مریض کا نسخہ اور آرڈر کا اندراج", lblCustName: "گاہک کا پورا نام *", lblCustPhone: "فون / موبائل *", lblCustEmail: "ای میل (اختیاری)", lblCustAge: "عمر", lblCustAddress: "پتہ", hdrRxDetails: "نسخے کی تفصیلات (Rx)", lblPrescribedBy: "تجویز کردہ از ڈاکٹر", hdrOrderBilling: "آرڈر اور بلنگ کی تفصیلات", lblItemDesc: "آئٹم کی تفصیل", lblTotalAmount: "کل رقم", lblAmountPaid: "ادا شدہ رقم", lblOrderStatus: "حیثیت (سٹیٹس)", lblRemainingBal: "بقیہ رقم", btnFormCancel: "منسوخ کریں", btnFormSave: "کسٹمر ریکارڈ محفوظ کریں", searchPlaceholder: "مریض کا نام، فیملی ممبر یا فون نمبر سے تلاش کریں...", btnMarkDelivered: "ڈیلیور نشان زد کریں", btnEditRecord: "ترمیم کریں", btnLogout: "لاگ آؤٹ"
       },
       ar: {
-        welcomeSub: "نظام إدارة الممارسة البصرية والعملاء", enterPortal: "الدخول إلى البوابة", settingsTitle: "التفضيلات", settingsSubtitle: "حدد لغتك المفضلة والعملة المحلية.", selectLang: "اللغة", selectCurr: "العملة", btnContinueAuth: "الانتقال إلى المصادقة", authTitle: "مصادقة المتجر", authSubtitle: "أدخل بياناتك لتسجيل الدخول أو تسجيل متجر البصريات الخاص بك.", lblShopName: "اسم المتجر / العيادة", lblMobile: "رقم الهاتف المحمول", lblEmail: "البريد الإلكتروني للمالك", lblAddress: "عنوان المتجر", btnSendOtp: "إرسال رمز التحقق (OTP) إلى البريد", lblEnterOtp: "أدخل رمز OTP المكون من 6 أرقام", btnVerifyOtp: "التحقق والدخول إلى البوابة", tabDashboard: "لوحة التحكم", tabNewOrder: "+ طلب جديد", tabDatabase: "قاعدة بيانات العملاء", tabAccount: "الملف الشخصي والإعدادات", lblActiveOrders: "الطلبات النشطة المعلقة", lblOutstandingDues: "إجمالي المبالغ المستحقة", lblCompletedOrders: "الطلبات المكتملة", hdrCurrentActive: "الطلبات النشطة الحالية", hdrPatientEntry: "وصفة المريض وإدخال الطلب", lblCustName: "اسم العميل الكامل *", lblCustPhone: "الهاتف / المحمول *", lblCustEmail: "البريد الإلكتروني (اختياري)", lblCustAge: "العمر", lblCustGender: "الجنس", lblCustAddress: "العنوان", hdrRxDetails: "تفاصيل الوصفة الطبية (Rx)", lblPrescribedBy: "تم الوصف بواسطة الطبيب", hdrOrderBilling: "تفاصيل الطلب والفلترة", lblItemDesc: "وصف العنصر", lblTotalAmount: "المبلغ الإجمالي", lblAmountPaid: "المبلغ المدفوع", lblOrderStatus: "الحالة", lblRemainingBal: "الرصيد المتبقي", btnFormCancel: "إلغاء", btnFormSave: "حفظ سجل العميل", searchPlaceholder: "البحث باسم المريض أو رقم الهاتف...", btnMarkDelivered: "تحديد كتم التسليم", btnEditRecord: "تعديل السجل", btnLogout: "تسجيل الخروج"
+        welcomeSub: "نظام إدارة الممارسة البصرية والعملاء", enterPortal: "الدخول إلى البوابة", settingsTitle: "التفضيلات", settingsSubtitle: "حدد لغتك المفضلة والعملة المحلية.", selectLang: "اللغة", selectCurr: "العملة", btnContinueAuth: "الانتقال إلى المصادقة", authTitle: "مصادقة المتجر", authSubtitle: "أدخل بياناتك لتسجيل الدخول أو تسجيل متجر البصريات الخاص بك.", lblShopName: "اسم المتجر / العيادة", lblMobile: "رقم الهاتف المحمول", lblEmail: "البريد الإلكتروني للمالك", lblAddress: "عنوان المتجر", btnSendOtp: "إرسال رمز التحقق (OTP) إلى البريد", lblEnterOtp: "أدخل رمز OTP المكون من 6 أرقام", btnVerifyOtp: "التحقق والدخول إلى البوابة", tabDashboard: "لوحة التحكم", tabNewOrder: "+ طلب جديد", tabDatabase: "قاعدة بيانات العملاء", tabAccount: "الملف الشخصي والإعدادات", lblActiveOrders: "الطلبات النشطة المعلقة", lblOutstandingDues: "إجمالي المبالغ المستحقة", lblCompletedOrders: "الطلبات المكتملة", hdrCurrentActive: "الطلبات النشطة الحالية", hdrPatientEntry: "وصفة المريض وإدخال الطلب", lblCustName: "اسم العميل الكامل *", lblCustPhone: "الهاتف / المحمول *", lblCustEmail: "البريد الإلكتروني (اختياري)", lblCustAge: "العمر", lblCustAddress: "العنوان", hdrRxDetails: "تفاصيل الوصفة الطبية (Rx)", lblPrescribedBy: "تم الوصف بواسطة الطبيب", hdrOrderBilling: "تفاصيل الطلب والفلترة", lblItemDesc: "وصف العنصر", lblTotalAmount: "المبلغ الإجمالي", lblAmountPaid: "المبلغ المدفوع", lblOrderStatus: "الحالة", lblRemainingBal: "الرصيد المتبقي", btnFormCancel: "إلغاء", btnFormSave: "حفظ سجل العميل", searchPlaceholder: "البحث باسم المريض أو الفرد الأسري...", btnMarkDelivered: "تحديد كتم التسليم", btnEditRecord: "تعديل السجل", btnLogout: "تسجيل الخروج"
       }
     };
 
@@ -420,6 +455,18 @@
       populateProfileFields();
       changeLanguage(appConfig.lang || 'en');
       changeCurrency(appConfig.currency || 'PKR');
+    }
+
+    function toggleFamilyMemberFields(val) {
+      const relBox = document.getElementById('family-rel-box');
+      const nameBox = document.getElementById('family-name-box');
+      if (val === 'Family Member') {
+        relBox.classList.remove('hidden');
+        nameBox.classList.remove('hidden');
+      } else {
+        relBox.classList.add('hidden');
+        nameBox.classList.add('hidden');
+      }
     }
 
     function populateProfileFields() {
@@ -499,7 +546,6 @@
       document.getElementById('lbl-cust-phone').innerText = dict.lblCustPhone;
       document.getElementById('lbl-cust-email').innerText = dict.lblCustEmail;
       document.getElementById('lbl-cust-age').innerText = dict.lblCustAge;
-      document.getElementById('lbl-cust-gender').innerText = dict.lblCustGender;
       document.getElementById('lbl-cust-address').innerText = dict.lblCustAddress;
       document.getElementById('hdr-rx-details').innerText = dict.hdrRxDetails;
       document.getElementById('lbl-prescribed-by').innerText = dict.lblPrescribedBy;
@@ -725,11 +771,15 @@
       document.getElementById('cust-name').value = cust.name;
       document.getElementById('cust-phone').value = cust.phone;
       document.getElementById('cust-email').value = cust.email || '';
-      document.getElementById('cust-age').value = cust.age || '';
-      document.getElementById('cust-gender').value = cust.gender || 'Male';
       document.getElementById('cust-address').value = cust.address || '';
 
       if (order) {
+        document.getElementById('order-for-type').value = order.forType || 'Self';
+        toggleFamilyMemberFields(order.forType || 'Self');
+        document.getElementById('family-relation').value = order.familyRelation || 'Son';
+        document.getElementById('family-member-name').value = order.patientName || '';
+        document.getElementById('cust-age').value = order.patientAge || '';
+
         document.getElementById('order-item').value = order.item || '';
         document.getElementById('order-total').value = order.total || 0;
         document.getElementById('order-paid').value = order.paid || 0;
@@ -765,9 +815,20 @@
       const total = Number(document.getElementById('order-total').value || 0);
       const paid = Number(document.getElementById('order-paid').value || 0);
 
+      const forType = document.getElementById('order-for-type').value;
+      const familyRel = document.getElementById('family-relation').value;
+      const familyName = document.getElementById('family-member-name').value.trim();
+
+      const patientDisplayName = forType === 'Family Member' && familyName ? `${familyName} (${familyRel})` : nameEl.value;
+
       const purchaseData = {
         orderId: existingOrderId ? Number(existingOrderId) : Date.now(),
         date: new Date().toISOString().split('T')[0],
+        forType: forType,
+        familyRelation: familyRel,
+        patientName: familyName || nameEl.value,
+        patientDisplayName: patientDisplayName,
+        patientAge: document.getElementById('cust-age').value,
         item: document.getElementById('order-item').value || 'Eyewear Frame & Lenses',
         total: total,
         paid: paid,
@@ -792,8 +853,6 @@
           cust.name = nameEl.value;
           cust.phone = phoneEl.value;
           cust.email = document.getElementById('cust-email').value;
-          cust.age = document.getElementById('cust-age').value;
-          cust.gender = document.getElementById('cust-gender').value;
           cust.address = document.getElementById('cust-address').value;
 
           if (existingOrderId) {
@@ -810,8 +869,6 @@
           name: nameEl.value,
           phone: phoneEl.value,
           email: document.getElementById('cust-email').value,
-          age: document.getElementById('cust-age').value,
-          gender: document.getElementById('cust-gender').value,
           address: document.getElementById('cust-address').value,
           purchases: [purchaseData]
         });
@@ -827,6 +884,7 @@
       document.getElementById('customer-form').reset();
       document.getElementById('editing-cust-id').value = '';
       document.getElementById('editing-order-id').value = '';
+      toggleFamilyMemberFields('Self');
       calcBalance();
     }
 
@@ -838,8 +896,6 @@
         document.getElementById('cust-name').value = cust.name;
         document.getElementById('cust-phone').value = cust.phone;
         document.getElementById('cust-email').value = cust.email || '';
-        document.getElementById('cust-age').value = cust.age || '';
-        document.getElementById('cust-gender').value = cust.gender || 'Male';
         document.getElementById('cust-address').value = cust.address || '';
         switchAppTab('new-customer');
       }
@@ -860,13 +916,16 @@
             activeCount++;
             totalDue += due;
 
+            const isFamily = purchase.forType === 'Family Member';
+            const displayTag = isFamily ? `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[10px] uppercase ml-1">${purchase.patientDisplayName}</span>` : '';
+
             const itemCard = document.createElement('div');
             itemCard.className = "flex flex-col md:flex-row justify-between items-start md:items-center p-4 rounded-xl bg-neutral-900 border border-neutral-800 gap-4";
             itemCard.innerHTML = `
               <div class="flex items-center gap-4">
                 <div class="w-12 h-12 rounded-full bg-neutral-800 border gold-border flex items-center justify-center font-bold text-amber-400 text-sm">${cust.name.charAt(0)}</div>
                 <div>
-                  <h4 class="font-bold text-stone-100 text-sm">${cust.name} <span class="text-xs text-stone-400 font-normal">(${cust.phone})</span></h4>
+                  <h4 class="font-bold text-stone-100 text-sm">${cust.name} ${displayTag} <span class="text-xs text-stone-400 font-normal">(${cust.phone})</span></h4>
                   <p class="text-xs text-amber-400 font-medium">${purchase.item}</p>
                   <p class="text-[11px] text-stone-400">Date: ${purchase.date} | Status: <span class="text-amber-400 font-semibold">${purchase.status}</span></p>
                 </div>
@@ -910,7 +969,9 @@
       container.innerHTML = '';
 
       const filtered = customerDatabase.filter(c => 
-        c.name.toLowerCase().includes(query) || c.phone.toLowerCase().includes(query)
+        c.name.toLowerCase().includes(query) || 
+        c.phone.toLowerCase().includes(query) ||
+        c.purchases.some(p => p.patientName && p.patientName.toLowerCase().includes(query))
       );
 
       if (filtered.length === 0) {
@@ -923,14 +984,20 @@
         custCard.className = "p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-4";
         
         let purchasesHtml = cust.purchases.map(p => `
-          <div class="border-t border-neutral-800 pt-3 mt-3 flex justify-between items-center text-xs">
-            <div>
-              <p class="font-medium text-stone-200">${p.item} (${p.date})</p>
-              <p class="text-[11px] text-stone-400">Rx OD: SPH ${p.rx.odSph || '-'}, CYL ${p.rx.odCyl || '-'} | OS: SPH ${p.rx.osSph || '-'}, CYL ${p.rx.osCyl || '-'}</p>
+          <div class="border-t border-neutral-800 pt-3 mt-3 space-y-2 text-xs">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="font-bold text-amber-400">${p.item} (${p.date})</p>
+                <p class="text-[11px] text-stone-300 font-medium">Patient: <span class="text-stone-100 font-semibold">${p.patientDisplayName || cust.name}</span> ${p.patientAge ? '| Age: ' + p.patientAge : ''}</p>
+              </div>
+              <div class="text-right">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.status === 'Delivered' ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-400'}">${p.status}</span>
+                <p class="text-stone-300 font-semibold mt-1">${appConfig.currSymbol} ${p.total.toLocaleString()}</p>
+              </div>
             </div>
-            <div class="text-right">
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.status === 'Delivered' ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-400'}">${p.status}</span>
-              <p class="text-stone-300 font-semibold mt-1">${appConfig.currSymbol} ${p.total.toLocaleString()}</p>
+            <div class="bg-neutral-950 p-2.5 rounded-xl border border-neutral-800 font-mono text-[11px] text-stone-300 grid grid-cols-2 gap-2">
+              <div>OD (Right): SPH ${p.rx.odSph || '-'}, CYL ${p.rx.odCyl || '-'}, AXIS ${p.rx.odAxis || '-'}, ADD ${p.rx.odAdd || '-'}</div>
+              <div>OS (Left): SPH ${p.rx.osSph || '-'}, CYL ${p.rx.osCyl || '-'}, AXIS ${p.rx.osAxis || '-'}, ADD ${p.rx.osAdd || '-'}</div>
             </div>
           </div>
         `).join('');
@@ -938,12 +1005,12 @@
         custCard.innerHTML = `
           <div class="flex justify-between items-start">
             <div>
-              <h4 class="font-bold text-stone-100 text-base">${cust.name}</h4>
+              <h4 class="font-bold text-stone-100 text-base">${cust.name} <span class="text-xs font-mono text-amber-400/80">(Primary ID)</span></h4>
               <p class="text-xs text-stone-400">${cust.phone} ${cust.email ? '| ' + cust.email : ''}</p>
               <p class="text-xs text-stone-500">${cust.address || 'No address provided'}</p>
             </div>
             <button onclick="prepareNewPurchaseForCustomer(${cust.id})" class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-semibold text-xs">
-              + New Order
+              + New Order for Family/Self
             </button>
           </div>
           <div>${purchasesHtml}</div>
