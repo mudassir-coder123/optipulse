@@ -416,38 +416,75 @@
     let appConfig = { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: {} };
     let customerDatabase = [];
 
-    function getUserStorageKey(suffix) {
-      if (!currentUser || !currentUser.email) return `guest-${suffix}`;
-      return `user-${currentUser.email.toLowerCase()}-${suffix}`;
+    // ---- CLOUD PERSISTENCE (Supabase) ----
+    // Everything is stored in the single "orders" table you created.
+    // One special row per user (customer_name = '__CONFIG__') holds shop/profile settings.
+    // One row per customer (id = customer's numeric id, as text) holds that customer's
+    // full record, including all family members and purchase history, inside order_data.
+    // Because rows are keyed by user_email, whichever Gmail you log in with, you always
+    // get that same account's data back - even after you edit and redeploy the code.
+
+    function configRowId() {
+      return 'config-' + currentUser.email.toLowerCase();
     }
 
     async function persistConfig() {
-      if (currentUser && currentUser.email) {
-        localStorage.setItem(getUserStorageKey('config'), JSON.stringify(appConfig));
+      if (!currentUser || !currentUser.email) return;
+      const { error } = await supabaseClient
+        .from('orders')
+        .upsert({
+          id: configRowId(),
+          user_email: currentUser.email.toLowerCase(),
+          customer_name: '__CONFIG__',
+          phone: '',
+          order_data: appConfig
+        });
+      if (error) console.error('Error saving settings to Supabase:', error);
+    }
+
+    async function persistCustomer(cust) {
+      if (!currentUser || !currentUser.email) return;
+      const { error } = await supabaseClient
+        .from('orders')
+        .upsert({
+          id: String(cust.id),
+          user_email: currentUser.email.toLowerCase(),
+          customer_name: cust.name,
+          phone: cust.phone,
+          order_data: cust
+        });
+      if (error) {
+        console.error('Error saving customer to Supabase:', error);
+        alert('Could not save to the cloud database: ' + error.message);
       }
     }
 
-    async function persistCustomers() {
-      if (currentUser && currentUser.email) {
-        localStorage.setItem(getUserStorageKey('customers'), JSON.stringify(customerDatabase));
+    async function persistAllCustomers() {
+      if (!currentUser || !currentUser.email) return;
+      for (const cust of customerDatabase) {
+        await persistCustomer(cust);
       }
     }
 
     async function loadUserData(userEmail) {
-      currentUser = { email: userEmail };
-      
-      const savedConfig = localStorage.getItem(getUserStorageKey('config'));
-      if (savedConfig) {
-        try { appConfig = JSON.parse(savedConfig); } catch(e){}
-      } else {
-        appConfig = { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: { shop: 'OptiPulse Store', email: userEmail } };
-      }
+      currentUser = { email: userEmail.toLowerCase() };
 
-      const savedCust = localStorage.getItem(getUserStorageKey('customers'));
-      if (savedCust) {
-        try { customerDatabase = JSON.parse(savedCust); } catch(e){}
-      } else {
+      const { data, error } = await supabaseClient
+        .from('orders')
+        .select('id, customer_name, order_data')
+        .eq('user_email', currentUser.email);
+
+      if (error) {
+        console.error('Error loading data from Supabase:', error);
+        alert('Could not load your data from the cloud database: ' + error.message);
+        appConfig = { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: { shop: 'OptiPulse Store', email: userEmail } };
         customerDatabase = [];
+      } else {
+        const configRow = (data || []).find(r => r.customer_name === '__CONFIG__');
+        appConfig = configRow ? configRow.order_data : { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: { shop: 'OptiPulse Store', email: userEmail } };
+        customerDatabase = (data || [])
+          .filter(r => r.customer_name !== '__CONFIG__')
+          .map(r => r.order_data);
       }
 
       populateProfileFields();
@@ -474,13 +511,13 @@
       document.getElementById('profile-address-input').value = appConfig.owner.address || '';
     }
 
-    function handleUpdateProfile(e) {
+    async function handleUpdateProfile(e) {
       e.preventDefault();
       appConfig.owner.shop = document.getElementById('profile-shop-input').value;
       appConfig.owner.mobile = document.getElementById('profile-mobile-input').value;
       appConfig.owner.address = document.getElementById('profile-address-input').value;
 
-      persistConfig();
+      await persistConfig();
 
       document.getElementById('disp-shop-title').innerText = appConfig.owner.shop.toUpperCase();
       document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop}`;
@@ -488,19 +525,31 @@
       alert("Profile details updated successfully!");
     }
 
-    function clearDashboardDataOnly() {
+    async function clearDashboardDataOnly() {
       if (confirm("Are you sure you want to clear all order records? Profile settings will stay.")) {
+        if (currentUser && currentUser.email) {
+          const { error } = await supabaseClient
+            .from('orders')
+            .delete()
+            .eq('user_email', currentUser.email)
+            .neq('customer_name', '__CONFIG__');
+          if (error) { alert('Could not clear cloud data: ' + error.message); return; }
+        }
         customerDatabase = [];
-        persistCustomers();
         renderDashboard();
         alert("Customer orders cleared successfully.");
       }
     }
 
-    function clearEntireAccountDatabase() {
+    async function clearEntireAccountDatabase() {
       if (confirm("WARNING: This will permanently delete ALL customer IDs, family records, prescriptions, and settings for this account. Continue?")) {
-        localStorage.removeItem(getUserStorageKey('config'));
-        localStorage.removeItem(getUserStorageKey('customers'));
+        if (currentUser && currentUser.email) {
+          const { error } = await supabaseClient
+            .from('orders')
+            .delete()
+            .eq('user_email', currentUser.email);
+          if (error) { alert('Could not wipe cloud database: ' + error.message); return; }
+        }
         alert("Entire account database wiped successfully.");
         handleLogout();
       }
@@ -562,9 +611,10 @@
       renderDashboard();
     }
 
-    function changeCurrency(currCode) {
+    async function changeCurrency(currCode) {
       const oldCurr = appConfig.currency || 'PKR';
-      if (oldCurr !== currCode) {
+      const currencyChanged = oldCurr !== currCode;
+      if (currencyChanged) {
         customerDatabase.forEach(cust => {
           cust.purchases.forEach(p => {
             const baseUSDTotal = p.total / (currencyRates[oldCurr] || 1);
@@ -582,8 +632,8 @@
       document.getElementById('dash-select-curr').value = currCode;
 
       calcBalance();
-      persistConfig();
-      persistCustomers();
+      await persistConfig();
+      if (currencyChanged) await persistAllCustomers();
       renderDashboard();
     }
 
@@ -704,7 +754,7 @@
         address: document.getElementById('owner-address').value
       };
 
-      persistConfig();
+      await persistConfig();
 
       document.getElementById('disp-shop-title').innerText = appConfig.owner.shop.toUpperCase();
       document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop}`;
@@ -745,13 +795,13 @@
       document.getElementById('order-due-display').innerText = `${appConfig.currSymbol} ${due.toLocaleString()}`;
     }
 
-    function deliverOrder(custId, orderId) {
+    async function deliverOrder(custId, orderId) {
       const cust = customerDatabase.find(c => c.id === custId);
       if (cust) {
         const order = cust.purchases.find(p => p.orderId === orderId);
         if (order) {
           order.status = 'Delivered';
-          persistCustomers();
+          await persistCustomer(cust);
           renderDashboard();
         }
       }
@@ -801,7 +851,7 @@
       switchAppTab('new-customer');
     }
 
-    function handleSaveCustomer(e) {
+    async function handleSaveCustomer(e) {
       e.preventDefault();
 
       const nameEl = document.getElementById('cust-name');
@@ -896,7 +946,7 @@
         cust.purchases.push(purchaseData);
       }
 
-      persistCustomers();
+      await persistCustomer(cust);
       resetCustomerForm();
       switchAppTab('dashboard');
       renderDashboard();
