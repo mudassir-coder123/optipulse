@@ -295,225 +295,79 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
-    // Initialize Supabase Client safely
     const SUPABASE_URL = 'https://qcdjyhxzswcwcxzwjcws.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_ej-63argNI2JcwZDXnAV0w_oYANtClg';
 
     const supabaseLib = window.supabase || supabase;
     const supabaseClient = supabaseLib.createClient(SUPABASE_URL, SUPABASE_KEY, {
-      global: {
-        headers: {
-          'apikey': SUPABASE_KEY
-        }
-      }
+      global: { headers: { 'apikey': SUPABASE_KEY } }
     });
 
-    /* ---- Currency Conversion Rates (Base: USD = 1.0) ---- */
-    const currencyRates = {
-      USD: 1.0,
-      PKR: 278.50,
-      INR: 83.50,
-      OMR: 0.385,
-      SAR: 3.75,
-      QAR: 3.64,
-      AED: 3.67
-    };
+    const currencyRates = { USD: 1.0, PKR: 278.50, INR: 83.50, OMR: 0.385, SAR: 3.75, QAR: 3.64, AED: 3.67 };
 
-    /* ---- Dictionary Translations ---- */
     const translations = {
       en: {
-        welcomeSub: "Optical Practice & Customer Management System",
-        enterPortal: "Enter System Portal",
-        settingsTitle: "Preferences",
-        settingsSubtitle: "Select your preferred language and local currency.",
-        selectLang: "Language",
-        selectCurr: "Currency",
-        btnContinueAuth: "Continue to Authentication",
-        authTitle: "Shop Authentication",
-        authSubtitle: "Enter your details to log in or register your optical store.",
-        lblShopName: "Shop / Practice Name",
-        lblMobile: "Mobile Contact",
-        lblEmail: "Owner Email",
-        lblAddress: "Shop Address",
-        btnSendOtp: "Send Email Verification OTP",
-        lblEnterOtp: "Enter 6-Digit OTP Code",
-        btnVerifyOtp: "Verify & Enter Portal",
-        tabDashboard: "Dashboard",
-        tabNewOrder: "+ New Order",
-        tabDatabase: "Customer Database",
-        lblActiveOrders: "Active Pending Orders",
-        lblOutstandingDues: "Total Outstanding Dues",
-        lblCompletedOrders: "Completed Orders",
-        hdrCurrentActive: "Current Active Orders",
-        hdrPatientEntry: "Patient Prescription & Order Entry",
-        lblCustName: "Customer Full Name *",
-        lblCustPhone: "Phone / Mobile *",
-        lblCustEmail: "Email (Optional)",
-        lblCustAge: "Age",
-        lblCustGender: "Gender",
-        lblCustAddress: "Address",
-        hdrRxDetails: "Prescription Details (Rx)",
-        lblPrescribedBy: "Prescribed By",
-        hdrOrderBilling: "Order & Billing Details",
-        lblItemDesc: "Item Description",
-        lblTotalAmount: "Total Amount",
-        lblAmountPaid: "Amount Paid",
-        lblOrderStatus: "Status",
-        lblRemainingBal: "Remaining Balance",
-        btnFormCancel: "Cancel",
-        btnFormSave: "Save Customer Record",
-        searchPlaceholder: "Search by patient name or phone number...",
-        btnMarkDelivered: "Mark Delivered",
-        btnEditRecord: "Edit Record",
-        btnLogout: "Logout"
+        welcomeSub: "Optical Practice & Customer Management System", enterPortal: "Enter System Portal", settingsTitle: "Preferences", settingsSubtitle: "Select your preferred language and local currency.", selectLang: "Language", selectCurr: "Currency", btnContinueAuth: "Continue to Authentication", authTitle: "Shop Authentication", authSubtitle: "Enter your details to log in or register your optical store.", lblShopName: "Shop / Practice Name", lblMobile: "Mobile Contact", lblEmail: "Owner Email", lblAddress: "Shop Address", btnSendOtp: "Send Email Verification OTP", lblEnterOtp: "Enter 6-Digit OTP Code", btnVerifyOtp: "Verify & Enter Portal", tabDashboard: "Dashboard", tabNewOrder: "+ New Order", tabDatabase: "Customer Database", lblActiveOrders: "Active Pending Orders", lblOutstandingDues: "Total Outstanding Dues", lblCompletedOrders: "Completed Orders", hdrCurrentActive: "Current Active Orders", hdrPatientEntry: "Patient Prescription & Order Entry", lblCustName: "Customer Full Name *", lblCustPhone: "Phone / Mobile *", lblCustEmail: "Email (Optional)", lblCustAge: "Age", lblCustGender: "Gender", lblCustAddress: "Address", hdrRxDetails: "Prescription Details (Rx)", lblPrescribedBy: "Prescribed By", hdrOrderBilling: "Order & Billing Details", lblItemDesc: "Item Description", lblTotalAmount: "Total Amount", lblAmountPaid: "Amount Paid", lblOrderStatus: "Status", lblRemainingBal: "Remaining Balance", btnFormCancel: "Cancel", btnFormSave: "Save Customer Record", searchPlaceholder: "Search by patient name or phone number...", btnMarkDelivered: "Mark Delivered", btnEditRecord: "Edit Record", btnLogout: "Logout"
       },
       ur: {
-        welcomeSub: "آپٹیکل پریکٹس اور کسٹمر منیجمنٹ سسٹم",
-        enterPortal: "سسٹم پورٹل میں داخل ہوں",
-        settingsTitle: "ترجیحات",
-        settingsSubtitle: "اپنی پسندیدہ زبان اور مقامی کرنسی کا انتخاب کریں۔",
-        selectLang: "زبان",
-        selectCurr: "کرنسی",
-        btnContinueAuth: "آتھینٹیکیشن پر آگے بڑھیں",
-        authTitle: "دوکان کی تصدیق",
-        authSubtitle: "لاگ ان کرنے یا اپنی آپٹیکل شاپ کو رجسٹر کرنے کے لیے تفصیلات درج کریں۔",
-        lblShopName: "دوکان / پریکٹس کا نام",
-        lblMobile: "موبائل نمبر",
-        lblEmail: "آنر کا ای میل",
-        lblAddress: "دوکان کا پتہ",
-        btnSendOtp: "ای میل تصدیق کا OTP بھیجیں",
-        lblEnterOtp: "6 ہندسوں کا OTP کوڈ درج کریں",
-        btnVerifyOtp: "تصدیق کریں اور پورٹل میں داخل ہوں",
-        tabDashboard: "ڈیش بورڈ",
-        tabNewOrder: "+ نیا آرڈر",
-        tabDatabase: "کسٹمر ڈیٹا بیس",
-        lblActiveOrders: "فعال زیر التوا آرڈرز",
-        lblOutstandingDues: "کل واجب الادا رقم",
-        lblCompletedOrders: "مکمل شدہ آرڈرز",
-        hdrCurrentActive: "موجودہ فعال آرڈرز",
-        hdrPatientEntry: "مریض کا نسخہ اور آرڈر کا اندراج",
-        lblCustName: "گاہک کا پورا نام *",
-        lblCustPhone: "فون / موبائل *",
-        lblCustEmail: "ای میل (اختیاری)",
-        lblCustAge: "عمر",
-        lblCustGender: "جنس",
-        lblCustAddress: "پتہ",
-        hdrRxDetails: "نسخے کی تفصیلات (Rx)",
-        lblPrescribedBy: "تجویز کردہ از ڈاکٹر",
-        hdrOrderBilling: "آرڈر اور بلنگ کی تفصیلات",
-        lblItemDesc: "آئٹم کی تفصیل",
-        lblTotalAmount: "کل رقم",
-        lblAmountPaid: "ادا شدہ رقم",
-        lblOrderStatus: "حیثیت (سٹیٹس)",
-        lblRemainingBal: "بقیہ رقم",
-        btnFormCancel: "منسوخ کریں",
-        btnFormSave: "کسٹمر ریکارڈ محفوظ کریں",
-        searchPlaceholder: "مریض کا نام یا فون نمبر کے ذریعہ تلاش کریں...",
-        btnMarkDelivered: "ڈیلیور نشان زد کریں",
-        btnEditRecord: "ریکارڈ میں ترمیم کریں",
-        btnLogout: "لاگ آؤٹ"
+        welcomeSub: "آپٹیکل پریکٹس اور کسٹمر منیجمنٹ سسٹم", enterPortal: "سسٹم پورٹل میں داخل ہوں", settingsTitle: "ترجیحات", settingsSubtitle: "اپنی پسندیدہ زبان اور مقامی کرنسی کا انتخاب کریں۔", selectLang: "زبان", selectCurr: "کرنسی", btnContinueAuth: "آتھینٹیکیشن پر آگے بڑھیں", authTitle: "دوکان کی تصدیق", authSubtitle: "لاگ ان کرنے یا اپنی آپٹیکل شاپ کو رجسٹر کرنے کے لیے تفصیلات درج کریں۔", lblShopName: "دوکان / پریکٹس کا نام", lblMobile: "موبائل نمبر", lblEmail: "آنر کا ای میل", lblAddress: "دوکان کا پتہ", btnSendOtp: "ای میل تصدیق کا OTP بھیجیں", lblEnterOtp: "6 ہندسوں کا OTP کوڈ درج کریں", btnVerifyOtp: "تصدیق کریں اور پورٹل میں داخل ہوں", tabDashboard: "ڈیش بورڈ", tabNewOrder: "+ نیا آرڈر", tabDatabase: "کسٹمر ڈیٹا بیس", lblActiveOrders: "فعال زیر التوا آرڈرز", lblOutstandingDues: "کل واجب الادا رقم", lblCompletedOrders: "مکمل شدہ آرڈرز", hdrCurrentActive: "موجودہ فعال آرڈرز", hdrPatientEntry: "مریض کا نسخہ اور آرڈر کا اندراج", lblCustName: "گاہک کا پورا نام *", lblCustPhone: "فون / موبائل *", lblCustEmail: "ای میل (اختیاری)", lblCustAge: "عمر", lblCustGender: "جنس", lblCustAddress: "پتہ", hdrRxDetails: "نسخے کی تفصیلات (Rx)", lblPrescribedBy: "تجویز کردہ از ڈاکٹر", hdrOrderBilling: "آرڈر اور بلنگ کی تفصیلات", lblItemDesc: "آئٹم کی تفصیل", lblTotalAmount: "کل رقم", lblAmountPaid: "ادا شدہ رقم", lblOrderStatus: "حیثیت (سٹیٹس)", lblRemainingBal: "بقیہ رقم", btnFormCancel: "منسوخ کریں", btnFormSave: "کسٹمر ریکارڈ محفوظ کریں", searchPlaceholder: "مریض کا نام یا فون نمبر کے ذریعہ تلاش کریں...", btnMarkDelivered: "ڈیلیور نشان زد کریں", btnEditRecord: "ریکارڈ میں ترمیم کریں", btnLogout: "لاگ آؤٹ"
       },
       ar: {
-        welcomeSub: "نظام إدارة الممارسة البصرية والعملاء",
-        enterPortal: "الدخول إلى البوابة",
-        settingsTitle: "التفضيلات",
-        settingsSubtitle: "حدد لغتك المفضلة والعملة المحلية.",
-        selectLang: "اللغة",
-        selectCurr: "العملة",
-        btnContinueAuth: "الانتقال إلى المصادقة",
-        authTitle: "مصادقة المتجر",
-        authSubtitle: "أدخل بياناتك لتسجيل الدخول أو تسجيل متجر البصريات الخاص بك.",
-        lblShopName: "اسم المتجر / العيادة",
-        lblMobile: "رقم الهاتف المحمول",
-        lblEmail: "البريد الإلكتروني للمالك",
-        lblAddress: "عنوان المتجر",
-        btnSendOtp: "إرسال رمز التحقق (OTP) إلى البريد",
-        lblEnterOtp: "أدخل رمز OTP المكون من 6 أرقام",
-        btnVerifyOtp: "التحقق والدخول إلى البوابة",
-        tabDashboard: "لوحة التحكم",
-        tabNewOrder: "+ طلب جديد",
-        tabDatabase: "قاعدة بيانات العملاء",
-        lblActiveOrders: "الطلبات النشطة المعلقة",
-        lblOutstandingDues: "إجمالي المبالغ المستحقة",
-        lblCompletedOrders: "الطلبات المكتملة",
-        hdrCurrentActive: "الطلبات النشطة الحالية",
-        hdrPatientEntry: "وصفة المريض وإدخال الطلب",
-        lblCustName: "اسم العميل الكامل *",
-        lblCustPhone: "الهاتف / المحمول *",
-        lblCustEmail: "البريد الإلكتروني (اختياري)",
-        lblCustAge: "العمر",
-        lblCustGender: "الجنس",
-        lblCustAddress: "العنوان",
-        hdrRxDetails: "تفاصيل الوصفة الطبية (Rx)",
-        lblPrescribedBy: "تم الوصف بواسطة الطبيب",
-        hdrOrderBilling: "تفاصيل الطلب والفلترة",
-        lblItemDesc: "وصف العنصر",
-        lblTotalAmount: "المبلغ الإجمالي",
-        lblAmountPaid: "المبلغ المدفوع",
-        lblOrderStatus: "الحالة",
-        lblRemainingBal: "الرصيد المتبقي",
-        btnFormCancel: "إلغاء",
-        btnFormSave: "حفظ سجل العميل",
-        searchPlaceholder: "البحث باسم المريض أو رقم الهاتف...",
-        btnMarkDelivered: "تحديد كتم التسليم",
-        btnEditRecord: "تعديل السجل",
-        btnLogout: "تسجيل الخروج"
+        welcomeSub: "نظام إدارة الممارسة البصرية والعملاء", enterPortal: "الدخول إلى البوابة", settingsTitle: "التفضيلات", settingsSubtitle: "حدد لغتك المفضلة والعملة المحلية.", selectLang: "اللغة", selectCurr: "العملة", btnContinueAuth: "الانتقال إلى المصادقة", authTitle: "مصادقة المتجر", authSubtitle: "أدخل بياناتك لتسجيل الدخول أو تسجيل متجر البصريات الخاص بك.", lblShopName: "اسم المتجر / العيادة", lblMobile: "رقم الهاتف المحمول", lblEmail: "البريد الإلكتروني للمالك", lblAddress: "عنوان المتجر", btnSendOtp: "إرسال رمز التحقق (OTP) إلى البريد", lblEnterOtp: "أدخل رمز OTP المكون من 6 أرقام", btnVerifyOtp: "التحقق والدخول إلى البوابة", tabDashboard: "لوحة التحكم", tabNewOrder: "+ طلب جديد", tabDatabase: "قاعدة بيانات العملاء", lblActiveOrders: "الطلبات النشطة المعلقة", lblOutstandingDues: "إجمالي المبالغ المستحقة", lblCompletedOrders: "الطلبات المكتملة", hdrCurrentActive: "الطلبات النشطة الحالية", hdrPatientEntry: "وصفة المريض وإدخال الطلب", lblCustName: "اسم العميل الكامل *", lblCustPhone: "الهاتف / المحمول *", lblCustEmail: "البريد الإلكتروني (اختياري)", lblCustAge: "العمر", lblCustGender: "الجنس", lblCustAddress: "العنوان", hdrRxDetails: "تفاصيل الوصفة الطبية (Rx)", lblPrescribedBy: "تم الوصف بواسطة الطبيب", hdrOrderBilling: "تفاصيل الطلب والفلترة", lblItemDesc: "وصف العنصر", lblTotalAmount: "المبلغ الإجمالي", lblAmountPaid: "المبلغ المدفوع", lblOrderStatus: "الحالة", lblRemainingBal: "الرصيد المتبقي", btnFormCancel: "إلغاء", btnFormSave: "حفظ سجل العميل", searchPlaceholder: "البحث باسم المريض أو رقم الهاتف...", btnMarkDelivered: "تحديد كتم التسليم", btnEditRecord: "تعديل السجل", btnLogout: "تسجيل الخروج"
       }
     };
 
-    /* ---- Persistent Storage Helpers ---- */
-    async function sget(key) {
-      try {
-        const val = localStorage.getItem(key);
-        return val ? val : null;
-      } catch(e) { return null; }
-    }
-    
-    async function sset(key, value) {
-      try {
-        localStorage.setItem(key, value);
-      } catch(e) { console.error('Storage set failed', e); }
-    }
-
-    function persistConfig() { sset('app-config', JSON.stringify(appConfig)); }
-    function persistCustomers() { sset('customer-database', JSON.stringify(customerDatabase)); }
-
-    let appConfig = {
-      lang: 'en',
-      currency: 'PKR',
-      currSymbol: 'PKR',
-      owner: {}
-    };
-
+    let currentUser = null;
+    let appConfig = { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: {} };
     let customerDatabase = [];
 
-    /* ---- Dynamic Currency Conversion Helper ---- */
-    function convertCurrencyValue(val, targetCurr) {
-      const num = Number(val || 0);
-      const baseUSD = num / (currencyRates[appConfig.currency] || 1);
-      const converted = baseUSD * (currencyRates[targetCurr] || 1);
-      return Math.round(converted * 100) / 100;
+    function getUserStorageKey(suffix) {
+      if (!currentUser || !currentUser.email) return `guest-${suffix}`;
+      return `user-${currentUser.email.toLowerCase()}-${suffix}`;
     }
 
-    /* ---- Change Language Dynamically ---- */
+    async function persistConfig() {
+      if (currentUser && currentUser.email) {
+        localStorage.setItem(getUserStorageKey('config'), JSON.stringify(appConfig));
+      }
+    }
+
+    async function persistCustomers() {
+      if (currentUser && currentUser.email) {
+        localStorage.setItem(getUserStorageKey('customers'), JSON.stringify(customerDatabase));
+      }
+    }
+
+    async function loadUserData(userEmail) {
+      currentUser = { email: userEmail };
+      
+      const savedConfig = localStorage.getItem(getUserStorageKey('config'));
+      if (savedConfig) {
+        try { appConfig = JSON.parse(savedConfig); } catch(e){}
+      } else {
+        appConfig = { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: { shop: 'OptiPulse Store', email: userEmail } };
+      }
+
+      const savedCust = localStorage.getItem(getUserStorageKey('customers'));
+      if (savedCust) {
+        try { customerDatabase = JSON.parse(savedCust); } catch(e){}
+      } else {
+        customerDatabase = [];
+      }
+
+      changeLanguage(appConfig.lang || 'en');
+      changeCurrency(appConfig.currency || 'PKR');
+    }
+
     function changeLanguage(langCode) {
       appConfig.lang = langCode;
-      
-      // Keep dropdown selections in sync
       document.getElementById('select-lang').value = langCode;
       document.getElementById('dash-select-lang').value = langCode;
 
       const dict = translations[langCode] || translations.en;
       const htmlRoot = document.getElementById('html-root');
+      htmlRoot.setAttribute('dir', (langCode === 'ar' || langCode === 'ur') ? 'rtl' : 'ltr');
 
-      // Adjust text direction for Arabic / Urdu
-      if (langCode === 'ar' || langCode === 'ur') {
-        htmlRoot.setAttribute('dir', 'rtl');
-      } else {
-        htmlRoot.setAttribute('dir', 'ltr');
-      }
-
-      // Map dynamic UI translations
       document.getElementById('welcome-subtext').innerText = dict.welcomeSub;
       document.getElementById('btn-welcome-continue').innerText = dict.enterPortal;
       document.getElementById('settings-title').innerText = dict.settingsTitle;
@@ -561,31 +415,22 @@
       renderDashboard();
     }
 
-    /* ---- Change Currency Dynamically & Recalculate Database Amounts ---- */
     function changeCurrency(currCode) {
-      if (appConfig.currency === currCode) return;
-
-      const oldCurr = appConfig.currency;
-      
-      // Update stored amounts across all orders in database
-      customerDatabase.forEach(cust => {
-        cust.purchases.forEach(p => {
-          const oldTotal = p.total;
-          const oldPaid = p.paid;
-          
-          // Convert from old currency to new target currency
-          const baseUSDTotal = oldTotal / (currencyRates[oldCurr] || 1);
-          const baseUSDPaid = oldPaid / (currencyRates[oldCurr] || 1);
-          
-          p.total = Math.round(baseUSDTotal * (currencyRates[currCode] || 1));
-          p.paid = Math.round(baseUSDPaid * (currencyRates[currCode] || 1));
+      const oldCurr = appConfig.currency || 'PKR';
+      if (oldCurr !== currCode) {
+        customerDatabase.forEach(cust => {
+          cust.purchases.forEach(p => {
+            const baseUSDTotal = p.total / (currencyRates[oldCurr] || 1);
+            const baseUSDPaid = p.paid / (currencyRates[oldCurr] || 1);
+            p.total = Math.round(baseUSDTotal * (currencyRates[currCode] || 1));
+            p.paid = Math.round(baseUSDPaid * (currencyRates[currCode] || 1));
+          });
         });
-      });
+      }
 
       appConfig.currency = currCode;
       appConfig.currSymbol = currCode;
 
-      // Keep dropdown selections in sync
       document.getElementById('select-curr').value = currCode;
       document.getElementById('dash-select-curr').value = currCode;
 
@@ -595,7 +440,6 @@
       renderDashboard();
     }
 
-    /* ---- 3D Animation Background ---- */
     function init3DLogo() {
       const container = document.getElementById('login-canvas-container');
       if (!container || typeof THREE === 'undefined') return;
@@ -623,46 +467,30 @@
       animate();
     }
 
-    // Application Initialization
     window.addEventListener('DOMContentLoaded', async () => {
-      const savedConfigRaw = await sget('app-config');
-      if (savedConfigRaw) {
-        try {
-          const savedConfig = JSON.parse(savedConfigRaw);
-          if (savedConfig && savedConfig.owner && savedConfig.owner.shop) {
-            appConfig = savedConfig;
-            
-            document.getElementById('select-lang').value = appConfig.lang || 'en';
-            document.getElementById('dash-select-lang').value = appConfig.lang || 'en';
-            document.getElementById('select-curr').value = appConfig.currency || 'PKR';
-            document.getElementById('dash-select-curr').value = appConfig.currency || 'PKR';
-
-            changeLanguage(appConfig.lang || 'en');
-
-            const savedCustomersRaw = await sget('customer-database');
-            if (savedCustomersRaw) { try { customerDatabase = JSON.parse(savedCustomersRaw); } catch(e){} }
-
-            document.getElementById('step-welcome').classList.add('hidden');
-            document.getElementById('step-app-dashboard').classList.remove('hidden');
-            document.getElementById('disp-shop-title').innerText = appConfig.owner.shop.toUpperCase();
-            document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop}`;
-            renderDashboard();
-            return;
-          }
-        } catch(e) {}
-      }
-
       init3DLogo();
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 25;
-        document.getElementById('loading-bar').style.width = progress + '%';
-        if (progress >= 100) {
-          clearInterval(interval);
-          document.getElementById('welcome-loading-box').classList.add('hidden');
-          document.getElementById('btn-welcome-continue').classList.remove('hidden');
-        }
-      }, 250);
+
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      
+      if (session && session.user) {
+        await loadUserData(session.user.email);
+        document.getElementById('step-welcome').classList.add('hidden');
+        document.getElementById('step-app-dashboard').classList.remove('hidden');
+        document.getElementById('disp-shop-title').innerText = (appConfig.owner.shop || 'OptiPulse').toUpperCase();
+        document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop || session.user.email}`;
+        renderDashboard();
+      } else {
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 25;
+          document.getElementById('loading-bar').style.width = progress + '%';
+          if (progress >= 100) {
+            clearInterval(interval);
+            document.getElementById('welcome-loading-box').classList.add('hidden');
+            document.getElementById('btn-welcome-continue').classList.remove('hidden');
+          }
+        }, 200);
+      }
     });
 
     function nextStep(current, next) {
@@ -670,56 +498,38 @@
       document.getElementById(`step-${next}`).classList.remove('hidden');
     }
 
-    /* ---- 1. SEND 6-DIGIT OTP VIA SUPABASE ---- */
     async function handleOwnerRegister(e) {
       e.preventDefault();
-      
       const email = document.getElementById('owner-email').value;
       const btn = document.getElementById('btn-send-otp');
       
-      if (!email) {
-        alert("Please enter a valid email address.");
-        return;
-      }
+      if (!email) return alert("Please enter a valid email address.");
 
       btn.innerText = "...";
       btn.disabled = true;
 
       const { error } = await supabaseClient.auth.signInWithOtp({
         email: email,
-        options: {
-          shouldCreateUser: true
-        }
+        options: { shouldCreateUser: true }
       });
 
-      const dict = translations[appConfig.lang] || translations.en;
-      btn.innerText = dict.btnSendOtp;
+      btn.innerText = translations[appConfig.lang].btnSendOtp;
       btn.disabled = false;
 
       if (error) {
         alert("Error sending OTP: " + error.message);
       } else {
         alert("A 6-digit OTP code has been sent to " + email + ". Check your inbox!");
-        appConfig.owner = {
-          shop: document.getElementById('owner-shop').value,
-          mobile: document.getElementById('owner-mobile').value,
-          email: email,
-          address: document.getElementById('owner-address').value,
-        };
         document.getElementById('otp-verification-box').classList.remove('hidden');
       }
     }
 
-    /* ---- 2. VERIFY 6-DIGIT OTP CODE ---- */
     async function verifyOTP() {
       const otp = document.getElementById('otp-input').value.trim();
       const email = document.getElementById('owner-email').value;
       const verifyBtn = document.getElementById('btn-verify-otp');
 
-      if (!otp) {
-        alert("Please enter the 6-digit code sent to your email.");
-        return;
-      }
+      if (!otp) return alert("Please enter the 6-digit code sent to your email.");
 
       verifyBtn.innerText = "...";
       verifyBtn.disabled = true;
@@ -730,8 +540,7 @@
         type: 'email'
       });
 
-      const dict = translations[appConfig.lang] || translations.en;
-      verifyBtn.innerText = dict.btnVerifyOtp;
+      verifyBtn.innerText = translations[appConfig.lang].btnVerifyOtp;
       verifyBtn.disabled = false;
 
       if (error) {
@@ -739,20 +548,31 @@
         return;
       }
 
+      await loadUserData(email);
+
+      appConfig.owner = {
+        shop: document.getElementById('owner-shop').value || 'Vision Care Optics',
+        mobile: document.getElementById('owner-mobile').value,
+        email: email,
+        address: document.getElementById('owner-address').value
+      };
+
+      persistConfig();
+
       document.getElementById('disp-shop-title').innerText = appConfig.owner.shop.toUpperCase();
       document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop}`;
+      
       nextStep('owner-login', 'app-dashboard');
-      persistConfig();
       renderDashboard();
     }
 
     async function handleLogout() {
       await supabaseClient.auth.signOut();
-      localStorage.clear();
+      currentUser = null;
+      customerDatabase = [];
       location.reload();
     }
 
-    /* ---- DASHBOARD & CUSTOMER MANAGEMENT LOGIC ---- */
     function switchAppTab(tabName) {
       document.getElementById('view-tab-dashboard').classList.add('hidden');
       document.getElementById('view-tab-new-customer').classList.add('hidden');
@@ -763,8 +583,7 @@
       document.getElementById('tab-history').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold";
 
       document.getElementById(`view-tab-${tabName}`).classList.remove('hidden');
-      const activeTabBtn = document.getElementById(`tab-${tabName}`);
-      activeTabBtn.className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold";
+      document.getElementById(`tab-${tabName}`).className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold";
 
       if (tabName === 'history') renderHistory();
     }
@@ -788,14 +607,12 @@
       }
     }
 
-    /* ---- EDIT CUSTOMER / ORDER DIRECTLY FROM DASHBOARD ---- */
     function editCustomerFromDashboard(custId, orderId) {
       const cust = customerDatabase.find(c => c.id === custId);
       if (!cust) return;
 
       const order = cust.purchases.find(p => p.orderId === orderId);
 
-      // Populate main form elements
       document.getElementById('editing-cust-id').value = cust.id;
       document.getElementById('editing-order-id').value = orderId;
       
@@ -875,11 +692,8 @@
 
           if (existingOrderId) {
             const orderIndex = cust.purchases.findIndex(p => p.orderId === Number(existingOrderId));
-            if (orderIndex !== -1) {
-              cust.purchases[orderIndex] = purchaseData;
-            } else {
-              cust.purchases.push(purchaseData);
-            }
+            if (orderIndex !== -1) cust.purchases[orderIndex] = purchaseData;
+            else cust.purchases.push(purchaseData);
           } else {
             cust.purchases.push(purchaseData);
           }
@@ -982,9 +796,7 @@
       document.getElementById('stat-delivered-count').innerText = deliveredCount;
     }
 
-    function renderHistory() {
-      filterCustomerHistory();
-    }
+    function renderHistory() { filterCustomerHistory(); }
 
     function filterCustomerHistory() {
       const query = (document.getElementById('history-search-input').value || '').toLowerCase();
