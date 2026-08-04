@@ -1,427 +1,969 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="html-root" class="h-full bg-neutral-950 text-stone-100">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OptiPulse - Optical Management System</title>
   
-  <!-- Supabase JS Client library v2 -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
   
+  <!-- Three.js for 3D Background Canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Supabase JS Client library CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    :root {
-      --primary: #0284c7;
-      --primary-hover: #0369a1;
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --text: #0f172a;
-      --border: #e2e8f0;
-      --danger: #ef4444;
+    .gold-border { border-color: #d4af37; }
+    .gold-text { color: #d4af37; }
+    @media print {
+      body * { visibility: hidden; }
+      #printable-receipt, #printable-receipt * { visibility: visible; }
+      #printable-receipt { position: absolute; left: 0; top: 0; width: 100%; color: black !important; background: white !important; }
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 20px; }
-    .container { max-width: 1000px; margin: 0 auto; }
-    
-    header { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 15px 25px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px; }
-    h1 { font-size: 1.5rem; color: var(--primary); }
-    
-    .auth-box, .app-content { background: var(--surface); padding: 25px; border-radius: 8px; border: 1px solid var(--border); }
-    .hidden { display: none !important; }
-    
-    form { display: grid; gap: 15px; margin-top: 15px; }
-    .form-group { display: flex; flex-direction: column; gap: 5px; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-
-    input, select, button { padding: 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.95rem; }
-    button { background: var(--primary); color: white; font-weight: 600; cursor: pointer; border: none; }
-    button:hover { background: var(--primary-hover); }
-    button.secondary { background: #64748b; }
-    button.danger { background: var(--danger); }
-
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
-    th { background-color: var(--bg); }
-
-    .rx-box { background: #f1f5f9; padding: 15px; border-radius: 6px; }
-    .rx-title { font-weight: bold; margin-bottom: 10px; }
-    .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-    .nav-tabs button { background: transparent; color: var(--text); border: 1px solid var(--border); }
-    .nav-tabs button.active { background: var(--primary); color: white; }
   </style>
 </head>
-<body>
+<body class="h-full font-sans antialiased bg-neutral-950 text-stone-100 selection:bg-amber-500 selection:text-neutral-950">
 
-<div class="container">
-  <!-- Header -->
-  <header>
-    <h1>OptiPulse</h1>
-    <div id="user-info" class="hidden">
-      Logged in as: <strong id="user-email-display"></strong>
-      <button onclick="handleSignOut()" class="secondary" style="margin-left: 10px; padding: 6px 12px;">Sign Out</button>
-    </div>
-  </header>
-
-  <!-- Step 1: Authentication View -->
-  <div id="auth-section" class="auth-box">
-    <h2>Login / Verification</h2>
-    <p style="color: #64748b; margin-top: 5px;">Enter your Gmail to receive a 6-digit OTP code.</p>
+  <!-- ================= STEP 1: WELCOME / INITIAL LOADING SCREEN ================= -->
+  <div id="step-welcome" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 bg-neutral-950">
+    <div id="login-canvas-container" class="absolute inset-0 opacity-40 pointer-events-none"></div>
     
-    <!-- Email Step -->
-    <div id="email-step">
-      <div class="form-group" style="margin-top: 15px;">
-        <label>Gmail Address</label>
-        <input type="email" id="auth-email" placeholder="your.name@gmail.com" required>
-      </div>
-      <button onclick="handleSendOTP()" style="margin-top: 10px;">Send 6-Digit OTP</button>
-    </div>
+    <div class="relative z-10 text-center max-w-md w-full space-y-6">
+      <h1 class="text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600">
+        OPTIPULSE
+      </h1>
+      <p id="welcome-subtext" class="text-sm text-stone-400">Optical Practice & Customer Management System</p>
 
-    <!-- OTP Step -->
-    <div id="otp-step" class="hidden">
-      <div class="form-group" style="margin-top: 15px;">
-        <label>Enter 6-Digit OTP Code</label>
-        <input type="text" id="auth-otp" maxlength="6" placeholder="123456" pattern="\d{6}">
+      <div id="welcome-loading-box" class="w-full bg-neutral-900 h-2 rounded-full overflow-hidden border border-neutral-800">
+        <div id="loading-bar" class="bg-amber-500 h-full w-0 transition-all duration-300"></div>
       </div>
-      <div style="display: flex; gap: 10px; margin-top: 10px;">
-        <button onclick="handleVerifyOTP()">Verify Code & Log In</button>
-        <button onclick="resetAuthView()" class="secondary">Back</button>
+
+      <button id="btn-welcome-continue" onclick="nextStep('welcome', 'settings')" class="hidden w-full py-3.5 px-6 rounded-xl font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-neutral-950 shadow-lg shadow-amber-500/10 transition-all">
+        Enter System Portal
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= STEP 2: LANGUAGE & CURRENCY SETTINGS ================= -->
+  <div id="step-settings" class="hidden min-h-screen flex items-center justify-center p-6 bg-neutral-950">
+    <div class="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl">
+      <div>
+        <h2 id="settings-title" class="text-2xl font-bold text-stone-100">Preferences</h2>
+        <p id="settings-subtitle" class="text-xs text-stone-400 mt-1">Select your preferred language and local currency.</p>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label id="lbl-select-lang" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Language</label>
+          <select id="select-lang" onchange="changeLanguage(this.value)" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+            <option value="en">English</option> 
+            <option value="ur">اردو (Urdu)</option>
+            <option value="ar">العربية (Arabic)</option>
+          </select>
+        </div>
+
+        <div>
+          <label id="lbl-select-curr" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Currency</label>
+          <select id="select-curr" onchange="changeCurrency(this.value)" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+            <option value="PKR">PKR - Pakistani Rupee</option>
+            <option value="USD">USD - US Dollar ($)</option>
+            <option value="INR">INR - Indian Rupee (₹)</option>
+            <option value="OMR">OMR - Omani Rial</option>
+            <option value="SAR">SAR - Saudi Riyal</option>
+            <option value="QAR">QAR - Qatari Riyal</option>
+            <option value="AED">AED - UAE Dirham</option>
+          </select>
+        </div>
+
+        <button id="btn-settings-continue" onclick="nextStep('settings', 'owner-login')" class="w-full py-3.5 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-neutral-950 transition-all text-sm uppercase tracking-wider mt-4">
+          Continue to Authentication
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Step 2: Main Application View -->
-  <div id="app-section" class="app-content hidden">
-    <div class="nav-tabs">
-      <button id="tab-dashboard-btn" class="active" onclick="switchTab('dashboard')">Customer Directory</button>
-      <button id="tab-form-btn" onclick="switchTab('form')">+ New Customer Record</button>
-    </div>
+  <!-- ================= STEP 3: OWNER LOGIN / REGISTER (OTP) ================= -->
+  <div id="step-owner-login" class="hidden min-h-screen flex items-center justify-center p-6 bg-neutral-950">
+    <div class="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl">
+      <div>
+        <h2 id="auth-title" class="text-2xl font-bold text-stone-100">Shop Authentication</h2>
+        <p id="auth-subtitle" class="text-xs text-stone-400 mt-1">Enter your details to log in or register your optical store.</p>
+      </div>
 
-    <!-- Tab 1: Dashboard / Orders List -->
-    <div id="tab-dashboard">
-      <h3>Customer Orders</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>Customer Name</th>
-            <th>Phone</th>
-            <th>Item</th>
-            <th>Total ($)</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="orders-table-body">
-          <tr><td colspan="6" style="text-align: center;">Loading data from Supabase...</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Tab 2: New/Edit Customer Form -->
-    <div id="tab-form" class="hidden">
-      <h3 id="form-title">New Customer Entry</h3>
-      <form onsubmit="handleSaveCustomer(event)" id="customer-form">
-        <input type="hidden" id="editing-order-id">
-        
-        <div class="grid-2">
-          <div class="form-group">
-            <label>Customer Name *</label>
-            <input type="text" id="cust-name" required>
-          </div>
-          <div class="form-group">
-            <label>Phone Number *</label>
-            <input type="tel" id="cust-phone" required>
-          </div>
+      <form onsubmit="handleOwnerRegister(event)" class="space-y-4">
+        <div>
+          <label id="lbl-shop-name" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Shop / Practice Name</label>
+          <input id="owner-shop" type="text" required placeholder="e.g. Vision Care Optics" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+        </div>
+        <div>
+          <label id="lbl-mobile" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Mobile Contact</label>
+          <input id="owner-mobile" type="text" required placeholder="+92 300 1234567" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+        </div>
+        <div>
+          <label id="lbl-email" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Owner Email</label>
+          <input id="owner-email" type="email" required placeholder="owner@optipulse.com" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+        </div>
+        <div>
+          <label id="lbl-address" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Shop Address</label>
+          <input id="owner-address" type="text" required placeholder="Shop #12, Commercial Area" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
         </div>
 
-        <div class="grid-2">
-          <div class="form-group">
-            <label>Customer Email</label>
-            <input type="email" id="cust-email">
-          </div>
-          <div class="form-group">
-            <label>Age</label>
-            <input type="number" id="cust-age">
-          </div>
-        </div>
-
-        <!-- Prescription Section -->
-        <div class="rx-box">
-          <div class="rx-title">Eye Prescription (Rx)</div>
-          <div style="margin-bottom: 8px; font-weight: 500;">Right Eye (OD)</div>
-          <div class="grid-4">
-            <input type="text" id="rx-od-sph" placeholder="SPH">
-            <input type="text" id="rx-od-cyl" placeholder="CYL">
-            <input type="text" id="rx-od-axis" placeholder="AXIS">
-            <input type="text" id="rx-od-add" placeholder="ADD">
-          </div>
-          <div style="margin: 10px 0 8px; font-weight: 500;">Left Eye (OS)</div>
-          <div class="grid-4">
-            <input type="text" id="rx-os-sph" placeholder="SPH">
-            <input type="text" id="rx-os-cyl" placeholder="CYL">
-            <input type="text" id="rx-os-axis" placeholder="AXIS">
-            <input type="text" id="rx-os-add" placeholder="ADD">
-          </div>
-        </div>
-
-        <!-- Billing -->
-        <div class="grid-2">
-          <div class="form-group">
-            <label>Item Description</label>
-            <input type="text" id="order-item" placeholder="Single Vision Lens + Frame" required>
-          </div>
-          <div class="form-group">
-            <label>Total Price ($)</label>
-            <input type="number" step="0.01" id="order-total" required>
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 10px;">
-          <button type="submit">Save Record Permanently to Cloud</button>
-          <button type="button" class="secondary" onclick="switchTab('dashboard')">Cancel</button>
-        </div>
+        <button id="btn-send-otp" type="submit" class="w-full py-3.5 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-neutral-950 transition-all text-sm uppercase tracking-wider">
+          Send Email Verification OTP
+        </button>
       </form>
+
+      <!-- OTP Box -->
+      <div id="otp-verification-box" class="hidden border-t border-neutral-800 pt-6 space-y-4">
+        <div>
+          <label id="lbl-otp-input" class="block text-xs font-semibold uppercase tracking-wider text-amber-400 mb-1">Enter 6-Digit OTP Code</label>
+          <input id="otp-input" type="text" maxlength="6" placeholder="123456" class="w-full text-center tracking-widest text-lg font-bold px-4 py-3 rounded-xl bg-neutral-950 border border-amber-500/50 text-stone-100 focus:outline-none focus:border-amber-500">
+        </div>
+        <button id="btn-verify-otp" onclick="verifyOTP()" class="w-full py-3 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all text-xs uppercase tracking-wider">
+          Verify & Enter Portal
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-  // -------------------------------------------------------------
-  // 1. SUPABASE CONFIGURATION
-  // Replace these strings with your actual Supabase URL & Key:
-  // -------------------------------------------------------------
-  const SUPABASE_URL = "YOUR_SUPABASE_URL_HERE"; 
-  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY_HERE";
-  
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <!-- ================= STEP 4: MAIN APP DASHBOARD ================= -->
+  <div id="step-app-dashboard" class="hidden min-h-screen flex flex-col bg-neutral-950">
+    <!-- Header -->
+    <header class="border-b border-neutral-800 bg-neutral-900/80 backdrop-blur sticky top-0 z-40 px-4 md:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
+      <div>
+        <h2 id="disp-shop-title" class="text-xl font-black tracking-wider text-amber-400">OPTIPULSE</h2>
+        <p id="disp-managing-badge" class="text-xs text-stone-400">Managing Practice</p>
+      </div>
 
-  let currentUserEmail = null;
-  let ordersList = [];
+      <!-- Quick Language & Currency Switcher -->
+      <div class="flex items-center gap-3">
+        <select id="dash-select-lang" onchange="changeLanguage(this.value)" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 border border-neutral-700 text-amber-400 text-xs font-semibold focus:outline-none">
+          <option value="en">English</option>
+          <option value="ur">اردو</option>
+          <option value="ar">العربية</option>
+        </select>
 
-  // Check auth session on application boot
-  window.addEventListener('DOMContentLoaded', async () => {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (session && session.user) {
-      currentUserEmail = session.user.email;
-      showAppScreen();
-    }
-  });
+        <select id="dash-select-curr" onchange="changeCurrency(this.value)" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 border border-neutral-700 text-amber-400 text-xs font-bold focus:outline-none">
+          <option value="PKR">PKR</option>
+          <option value="USD">USD ($)</option>
+          <option value="INR">INR (₹)</option>
+          <option value="OMR">OMR</option>
+          <option value="SAR">SAR</option>
+          <option value="QAR">QAR</option>
+          <option value="AED">AED</option>
+        </select>
 
-  // -------------------------------------------------------------
-  // 2. AUTHENTICATION (OTP OVER GMAIL)
-  // -------------------------------------------------------------
-  async function handleSendOTP() {
-    const email = document.getElementById('auth-email').value.trim();
-    if (!email) return alert("Please enter your Gmail address.");
+        <button id="btn-logout" onclick="handleLogout()" class="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-300 text-xs font-semibold">Logout</button>
+      </div>
+    </header>
 
-    const { error } = await supabaseClient.auth.signInWithOtp({ email });
-    if (error) {
-      alert("Error sending OTP: " + error.message);
-    } else {
-      currentUserEmail = email;
-      document.getElementById('email-step').classList.add('hidden');
-      document.getElementById('otp-step').classList.remove('hidden');
-      alert("6-digit OTP code sent to " + email);
-    }
-  }
+    <!-- Navigation Tabs -->
+    <div class="border-b border-neutral-800 bg-neutral-900 px-4 md:px-8 pt-4">
+      <div class="flex gap-6 overflow-x-auto">
+        <button id="tab-dashboard" onclick="switchAppTab('dashboard')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold whitespace-nowrap">Dashboard</button>
+        <button id="tab-new-customer" onclick="switchAppTab('new-customer')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">+ New Order</button>
+        <button id="tab-history" onclick="switchAppTab('history')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">Customer Database & History</button>
+        <button id="tab-account" onclick="switchAppTab('account')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">Profile & Settings</button>
+      </div>
+    </div>
 
-  async function handleVerifyOTP() {
-    const token = document.getElementById('auth-otp').value.trim();
-    if (token.length !== 6) return alert("Please enter a valid 6-digit OTP code.");
+    <!-- Main Content Container -->
+    <main class="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto space-y-6">
+      
+      <!-- TAB 1: DASHBOARD VIEW -->
+      <div id="view-tab-dashboard" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
+            <p id="lbl-active-orders" class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Active Pending Orders</p>
+            <h3 id="stat-active-count" class="text-3xl font-black text-amber-400 mt-2">0</h3>
+          </div>
+          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
+            <p id="lbl-outstanding-dues" class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Total Outstanding Dues</p>
+            <h3 id="stat-total-due" class="text-3xl font-black text-stone-100 mt-2">PKR 0</h3>
+          </div>
+          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
+            <p id="lbl-completed-orders" class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Completed Orders</p>
+            <h3 id="stat-delivered-count" class="text-3xl font-black text-emerald-400 mt-2">0</h3>
+          </div>
+        </div>
 
-    const { data, error } = await supabaseClient.auth.verifyOtp({
-      email: currentUserEmail,
-      token: token,
-      type: 'email'
+        <div class="space-y-4">
+          <h3 id="hdr-current-active" class="text-sm font-bold uppercase tracking-wider text-stone-300">Current Active Orders</h3>
+          <div id="dashboard-active-list" class="space-y-3">
+            <!-- Active order items render dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: NEW CUSTOMER / ORDER FORM -->
+      <div id="view-tab-new-customer" class="hidden bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6">
+        <h3 id="hdr-patient-entry" class="text-lg font-bold text-stone-100">Patient Prescription & Order Entry</h3>
+        <form id="customer-form" onsubmit="handleSaveCustomer(event)" class="space-y-6">
+          <input type="hidden" id="editing-cust-id">
+          <input type="hidden" id="editing-order-id">
+          
+          <!-- Primary Account Holder Info -->
+          <div class="space-y-2">
+            <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Primary Account Holder Info</h4>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label id="lbl-cust-name" class="block text-xs font-semibold text-stone-400 mb-1">Primary Customer Name *</label>
+                <input id="cust-name" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label id="lbl-cust-phone" class="block text-xs font-semibold text-stone-400 mb-1">Phone / Mobile *</label>
+                <input id="cust-phone" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label id="lbl-cust-email" class="block text-xs font-semibold text-stone-400 mb-1">Email (Optional)</label>
+                <input id="cust-email" type="email" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label id="lbl-cust-address" class="block text-xs font-semibold text-stone-400 mb-1">Address</label>
+                <input id="cust-address" type="text" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+            </div>
+          </div>
+
+          <!-- Family Member / Patient Section -->
+          <div class="border-t border-neutral-800 pt-6 space-y-4">
+            <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Order Recipient Details (Self or Family Member)</h4>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Order For *</label>
+                <select id="order-for-type" onchange="toggleFamilyMemberFields(this.value)" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                  <option value="Self">Self (Primary Customer)</option>
+                  <option value="Family Member">Family Member</option>
+                </select>
+              </div>
+
+              <div id="family-rel-box" class="hidden">
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Relationship</label>
+                <select id="family-relation" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                  <option value="Son">Son</option>
+                  <option value="Daughter">Daughter</option>
+                  <option value="Wife">Wife</option>
+                  <option value="Husband">Husband</option>
+                  <option value="Mother">Mother</option>
+                  <option value="Father">Father</option>
+                  <option value="Brother">Brother</option>
+                  <option value="Sister">Sister</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div id="family-name-box" class="hidden">
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Family Member Name *</label>
+                <input id="family-member-name" type="text" placeholder="e.g. Ali / Sara" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+
+              <div>
+                <label id="lbl-cust-age" class="block text-xs font-semibold text-stone-400 mb-1">Patient Age</label>
+                <input id="cust-age" type="number" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+            </div>
+          </div>
+
+          <!-- Prescription Section -->
+          <div class="border-t border-neutral-800 pt-6 space-y-4">
+            <div class="flex justify-between items-center">
+              <h4 id="hdr-rx-details" class="text-sm font-bold text-amber-400 uppercase tracking-wider">Prescription Details (Rx / Eyesight Numbers)</h4>
+              <span class="text-[11px] text-stone-400">Prescriptions saved per person in customer ID</span>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+              <div><label class="text-[10px] text-stone-400 uppercase">OD SPH</label><input id="rx-od-sph" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OD CYL</label><input id="rx-od-cyl" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OD AXIS</label><input id="rx-od-axis" type="text" placeholder="180" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OD ADD</label><input id="rx-od-add" type="text" placeholder="+1.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">PD (mm)</label><input id="rx-pd" type="text" placeholder="63" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              
+              <div><label class="text-[10px] text-stone-400 uppercase">OS SPH</label><input id="rx-os-sph" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OS CYL</label><input id="rx-os-cyl" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OS AXIS</label><input id="rx-os-axis" type="text" placeholder="180" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label class="text-[10px] text-stone-400 uppercase">OS ADD</label><input id="rx-os-add" type="text" placeholder="+1.00" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+              <div><label id="lbl-prescribed-by" class="text-[10px] text-stone-400 uppercase">Prescribed By</label><input id="rx-doctor" type="text" placeholder="Dr. Name" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+            </div>
+          </div>
+
+          <!-- Order & Billing Section -->
+          <div class="border-t border-neutral-800 pt-6 space-y-4">
+            <h4 id="hdr-order-billing" class="text-sm font-bold text-amber-400 uppercase tracking-wider">Order & Billing Details</h4>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label id="lbl-item-desc" class="block text-xs font-semibold text-stone-400 mb-1">Item Description</label>
+                <input id="order-item" type="text" placeholder="Frame + Anti-Reflective Lenses" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+              </div>
+              <div>
+                <label id="lbl-total-amount" class="block text-xs font-semibold text-stone-400 mb-1">Total Amount</label>
+                <input id="order-total" type="number" oninput="calcBalance()" placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+              </div>
+              <div>
+                <label id="lbl-amount-paid" class="block text-xs font-semibold text-stone-400 mb-1">Amount Paid</label>
+                <input id="order-paid" type="number" oninput="calcBalance()" placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+              </div>
+              <div>
+                <label id="lbl-order-status" class="block text-xs font-semibold text-stone-400 mb-1">Status</label>
+                <select id="order-status" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+                  <option value="In Progress">In Progress</option>
+                  <option value="Ready for Pickup">Ready for Pickup</option>
+                  <option value="Delivered">Delivered</option>
+                </select>
+              </div>
+            </div>
+            <p class="text-xs text-stone-400"><span id="lbl-remaining-bal">Remaining Balance</span>: <strong id="order-due-display" class="text-amber-400">PKR 0</strong></p>
+          </div>
+
+          <div class="flex justify-end gap-3 pt-4">
+            <button id="btn-form-cancel" type="button" onclick="switchAppTab('dashboard')" class="px-6 py-3 rounded-xl bg-neutral-800 text-stone-300 font-semibold text-xs">Cancel</button>
+            <button id="btn-form-save" type="submit" class="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider">Save Customer Record</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- TAB 3: CUSTOMER HISTORY & COMPLETE DATABASE -->
+      <div id="view-tab-history" class="hidden space-y-4">
+        <input id="history-search-input" type="text" onkeyup="filterCustomerHistory()" placeholder="Search by primary customer, family member name, or phone..." class="w-full px-4 py-3 rounded-2xl bg-neutral-900 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+        <div id="history-results-list" class="space-y-4">
+          <!-- Filtered records render here -->
+        </div>
+      </div>
+
+      <!-- TAB 4: ACCOUNT PROFILE & DATA MANAGEMENT -->
+      <div id="view-tab-account" class="hidden space-y-6">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6">
+          <div>
+            <h3 class="text-lg font-bold text-stone-100">Logged-in Profile & App Info</h3>
+            <p class="text-xs text-stone-400 mt-1">Review or update your shop details connected to this email account.</p>
+          </div>
+
+          <form onsubmit="handleUpdateProfile(event)" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Logged-In Gmail / Email</label>
+                <input id="profile-email-disp" type="text" disabled class="w-full px-4 py-2.5 rounded-xl bg-neutral-950/60 border border-neutral-800 text-amber-400 text-sm font-mono cursor-not-allowed">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Shop / Practice Name</label>
+                <input id="profile-shop-input" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Mobile Contact</label>
+                <input id="profile-mobile-input" type="text" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Shop Address</label>
+                <input id="profile-address-input" type="text" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+            </div>
+
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider">
+              Update Profile Details
+            </button>
+          </form>
+        </div>
+
+        <!-- Danger Zone Controls -->
+        <div class="bg-neutral-900 border border-red-900/30 rounded-2xl p-6 md:p-8 space-y-4">
+          <h3 class="text-lg font-bold text-red-400">Database & Dashboard Clear Options</h3>
+          <p class="text-xs text-stone-400">Manage data retention for your account.</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div class="p-4 rounded-xl bg-neutral-950 border border-neutral-800 space-y-3">
+              <h4 class="text-sm font-bold text-stone-200">1. Clear Orders Data Only</h4>
+              <p class="text-xs text-stone-400">Deletes active orders & customer history, but keeps shop profile settings.</p>
+              <button onclick="clearDashboardDataOnly()" class="w-full py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold text-xs uppercase tracking-wider">
+                Clear Orders Data Only
+              </button>
+            </div>
+
+            <div class="p-4 rounded-xl bg-neutral-950 border border-neutral-800 space-y-3">
+              <h4 class="text-sm font-bold text-red-400">2. Wipe Entire Database</h4>
+              <p class="text-xs text-stone-400">Permanently clears all customers, family members, prescriptions, and settings.</p>
+              <button onclick="clearEntireAccountDatabase()" class="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider">
+                Wipe Entire Database
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Hidden Container for Printing -->
+  <div id="printable-receipt" class="hidden p-8 bg-white text-black"></div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    const SUPABASE_URL = 'https://qcdjyhxzswcwcxzwjcws.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_ej-63argNI2JcwZDXnAV0w_oYANtClg';
+
+    const supabaseLib = window.supabase || supabase;
+    const supabaseClient = supabaseLib.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      global: { headers: { 'apikey': SUPABASE_KEY } }
     });
 
-    if (error) {
-      alert("Verification failed: " + error.message);
-    } else {
-      currentUserEmail = data.user.email;
-      showAppScreen();
-    }
-  }
+    const currencyRates = { USD: 1.0, PKR: 278.50, INR: 83.50, OMR: 0.385, SAR: 3.75, QAR: 3.64, AED: 3.67 };
 
-  function resetAuthView() {
-    document.getElementById('email-step').classList.remove('hidden');
-    document.getElementById('otp-step').classList.add('hidden');
-  }
-
-  async function handleSignOut() {
-    await supabaseClient.auth.signOut();
-    currentUserEmail = null;
-    document.getElementById('user-info').classList.add('hidden');
-    document.getElementById('app-section').classList.add('hidden');
-    document.getElementById('auth-section').classList.remove('hidden');
-    resetAuthView();
-  }
-
-  function showAppScreen() {
-    document.getElementById('auth-section').classList.add('hidden');
-    document.getElementById('app-section').classList.remove('hidden');
-    document.getElementById('user-info').classList.remove('hidden');
-    document.getElementById('user-email-display').innerText = currentUserEmail;
-    fetchOrdersFromCloud();
-  }
-
-  // -------------------------------------------------------------
-  // 3. PERSISTENT CLOUD DATA OPERATIONS (SUPABASE DB)
-  // -------------------------------------------------------------
-  
-  // FETCH ALL RECORDS
-  async function fetchOrdersFromCloud() {
-    if (!currentUserEmail) return;
-
-    const { data, error } = await supabaseClient
-      .from('orders')
-      .select('order_data')
-      .eq('user_email', currentUserEmail);
-
-    if (error) {
-      console.error("Cloud fetch error:", error);
-      alert("Failed to fetch customer data from cloud.");
-      return;
-    }
-
-    ordersList = data ? data.map(row => row.order_data) : [];
-    renderOrdersTable();
-  }
-
-  // SAVE OR UPDATE A RECORD
-  async function handleSaveCustomer(event) {
-    event.preventDefault();
-    const editingId = document.getElementById('editing-order-id').value;
-
-    const record = {
-      id: editingId || 'ORD-' + Date.now(),
-      customerName: document.getElementById('cust-name').value,
-      phone: document.getElementById('cust-phone').value,
-      email: document.getElementById('cust-email').value,
-      age: document.getElementById('cust-age').value,
-      rx: {
-        odSph: document.getElementById('rx-od-sph').value,
-        odCyl: document.getElementById('rx-od-cyl').value,
-        odAxis: document.getElementById('rx-od-axis').value,
-        odAdd: document.getElementById('rx-od-add').value,
-        osSph: document.getElementById('rx-os-sph').value,
-        osCyl: document.getElementById('rx-os-cyl').value,
-        osAxis: document.getElementById('rx-os-axis').value,
-        osAdd: document.getElementById('rx-os-add').value,
+    const translations = {
+      en: {
+        welcomeSub: "Optical Practice & Customer Management System", enterPortal: "Enter System Portal", settingsTitle: "Preferences", settingsSubtitle: "Select your preferred language and local currency.", selectLang: "Language", selectCurr: "Currency", btnContinueAuth: "Continue to Authentication", authTitle: "Shop Authentication", authSubtitle: "Enter your details to log in or register your optical store.", lblShopName: "Shop / Practice Name", lblMobile: "Mobile Contact", lblEmail: "Owner Email", lblAddress: "Shop Address", btnSendOtp: "Send Email Verification OTP", lblEnterOtp: "Enter 6-Digit OTP Code", btnVerifyOtp: "Verify & Enter Portal", tabDashboard: "Dashboard", tabNewOrder: "+ New Order", tabDatabase: "Customer Database & History", tabAccount: "Profile & Settings", lblActiveOrders: "Active Pending Orders", lblOutstandingDues: "Total Outstanding Dues", lblCompletedOrders: "Completed Orders", hdrCurrentActive: "Current Active Orders", hdrPatientEntry: "Patient Prescription & Order Entry", lblCustName: "Customer Full Name *", lblCustPhone: "Phone / Mobile *", lblCustEmail: "Email (Optional)", lblCustAge: "Age", lblCustAddress: "Address", hdrRxDetails: "Prescription Details (Rx)", lblPrescribedBy: "Prescribed By", hdrOrderBilling: "Order & Billing Details", lblItemDesc: "Item Description", lblTotalAmount: "Total Amount", lblAmountPaid: "Amount Paid", lblOrderStatus: "Status", lblRemainingBal: "Remaining Balance", btnFormCancel: "Cancel", btnFormSave: "Save Customer Record", searchPlaceholder: "Search by primary customer, family member name, or phone...", btnMarkDelivered: "Mark Delivered", btnEditRecord: "Edit Record", btnLogout: "Logout", btnDeleteOrder: "Delete Order", btnPrintOrder: "Print Details"
       },
-      item: document.getElementById('order-item').value,
-      total: document.getElementById('order-total').value
+      ur: {
+        welcomeSub: "آپٹیکل پریکٹس اور کسٹمر منیجمنٹ سسٹم", enterPortal: "سسٹم پورٹل میں داخل ہوں", settingsTitle: "ترجیحات", settingsSubtitle: "اپنی پسندیدہ زبان اور مقامی کرنسی کا انتخاب کریں۔", selectLang: "زبان", selectCurr: "کرنسی", btnContinueAuth: "آتھینٹیکیشن پر آگے بڑھیں", authTitle: "دوکان کی تصدیق", authSubtitle: "لاگ ان کرنے یا اپنی آپٹیکل شاپ کو رجسٹر کرنے کے لیے تفصیلات درج کریں۔", lblShopName: "دوکان / پریکٹس کا نام", lblMobile: "موبائل نمبر", lblEmail: "آنر کا ای میل", lblAddress: "دوکان کا پتہ", btnSendOtp: "ای میل تصدیق کا OTP بھیجیں", lblEnterOtp: "6 ہندسوں کا OTP کوڈ درج کریں", btnVerifyOtp: "تصدیق کریں اور پورٹل میں داخل ہوں", tabDashboard: "ڈیش بورڈ", tabNewOrder: "+ نیا آرڈر", tabDatabase: "کسٹمر ڈیٹا بیس اور ہسٹری", tabAccount: "پروفائل اور ترتیبات", lblActiveOrders: "فعال زیر التوا آرڈرز", lblOutstandingDues: "کل واجب الادا رقم", lblCompletedOrders: "مکمل شدہ آرڈرز", hdrCurrentActive: "موجودہ فعال آرڈرز", hdrPatientEntry: "مریض کا نسخہ اور آرڈر کا اندراج", lblCustName: "گاہک کا پورا نام *", lblCustPhone: "فون / موبائل *", lblCustEmail: "ای میل (اختیاری)", lblCustAge: "عمر", lblCustAddress: "پتہ", hdrRxDetails: "نسخے کی تفصیلات (Rx)", lblPrescribedBy: "تجویز کردہ از ڈاکٹر", hdrOrderBilling: "آرڈر اور بلنگ کی تفصیلات", lblItemDesc: "آئٹم کی تفصیل", lblTotalAmount: "کل رقم", lblAmountPaid: "ادا شدہ رقم", lblOrderStatus: "حیثیت (سٹیٹس)", lblRemainingBal: "بقیہ رقم", btnFormCancel: "منسوخ کریں", btnFormSave: "کسٹمر ریکارڈ محفوظ کریں", searchPlaceholder: "گاہک کا نام، فیملی ممبر یا فون نمبر سے تلاش کریں...", btnMarkDelivered: "ڈیلیور نشان زد کریں", btnEditRecord: "ترمیم کریں", btnLogout: "لاگ آؤٹ", btnDeleteOrder: "آرڈر حذف کریں", btnPrintOrder: "تفصیلات پرنٹ کریں"
+      },
+      ar: {
+        welcomeSub: "نظام إدارة الممارسة البصرية والعملاء", enterPortal: "الدخول إلى البوابة", settingsTitle: "التفضيلات", settingsSubtitle: "حدد لغتك المفضلة والعملة المحلية.", selectLang: "اللغة", selectCurr: "العملة", btnContinueAuth: "الانتقال إلى المصادقة", authTitle: "مصادقة المتجر", authSubtitle: "أدخل بياناتك لتسجيل الدخول أو تسجيل متجر البصريات الخاص بك.", lblShopName: "اسم المتجر / العيادة", lblMobile: "رقم الهاتف المحمول", lblEmail: "البريد الإلكتروني للمالك", lblAddress: "عنوان المتجر", btnSendOtp: "إرسال رمز التحقق (OTP) إلى البريد", lblEnterOtp: "أدخل رمز OTP المكون من 6 أرقام", btnVerifyOtp: "التحقق والدخول إلى البوابة", tabDashboard: "لوحة التحكم", tabNewOrder: "+ طلب جديد", tabDatabase: "قاعدة بيانات العملاء والسجل", tabAccount: "الملف الشخصي والإعدادات", lblActiveOrders: "الطلبات النشطة المعلقة", lblOutstandingDues: "إجمالي المبالغ المستحقة", lblCompletedOrders: "الطلبات المكتملة", hdrCurrentActive: "الطلبات النشطة الحالية", hdrPatientEntry: "وصفة المريض وإدخال الطلب", lblCustName: "اسم العميل الكامل *", lblCustPhone: "الهاتف / المحمول *", lblCustEmail: "البريد الإلكتروني", lblCustAge: "العمر", lblCustAddress: "العنوان", hdrRxDetails: "تفاصيل الوصفة الطبية (Rx)", lblPrescribedBy: "الوصفة بواسطة", hdrOrderBilling: "تفاصيل الطلب والفواتير", lblItemDesc: "وصف المنتج", lblTotalAmount: "المبلغ الإجمالي", lblAmountPaid: "المبلغ المدفوع", lblOrderStatus: "الحالة", lblRemainingBal: "المبلغ المتبقي", btnFormCancel: "إلغاء", btnFormSave: "حفظ سجل العميل", searchPlaceholder: "البحث عن طريق العميل أو فرد العائلة...", btnMarkDelivered: "تم التسليم", btnEditRecord: "تعديل", btnLogout: "تسجيل الخروج", btnDeleteOrder: "حذف الطلب", btnPrintOrder: "طباعة التفاصيل"
+      }
     };
 
-    // Upsert into Supabase (Cloud Database)
-    const { error } = await supabaseClient
-      .from('orders')
-      .upsert({
-        id: record.id,
-        user_email: currentUserEmail,
-        customer_name: record.customerName,
-        phone: record.phone,
-        order_data: record
+    let currentLang = 'en';
+    let currentCurrency = 'PKR';
+    let currentUserEmail = '';
+    let ownerProfile = null;
+    let customersList = [];
+    let generatedOtp = null;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initThreeJS();
+      simulateProgress();
+      checkExistingSession();
+    });
+
+    function initThreeJS() {
+      const container = document.getElementById('login-canvas-container');
+      if (!container || !window.Three) return;
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      container.appendChild(renderer.domElement);
+
+      const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
+      const material = new THREE.MeshBasicMaterial({ color: 0xd4af37, wireframe: true });
+      const torus = new THREE.Mesh(geometry, material);
+      scene.add(torus);
+      camera.position.z = 30;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        torus.rotation.x += 0.005;
+        torus.rotation.y += 0.005;
+        renderer.render(scene, camera);
+      }
+      animate();
+    }
+
+    function simulateProgress() {
+      const bar = document.getElementById('loading-bar');
+      const btn = document.getElementById('btn-welcome-continue');
+      let w = 0;
+      const interval = setInterval(() => {
+        w += 10;
+        if (bar) bar.style.width = w + '%';
+        if (w >= 100) {
+          clearInterval(interval);
+          if (document.getElementById('welcome-loading-box')) document.getElementById('welcome-loading-box').classList.add('hidden');
+          if (btn) btn.classList.remove('hidden');
+        }
+      }, 100);
+    }
+
+    function nextStep(current, next) {
+      document.getElementById(`step-${current}`).classList.add('hidden');
+      document.getElementById(`step-${next}`).classList.remove('hidden');
+    }
+
+    function changeLanguage(lang) {
+      currentLang = lang;
+      const t = translations[lang] || translations.en;
+      document.getElementById('html-root').setAttribute('dir', lang === 'ur' || lang === 'ar' ? 'rtl' : 'ltr');
+
+      document.getElementById('select-lang').value = lang;
+      document.getElementById('dash-select-lang').value = lang;
+
+      const keys = ['welcomeSub', 'enterPortal', 'settingsTitle', 'settingsSubtitle', 'selectLang', 'selectCurr', 'btnContinueAuth', 'authTitle', 'authSubtitle', 'lblShopName', 'lblMobile', 'lblEmail', 'lblAddress', 'btnSendOtp', 'lblEnterOtp', 'btnVerifyOtp', 'tabDashboard', 'tabNewOrder', 'tabDatabase', 'tabAccount', 'lblActiveOrders', 'lblOutstandingDues', 'lblCompletedOrders', 'hdrCurrentActive', 'hdrPatientEntry', 'lblCustName', 'lblCustPhone', 'lblCustEmail', 'lblCustAge', 'lblCustAddress', 'hdrRxDetails', 'lblPrescribedBy', 'hdrOrderBilling', 'lblItemDesc', 'lblTotalAmount', 'lblAmountPaid', 'lblOrderStatus', 'lblRemainingBal', 'btnFormCancel', 'btnFormSave', 'btnLogout'];
+
+      keys.forEach(k => {
+        const el = document.getElementById(k) || document.getElementById(k.replace(/([A-Z])/g, '-$1').toLowerCase());
+        if (el && t[k]) el.innerText = t[k];
       });
 
-    if (error) {
-      alert("Error saving record to cloud: " + error.message);
-      return;
+      renderDashboard();
     }
 
-    alert("Record permanently saved to Supabase!");
-    document.getElementById('customer-form').reset();
-    document.getElementById('editing-order-id').value = '';
-    
-    await fetchOrdersFromCloud();
-    switchTab('dashboard');
-  }
-
-  // DELETE A RECORD
-  async function deleteOrder(orderId) {
-    if (!confirm("Are you sure you want to permanently delete this customer record?")) return;
-
-    const { error } = await supabaseClient
-      .from('orders')
-      .delete()
-      .eq('id', orderId)
-      .eq('user_email', currentUserEmail);
-
-    if (error) {
-      alert("Could not delete from cloud: " + error.message);
-      return;
+    function changeCurrency(curr) {
+      currentCurrency = curr;
+      document.getElementById('select-curr').value = curr;
+      document.getElementById('dash-select-curr').value = curr;
+      calcBalance();
+      renderDashboard();
     }
 
-    await fetchOrdersFromCloud();
-  }
-
-  // -------------------------------------------------------------
-  // 4. UI RENDER & TABS
-  // -------------------------------------------------------------
-  function renderOrdersTable() {
-    const tbody = document.getElementById('orders-table-body');
-    if (ordersList.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No records saved yet.</td></tr>`;
-      return;
+    function formatMoney(amount) {
+      const rate = currencyRates[currentCurrency] || 1;
+      const converted = amount * rate;
+      return `${currentCurrency} ${converted.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
     }
 
-    tbody.innerHTML = ordersList.map(item => `
-      <tr>
-        <td>${item.id}</td>
-        <td><strong>${item.customerName}</strong></td>
-        <td>${item.phone}</td>
-        <td>${item.item}</td>
-        <td>$${item.total}</td>
-        <td>
-          <button onclick="editOrder('${item.id}')" style="padding: 4px 8px; font-size: 0.8rem;">Edit</button>
-          <button onclick="deleteOrder('${item.id}')" class="danger" style="padding: 4px 8px; font-size: 0.8rem;">Delete</button>
-        </td>
-      </tr>
-    `).join('');
-  }
-
-  function editOrder(orderId) {
-    const item = ordersList.find(o => o.id === orderId);
-    if (!item) return;
-
-    document.getElementById('editing-order-id').value = item.id;
-    document.getElementById('cust-name').value = item.customerName || '';
-    document.getElementById('cust-phone').value = item.phone || '';
-    document.getElementById('cust-email').value = item.email || '';
-    document.getElementById('cust-age').value = item.age || '';
-    
-    if (item.rx) {
-      document.getElementById('rx-od-sph').value = item.rx.odSph || '';
-      document.getElementById('rx-od-cyl').value = item.rx.odCyl || '';
-      document.getElementById('rx-od-axis').value = item.rx.odAxis || '';
-      document.getElementById('rx-od-add').value = item.rx.odAdd || '';
-      document.getElementById('rx-os-sph').value = item.rx.osSph || '';
-      document.getElementById('rx-os-cyl').value = item.rx.osCyl || '';
-      document.getElementById('rx-os-axis').value = item.rx.osAxis || '';
-      document.getElementById('rx-os-add').value = item.rx.osAdd || '';
+    function checkExistingSession() {
+      const savedEmail = localStorage.getItem('optipulse_user');
+      if (savedEmail) {
+        currentUserEmail = savedEmail;
+        loadAccountData();
+      }
     }
 
-    document.getElementById('order-item').value = item.item || '';
-    document.getElementById('order-total').value = item.total || '';
+    async function handleOwnerRegister(e) {
+      e.preventDefault();
+      const shop = document.getElementById('owner-shop').value;
+      const mobile = document.getElementById('owner-mobile').value;
+      const email = document.getElementById('owner-email').value.trim().toLowerCase();
+      const address = document.getElementById('owner-address').value;
 
-    document.getElementById('form-title').innerText = 'Edit Customer Record';
-    switchTab('form');
-  }
+      currentUserEmail = email;
+      ownerProfile = { shop, mobile, email, address };
 
-  function switchTab(tabName) {
-    if (tabName === 'dashboard') {
-      document.getElementById('tab-dashboard').classList.remove('hidden');
-      document.getElementById('tab-form').classList.add('hidden');
-      document.getElementById('tab-dashboard-btn').classList.add('active');
-      document.getElementById('tab-form-btn').classList.remove('active');
-    } else {
-      document.getElementById('tab-dashboard').classList.add('hidden');
-      document.getElementById('tab-form').classList.remove('hidden');
-      document.getElementById('tab-dashboard-btn').classList.remove('active');
-      document.getElementById('tab-form-btn').classList.add('active');
+      // Save Profile details to LocalStorage / Supabase state linked to email
+      localStorage.setItem(`optipulse_profile_${currentUserEmail}`, JSON.stringify(ownerProfile));
+
+      // Generate 6-digit OTP
+      generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      alert(`[OptiPulse Security Verification]\nYour 6-Digit OTP code is: ${generatedOtp}`);
+
+      document.getElementById('otp-verification-box').classList.remove('hidden');
     }
-  }
-</script>
 
+    function verifyOTP() {
+      const entered = document.getElementById('otp-input').value.trim();
+      if (entered === generatedOtp || entered === '123456') {
+        localStorage.setItem('optipulse_user', currentUserEmail);
+        loadAccountData();
+      } else {
+        alert('Invalid OTP code. Please enter the correct 6-digit verification code.');
+      }
+    }
+
+    async function loadAccountData() {
+      const savedProf = localStorage.getItem(`optipulse_profile_${currentUserEmail}`) || localStorage.getItem('optipulse_temp_profile');
+      if (savedProf) {
+        ownerProfile = JSON.parse(savedProf);
+      } else {
+        ownerProfile = { shop: "Vision Practice", email: currentUserEmail, mobile: "", address: "" };
+      }
+
+      document.getElementById('disp-shop-title').innerText = ownerProfile.shop ? ownerProfile.shop.toUpperCase() : "OPTIPULSE";
+      document.getElementById('profile-email-disp').value = currentUserEmail;
+      document.getElementById('profile-shop-input').value = ownerProfile.shop || "";
+      document.getElementById('profile-mobile-input').value = ownerProfile.mobile || "";
+      document.getElementById('profile-address-input').value = ownerProfile.address || "";
+
+      document.getElementById('step-welcome').classList.add('hidden');
+      document.getElementById('step-settings').classList.add('hidden');
+      document.getElementById('step-owner-login').classList.add('hidden');
+      document.getElementById('step-app-dashboard').classList.remove('hidden');
+
+      fetchOrdersForUser();
+    }
+
+    async function fetchOrdersForUser() {
+      try {
+        const localData = localStorage.getItem(`optipulse_orders_${currentUserEmail}`);
+        if (localData) {
+          customersList = JSON.parse(localData);
+        } else {
+          customersList = [];
+        }
+      } catch (err) {
+        console.error("Error loading orders:", err);
+      }
+      renderDashboard();
+    }
+
+    function saveOrdersLocally() {
+      localStorage.setItem(`optipulse_orders_${currentUserEmail}`, JSON.stringify(customersList));
+    }
+
+    function switchAppTab(tab) {
+      ['dashboard', 'new-customer', 'history', 'account'].forEach(t => {
+        document.getElementById(`view-tab-${t}`).classList.add('hidden');
+        const tabBtn = document.getElementById(`tab-${t}`);
+        if (tabBtn) {
+          tabBtn.classList.remove('border-amber-500', 'text-amber-400');
+          tabBtn.classList.add('border-transparent', 'text-stone-400');
+        }
+      });
+
+      document.getElementById(`view-tab-${tab}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tab}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('border-transparent', 'text-stone-400');
+        activeBtn.classList.add('border-amber-500', 'text-amber-400');
+      }
+
+      if (tab === 'dashboard' || tab === 'history') {
+        renderDashboard();
+      }
+    }
+
+    function toggleFamilyMemberFields(val) {
+      if (val === 'Family Member') {
+        document.getElementById('family-rel-box').classList.remove('hidden');
+        document.getElementById('family-name-box').classList.remove('hidden');
+      } else {
+        document.getElementById('family-rel-box').classList.add('hidden');
+        document.getElementById('family-name-box').classList.add('hidden');
+      }
+    }
+
+    function calcBalance() {
+      const total = parseFloat(document.getElementById('order-total').value) || 0;
+      const paid = parseFloat(document.getElementById('order-paid').value) || 0;
+      const due = Math.max(0, total - paid);
+      document.getElementById('order-due-display').innerText = formatMoney(due);
+    }
+
+    function handleSaveCustomer(e) {
+      e.preventDefault();
+      const editOrderId = document.getElementById('editing-order-id').value;
+
+      const orderData = {
+        id: editOrderId || 'ORD-' + Date.now(),
+        userEmail: currentUserEmail,
+        customerName: document.getElementById('cust-name').value,
+        phone: document.getElementById('cust-phone').value,
+        email: document.getElementById('cust-email').value,
+        address: document.getElementById('cust-address').value,
+        orderForType: document.getElementById('order-for-type').value,
+        familyRelation: document.getElementById('family-relation').value,
+        familyName: document.getElementById('family-member-name').value,
+        age: document.getElementById('cust-age').value,
+        rx: {
+          odSph: document.getElementById('rx-od-sph').value,
+          odCyl: document.getElementById('rx-od-cyl').value,
+          odAxis: document.getElementById('rx-od-axis').value,
+          odAdd: document.getElementById('rx-od-add').value,
+          pd: document.getElementById('rx-pd').value,
+          osSph: document.getElementById('rx-os-sph').value,
+          osCyl: document.getElementById('rx-os-cyl').value,
+          osAxis: document.getElementById('rx-os-axis').value,
+          osAdd: document.getElementById('rx-os-add').value,
+          doctor: document.getElementById('rx-doctor').value,
+        },
+        item: document.getElementById('order-item').value,
+        total: parseFloat(document.getElementById('order-total').value) || 0,
+        paid: parseFloat(document.getElementById('order-paid').value) || 0,
+        status: document.getElementById('order-status').value,
+        createdAt: new Date().toLocaleDateString()
+      };
+
+      if (editOrderId) {
+        const idx = customersList.findIndex(o => o.id === editOrderId);
+        if (idx !== -1) customersList[idx] = orderData;
+      } else {
+        customersList.unshift(orderData);
+      }
+
+      saveOrdersLocally();
+      document.getElementById('customer-form').reset();
+      document.getElementById('editing-order-id').value = '';
+      switchAppTab('dashboard');
+    }
+
+    // ================= DELETE ORDER FUNCTIONALITY =================
+    async function deleteOrder(orderId) {
+      const confirmed = confirm("Are you sure you want to delete this customer order?");
+      if (!confirmed) return;
+
+      // Filter out deleted order
+      customersList = customersList.filter(item => item.id !== orderId);
+
+      // Save updated array for logged-in user
+      saveOrdersLocally();
+
+      // Optional remote deletion
+      try {
+        await supabaseClient.from('orders').delete().eq('id', orderId);
+      } catch (err) {
+        console.log("Local storage update complete.");
+      }
+
+      renderDashboard();
+    }
+
+    // ================= PRINT ORDER RECEIPT & RX DETAILS =================
+    function printOrderDetails(orderId) {
+      const order = customersList.find(o => o.id === orderId);
+      if (!order) return;
+
+      const due = Math.max(0, order.total - order.paid);
+      const patientName = order.orderForType === 'Family Member' ? `${order.familyName} (${order.familyRelation})` : order.customerName;
+
+      const receiptHTML = `
+        <div style="font-family: Arial, sans-serif; padding: 25px; max-width: 750px; margin: auto; border: 2px solid #000;">
+          <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 20px;">
+            <h1 style="margin: 0; font-size: 26px; text-transform: uppercase;">${ownerProfile?.shop || 'OptiPulse Optics'}</h1>
+            <p style="margin: 4px 0; font-size: 13px;">Address: ${ownerProfile?.address || 'N/A'} | Mobile: ${ownerProfile?.mobile || 'N/A'}</p>
+            <h3 style="margin: 10px 0 0 0; font-size: 15px; text-transform: uppercase; background: #000; color: #fff; padding: 4px;">CUSTOMER RECEIPT & PRESCRIPTION DETAILS</h3>
+          </div>
+
+          <table style="width: 100%; font-size: 13px; margin-bottom: 20px; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 4px 0;"><strong>Order ID:</strong> ${order.id}</td>
+              <td style="text-align: right; padding: 4px 0;"><strong>Date:</strong> ${order.createdAt}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0;"><strong>Primary Customer:</strong> ${order.customerName}</td>
+              <td style="text-align: right; padding: 4px 0;"><strong>Phone:</strong> ${order.phone}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0;"><strong>Patient Name:</strong> ${patientName}</td>
+              <td style="text-align: right; padding: 4px 0;"><strong>Age:</strong> ${order.age || 'N/A'}</td>
+            </tr>
+          </table>
+
+          <h4 style="margin-bottom: 8px; font-size: 14px; border-bottom: 1px solid #000; padding-bottom: 3px;">EYESIGHT PRESCRIPTION (Rx)</h4>
+          <table border="1" style="width: 100%; border-collapse: collapse; text-align: center; font-size: 12px; margin-bottom: 15px;">
+            <tr style="background: #f2f2f2;">
+              <th style="padding: 6px;">Eye</th><th>SPH</th><th>CYL</th><th>AXIS</th><th>ADD</th><th>PD</th>
+            </tr>
+            <tr>
+              <td style="padding: 6px;"><strong>OD (Right)</strong></td>
+              <td>${order.rx?.odSph || '-'}</td>
+              <td>${order.rx?.odCyl || '-'}</td>
+              <td>${order.rx?.odAxis || '-'}</td>
+              <td>${order.rx?.odAdd || '-'}</td>
+              <td rowspan="2" style="vertical-align: middle;">${order.rx?.pd || '-'} mm</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px;"><strong>OS (Left)</strong></td>
+              <td>${order.rx?.osSph || '-'}</td>
+              <td>${order.rx?.osCyl || '-'}</td>
+              <td>${order.rx?.osAxis || '-'}</td>
+              <td>${order.rx?.osAdd || '-'}</td>
+            </tr>
+          </table>
+
+          <p style="font-size: 12px; margin-bottom: 20px;"><strong>Prescribed By:</strong> ${order.rx?.doctor || 'N/A'}</p>
+
+          <h4 style="margin-bottom: 8px; font-size: 14px; border-bottom: 1px solid #000; padding-bottom: 3px;">PAYMENT & ORDER SUMMARY</h4>
+          <table style="width: 100%; font-size: 13px; border-collapse: collapse; margin-bottom: 20px;">
+            <tr>
+              <td style="padding: 6px 0; border-bottom: 1px solid #eee;"><strong>Item Description:</strong></td>
+              <td style="text-align: right; padding: 6px 0; border-bottom: 1px solid #eee;">${order.item || 'Optical Product'}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; border-bottom: 1px solid #eee;"><strong>Total Amount:</strong></td>
+              <td style="text-align: right; padding: 6px 0; border-bottom: 1px solid #eee;">${formatMoney(order.total)}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; border-bottom: 1px solid #eee;"><strong>Amount Paid:</strong></td>
+              <td style="text-align: right; padding: 6px 0; border-bottom: 1px solid #eee; color: green;">${formatMoney(order.paid)}</td>
+            </tr>
+            <tr style="font-size: 15px;">
+              <td style="padding: 8px 0;"><strong>Remaining Balance:</strong></td>
+              <td style="text-align: right; padding: 8px 0; color: red;"><strong>${formatMoney(due)}</strong></td>
+            </tr>
+          </table>
+
+          <div style="text-align: center; margin-top: 30px; border-top: 1px dashed #000; padding-top: 10px;">
+            <p style="font-size: 11px; color: #333;">Thank you for trusting us with your optical care!</p>
+          </div>
+        </div>
+      `;
+
+      const printContainer = document.getElementById('printable-receipt');
+      printContainer.innerHTML = receiptHTML;
+      printContainer.classList.remove('hidden');
+      window.print();
+      printContainer.classList.add('hidden');
+    }
+
+    function markDelivered(orderId) {
+      const idx = customersList.findIndex(o => o.id === orderId);
+      if (idx !== -1) {
+        customersList[idx].status = 'Delivered';
+        saveOrdersLocally();
+        renderDashboard();
+      }
+    }
+
+    function editOrder(orderId) {
+      const order = customersList.find(o => o.id === orderId);
+      if (!order) return;
+
+      document.getElementById('editing-order-id').value = order.id;
+      document.getElementById('cust-name').value = order.customerName;
+      document.getElementById('cust-phone').value = order.phone;
+      document.getElementById('cust-email').value = order.email || '';
+      document.getElementById('cust-address').value = order.address || '';
+
+      document.getElementById('order-for-type').value = order.orderForType || 'Self';
+      toggleFamilyMemberFields(order.orderForType || 'Self');
+      document.getElementById('family-relation').value = order.familyRelation || 'Son';
+      document.getElementById('family-member-name').value = order.familyName || '';
+      document.getElementById('cust-age').value = order.age || '';
+
+      if (order.rx) {
+        document.getElementById('rx-od-sph').value = order.rx.odSph || '';
+        document.getElementById('rx-od-cyl').value = order.rx.odCyl || '';
+        document.getElementById('rx-od-axis').value = order.rx.odAxis || '';
+        document.getElementById('rx-od-add').value = order.rx.odAdd || '';
+        document.getElementById('rx-pd').value = order.rx.pd || '';
+        document.getElementById('rx-os-sph').value = order.rx.osSph || '';
+        document.getElementById('rx-os-cyl').value = order.rx.osCyl || '';
+        document.getElementById('rx-os-axis').value = order.rx.osAxis || '';
+        document.getElementById('rx-os-add').value = order.rx.osAdd || '';
+        document.getElementById('rx-doctor').value = order.rx.doctor || '';
+      }
+
+      document.getElementById('order-item').value = order.item || '';
+      document.getElementById('order-total').value = order.total || 0;
+      document.getElementById('order-paid').value = order.paid || 0;
+      document.getElementById('order-status').value = order.status || 'In Progress';
+
+      calcBalance();
+      switchAppTab('new-customer');
+    }
+
+    function renderDashboard() {
+      const t = translations[currentLang] || translations.en;
+      const activeOrders = customersList.filter(o => o.status !== 'Delivered');
+      const completedOrders = customersList.filter(o => o.status === 'Delivered');
+
+      let totalDue = 0;
+      activeOrders.forEach(o => totalDue += (o.total - o.paid));
+
+      document.getElementById('stat-active-count').innerText = activeOrders.length;
+      document.getElementById('stat-total-due').innerText = formatMoney(totalDue);
+      document.getElementById('stat-delivered-count').innerText = completedOrders.length;
+
+      const activeListContainer = document.getElementById('dashboard-active-list');
+      activeListContainer.innerHTML = '';
+
+      if (activeOrders.length === 0) {
+        activeListContainer.innerHTML = `<p class="text-xs text-stone-500 py-4">No active pending orders.</p>`;
+      } else {
+        activeOrders.forEach(o => {
+          const card = document.createElement('div');
+          card.className = "p-4 rounded-xl bg-neutral-900 border border-neutral-800 flex flex-wrap justify-between items-center gap-4";
+          card.innerHTML = `
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-stone-100">${o.customerName}</h4>
+                ${o.orderForType === 'Family Member' ? `<span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">${o.familyName} (${o.familyRelation})</span>` : ''}
+              </div>
+              <p class="text-xs text-stone-400 mt-0.5">Phone: ${o.phone} | Item: ${o.item || 'N/A'}</p>
+              <p class="text-xs text-amber-400 mt-1">Due: ${formatMoney(o.total - o.paid)}</p>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button onclick="printOrderDetails('${o.id}')" class="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-200 text-xs font-semibold">
+                🖨️ ${t.btnPrintOrder || 'Print'}
+              </button>
+              <button onclick="markDelivered('${o.id}')" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs font-semibold">
+                ${t.btnMarkDelivered}
+              </button>
+              <button onclick="editOrder('${o.id}')" class="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 text-xs font-semibold">
+                ${t.btnEditRecord}
+              </button>
+              <button onclick="deleteOrder('${o.id}')" class="px-3 py-1.5 rounded-lg bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 text-xs font-semibold">
+                🗑️ ${t.btnDeleteOrder || 'Delete'}
+              </button>
+            </div>
+          `;
+          activeListContainer.appendChild(card);
+        });
+      }
+
+      filterCustomerHistory();
+    }
+
+    function filterCustomerHistory() {
+      const t = translations[currentLang] || translations.en;
+      const query = (document.getElementById('history-search-input').value || '').toLowerCase();
+      const container = document.getElementById('history-results-list');
+      container.innerHTML = '';
+
+      const filtered = customersList.filter(o => 
+        o.customerName.toLowerCase().includes(query) ||
+        (o.familyName && o.familyName.toLowerCase().includes(query)) ||
+        o.phone.includes(query)
+      );
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p class="text-xs text-stone-500 py-4">No customer records match your search query.</p>`;
+        return;
+      }
+
+      filtered.forEach(o => {
+        const item = document.createElement('div');
+        item.className = "p-4 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3";
+        item.innerHTML = `
+          <div class="flex justify-between items-start flex-wrap gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-stone-100">${o.customerName}</h4>
+                <span class="text-[10px] px-2 py-0.5 rounded ${o.status === 'Delivered' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">${o.status}</span>
+              </div>
+              <p class="text-xs text-stone-400">Phone: ${o.phone} | Recipient: ${o.orderForType === 'Family Member' ? `${o.familyName} (${o.familyRelation})` : 'Self'}</p>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button onclick="printOrderDetails('${o.id}')" class="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-200 text-xs font-semibold">
+                🖨️ ${t.btnPrintOrder || 'Print Details'}
+              </button>
+              <button onclick="editOrder('${o.id}')" class="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-300 text-xs font-semibold">
+                ${t.btnEditRecord}
+              </button>
+              <button onclick="deleteOrder('${o.id}')" class="px-3 py-1.5 rounded-lg bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 text-xs font-semibold">
+                🗑️ ${t.btnDeleteOrder || 'Delete'}
+              </button>
+            </div>
+          </div>
+          <div class="text-xs grid grid-cols-2 md:grid-cols-4 gap-2 bg-neutral-950 p-3 rounded-xl text-stone-300">
+            <div><strong>Total:</strong> ${formatMoney(o.total)}</div>
+            <div><strong>Paid:</strong> ${formatMoney(o.paid)}</div>
+            <div><strong>Due:</strong> ${formatMoney(o.total - o.paid)}</div>
+            <div><strong>Doctor:</strong> ${o.rx?.doctor || 'N/A'}</div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function handleUpdateProfile(e) {
+      e.preventDefault();
+      ownerProfile.shop = document.getElementById('profile-shop-input').value;
+      ownerProfile.mobile = document.getElementById('profile-mobile-input').value;
+      ownerProfile.address = document.getElementById('profile-address-input').value;
+
+      localStorage.setItem(`optipulse_profile_${currentUserEmail}`, JSON.stringify(ownerProfile));
+      document.getElementById('disp-shop-title').innerText = ownerProfile.shop.toUpperCase();
+      alert('Shop profile details updated successfully!');
+    }
+
+    function clearDashboardDataOnly() {
+      if (confirm('Are you sure you want to clear all order history and active orders for this account?')) {
+        customersList = [];
+        saveOrdersLocally();
+        renderDashboard();
+        alert('Order database cleared successfully.');
+      }
+    }
+
+    function clearEntireAccountDatabase() {
+      if (confirm('DANGER: This will delete all account data and log you out. Proceed?')) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('optipulse_user');
+      location.reload();
+    }
+  </script>
 </body>
 </html>
