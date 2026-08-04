@@ -410,53 +410,171 @@
         welcomeSub: "آپٹیکل پریکٹس اور کسٹمر منیجمنٹ سسٹم", enterPortal: "سسٹم پورٹل میں داخل ہوں", settingsTitle: "ترجیحات", settingsSubtitle: "اپنی پسندیدہ زبان اور مقامی کرنسی کا انتخاب کریں۔", selectLang: "زبان", selectCurr: "کرنسی", btnContinueAuth: "آتھینٹیکیشن پر آگے بڑھیں", authTitle: "دوکان کی تصدیق", authSubtitle: "لاگ ان کرنے یا اپنی آپٹیکل شاپ کو رجسٹر کرنے کے لیے تفصیلات درج کریں۔", lblShopName: "دوکان / پریکٹس کا نام", lblMobile: "موبائل نمبر", lblEmail: "آنر کا ای میل", lblAddress: "دوکان کا پتہ", btnSendOtp: "ای میل تصدیق کا OTP بھیجیں", lblEnterOtp: "6 ہندسوں کا OTP کوڈ درج کریں", btnVerifyOtp: "تصدیق کریں اور پورٹل میں داخل ہوں", tabDashboard: "ڈیش بورڈ", tabNewOrder: "+ نیا آرڈر", tabDatabase: "کسٹمر ڈیٹا بیس", tabAccount: "پروفائل اور ترتیبات", lblActiveOrders: "فعال زیر التوا آرڈرز", lblOutstandingDues: "کل واجب الادا رقم", lblCompletedOrders: "مکمل شدہ آرڈرز", hdrCurrentActive: "موجودہ فعال آرڈرز", hdrPatientEntry: "مریض کا نسخہ اور آرڈر کا اندراج", lblCustName: "گاہک کا پورا نام *", lblCustPhone: "فون / موبائل *", lblCustEmail: "ای میل (اختیاری)", lblCustAge: "عمر", lblCustAddress: "پتہ", hdrRxDetails: "نسخے کی تفصیلات (Rx)", lblPrescribedBy: "تجویز کردہ از ڈاکٹر", hdrOrderBilling: "آرڈر اور بلنگ کی تفصیلات", lblItemDesc: "آئٹم کی تفصیل", lblTotalAmount: "کل رقم", lblAmountPaid: "ادا شدہ رقم", lblOrderStatus: "حیثیت (سٹیٹس)", lblRemainingBal: "بقیہ رقم", btnFormCancel: "منسوخ کریں", btnFormSave: "کسٹمر ریکارڈ محفوظ کریں", searchPlaceholder: "مریض کا نام، فیملی ممبر یا فون نمبر سے تلاش کریں...", btnMarkDelivered: "ڈیلیور نشان زد کریں", btnEditRecord: "ترمیم کریں", btnLogout: "لاگ آؤٹ"
       },
       ar: {
-        welcomeSub: "نظام إدارة الممارسة البصرية والعملاء", enterPortal: "الدخول إلى البوابة", settingsTitle: "التفضيلات", settingsSubtitle: "حدد لغتك المفضلة والعملة المحلية.", selectLang: "اللغة", selectCurr: "العملة", btnContinueAuth: "الانتقال إلى المصادقة", authTitle: "مصادقة المتجر", authSubtitle: "أدخل بياناتك لتسجيل الدخول أو تسجيل متجر البصريات الخاص بك.", lblShopName: "اسم المتجر / العيادة", lblMobile: "رقم الهاتف المحمول", lblEmail: "البريد الإلكتروني للمالك", lblAddress: "عنوان المتجر", btnSendOtp: "إرسال رمز التحقق (OTP) إلى البريد", lblEnterOtp: "أدخل رمز OTP المكون من 6 أرقام", btnVerifyOtp: "التحقق والدخول إلى البوابة", tabDashboard: "لوحة التحكم", tabNewOrder: "+ طلب جديد", tabDatabase: "قاعدة بيانات العملاء", tabAccount: "الملف الشخصي والإعدادات", lblActiveOrders: "الطلبات النشطة المعلقة", lblOutstandingDues: "إجمالي المبالغ المستحقة", lblCompletedOrders: "الطلبات المكتملة", hdrCurrentActive: "الطلبات النشطة الحالية", hdrPatientEntry: "وصفة المريض وإدخال الطلب", lblCustName: "اسم العميل الكامل *", lblCustPhone: "الهاتف / المحمول *", lblCustEmail: "البريد الإلكتروني (اختياري)", lblCustAge: "العمر", lblCustAddress: "العنوان", hdrRxDetails: "تفاصيل الوصفة الطبية (Rx)", lblPrescribedBy: "تم الوصف بواسطة الطبيب", hdrOrderBilling: "تفاصيل الطلب والفلترة", lblItemDesc: "وصف العنصر", lblTotalAmount: "المبلغ الإجمالي", lblAmountPaid: "المبلغ المدفوع", lblOrderStatus: "الحالة", lblRemainingBal: "الرصيد المتبقي", btnFormCancel: "إلغاء", btnFormSave: "حفظ سجل العميل", searchPlaceholder: "البحث باسم المريض أو الفرد الأسري...", btnMarkDelivered: "تحديد كتم التسليم", btnEditRecord: "تعديل السجل", btnLogout: "تسجيل الخروج"
+        welcomeSub: "نظام إدارة الممارسة البصرية والعملاء", enterPortal: "الدخول إلى البوابة", settingsTitle: "التفضيلات", settingsSubtitle: "حدد لغتك المفضلة والعملة المحلية.", selectLang: "اللغة", selectCurr: "العملة", btnContinueAuth: "الانتقال إلى المصادقة", authTitle: "مصادقة المتجر", authSubtitle: "أدخل بياناتك لتسجيل الدخول أو تسجيل متجر البصريات الخاص بك.", lblShopName: "اسم المتجر / العيادة", lblMobile: "رقم الهاتف المحمول", lblEmail: "البريد الإلكتروني للمالك", lblAddress: "عنوان المتجر", btnSendOtp: "إرسال رمز التحقق (OTP) إلى البريد", lblEnterOtp: "أدخل رمز OTP المكون من 6 أرقام", btnVerifyOtp: "التحقق والدخول إلى البوابة", tabDashboard: "لوحة التحكم", tabNewOrder: "+ طلب جديد", tabDatabase: "قاعدة بيانات العملاء", tabAccount: "الملف الشخصي والإعدادات", lblActiveOrders: "الطلبات النشطة المعلقة", lblOutstandingDues: "إجمالي المبالغ المستحقة", lblCompletedOrders: "الطلبات المكتملة", hdrCurrentActive: "الطلبات النشطة الحالية", hdrPatientEntry: "إدخال وصفة المريض والطلب", lblCustName: "الاسم الكامل للعميل *", lblCustPhone: "الهاتف / المحمول *", lblCustEmail: "البريد الإلكتروني (اختياري)", lblCustAge: "العمر", lblCustAddress: "العنوان", hdrRxDetails: "تفاصيل الوصفة الطبية (Rx)", lblPrescribedBy: "تم الوصف بواسطة", hdrOrderBilling: "تفاصيل الطلب والفلترة", lblItemDesc: "وصف العنصر", lblTotalAmount: "المبلغ الإجمالي", lblAmountPaid: "المبلغ المدفوع", lblOrderStatus: "الحالة", lblRemainingBal: "المبلغ المتبقي", btnFormCancel: "إلغاء", btnFormSave: "حفظ سجل العميل", searchPlaceholder: "البحث باسم المريض أو فرد العائلة أو رقم الهاتف...", btnMarkDelivered: "تحديد كـ تم التسليم", btnEditRecord: "تعديل السجل", btnLogout: "تسجيل الخروج"
       }
     };
 
-    let currentUser = null;
-    let appConfig = { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: {} };
-    let customerDatabase = [];
+    let currentLang = 'en';
+    let currentCurrency = 'PKR';
+    let currentOwner = null;
+    let customersData = [];
 
-    function getUserStorageKey(suffix) {
-      if (!currentUser || !currentUser.email) return `guest-${suffix}`;
-      return `user-${currentUser.email.toLowerCase()}-${suffix}`;
+    // --- INITIALIZATION ---
+    window.addEventListener('DOMContentLoaded', () => {
+      initThreeJS();
+      simulateLoading();
+    });
+
+    function simulateLoading() {
+      const bar = document.getElementById('loading-bar');
+      const btn = document.getElementById('btn-welcome-continue');
+      let width = 0;
+      const interval = setInterval(() => {
+        if (width >= 100) {
+          clearInterval(interval);
+          document.getElementById('welcome-loading-box').classList.add('hidden');
+          btn.classList.remove('hidden');
+        } else {
+          width += 10;
+          bar.style.width = width + '%';
+        }
+      }, 100);
     }
 
-    async function persistConfig() {
-      if (currentUser && currentUser.email) {
-        localStorage.setItem(getUserStorageKey('config'), JSON.stringify(appConfig));
+    function initThreeJS() {
+      const container = document.getElementById('login-canvas-container');
+      if (!container) return;
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      container.appendChild(renderer.domElement);
+
+      const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
+      const material = new THREE.MeshBasicMaterial({ color: 0xd4af37, wireframe: true });
+      const torus = new THREE.Mesh(geometry, material);
+      scene.add(torus);
+      camera.position.z = 30;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        torus.rotation.x += 0.01;
+        torus.rotation.y += 0.005;
+        renderer.render(scene, camera);
       }
+      animate();
     }
 
-    async function persistCustomers() {
-      if (currentUser && currentUser.email) {
-        localStorage.setItem(getUserStorageKey('customers'), JSON.stringify(customerDatabase));
-      }
+    // --- NAVIGATION ---
+    function nextStep(current, next) {
+      document.getElementById(`step-${current}`).classList.add('hidden');
+      document.getElementById(`step-${next}`).classList.remove('hidden');
     }
 
-    async function loadUserData(userEmail) {
-      currentUser = { email: userEmail };
+    function switchAppTab(tabName) {
+      const tabs = ['dashboard', 'new-customer', 'history', 'account'];
+      tabs.forEach(t => {
+        const view = document.getElementById(`view-tab-${t}`);
+        const btn = document.getElementById(`tab-${t}`);
+        if (t === tabName) {
+          view.classList.remove('hidden');
+          btn.className = 'pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold whitespace-nowrap';
+        } else {
+          view.classList.add('hidden');
+          btn.className = 'pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap';
+        }
+      });
+    }
+
+    // --- LANGUAGE & CURRENCY ---
+    function changeLanguage(lang) {
+      currentLang = lang;
+      document.getElementById('select-lang').value = lang;
+      document.getElementById('dash-select-lang').value = lang;
       
-      const savedConfig = localStorage.getItem(getUserStorageKey('config'));
-      if (savedConfig) {
-        try { appConfig = JSON.parse(savedConfig); } catch(e){}
-      } else {
-        appConfig = { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: { shop: 'OptiPulse Store', email: userEmail } };
-      }
+      const dict = translations[lang] || translations.en;
+      document.getElementById('html-root').dir = lang === 'ur' || lang === 'ar' ? 'rtl' : 'ltr';
 
-      const savedCust = localStorage.getItem(getUserStorageKey('customers'));
-      if (savedCust) {
-        try { customerDatabase = JSON.parse(savedCust); } catch(e){}
-      } else {
-        customerDatabase = [];
+      for (const [key, val] of Object.entries(dict)) {
+        const el = document.getElementById(key) || document.querySelector(`[data-i18n="${key}"]`);
+        if (el) {
+          if (el.tagName === 'INPUT' && el.type === 'text') {
+            el.placeholder = val;
+          } else {
+            el.innerText = val;
+          }
+        }
       }
-
-      populateProfileFields();
-      changeLanguage(appConfig.lang || 'en');
-      changeCurrency(appConfig.currency || 'PKR');
     }
 
+    function changeCurrency(curr) {
+      currentCurrency = curr;
+      document.getElementById('select-curr').value = curr;
+      document.getElementById('dash-select-curr').value = curr;
+      calcBalance();
+      renderDashboard();
+      renderHistory();
+    }
+
+    function formatAmount(amtInPKR) {
+      const rate = currencyRates[currentCurrency] || 1;
+      const converted = (amtInPKR / currencyRates['PKR']) * rate;
+      return `${currentCurrency} ${converted.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    }
+
+    // --- AUTHENTICATION ---
+    async function handleOwnerRegister(e) {
+      e.preventDefault();
+      const email = document.getElementById('owner-email').value;
+      const shop = document.getElementById('owner-shop').value;
+      const mobile = document.getElementById('owner-mobile').value;
+      const address = document.getElementById('owner-address').value;
+
+      currentOwner = { email, shop, mobile, address };
+
+      // Request OTP via Supabase Auth
+      const { error } = await supabaseClient.auth.signInWithOtp({ email });
+      if (error) {
+        alert("Authentication Error: " + error.message);
+      } else {
+        alert(`OTP code sent to ${email}. Please check your inbox.`);
+        document.getElementById('otp-verification-box').classList.remove('hidden');
+      }
+    }
+
+    async function verifyOTP() {
+      const otp = document.getElementById('otp-input').value;
+      const email = currentOwner.email;
+
+      const { data, error } = await supabaseClient.auth.verifyOtp({
+        email,
+        token: otp,
+        type: 'email'
+      });
+
+      if (error) {
+        alert("Verification failed: " + error.message);
+      } else {
+        setupOwnerProfile();
+        nextStep('owner-login', 'app-dashboard');
+      }
+    }
+
+    function setupOwnerProfile() {
+      document.getElementById('disp-shop-title').innerText = currentOwner.shop.toUpperCase();
+      document.getElementById('disp-managing-badge').innerText = `Shop: ${currentOwner.shop} | Contact: ${currentOwner.mobile}`;
+      document.getElementById('profile-email-disp').value = currentOwner.email;
+      document.getElementById('profile-shop-input').value = currentOwner.shop;
+      document.getElementById('profile-mobile-input').value = currentOwner.mobile;
+      document.getElementById('profile-address-input').value = currentOwner.address;
+    }
+
+    function handleLogout() {
+      supabaseClient.auth.signOut();
+      location.reload();
+    }
+
+    // --- FORM INTERACTIONS ---
     function toggleFamilyMemberFields(val) {
       const relBox = document.getElementById('family-rel-box');
       const nameBox = document.getElementById('family-name-box');
@@ -469,554 +587,221 @@
       }
     }
 
-    function populateProfileFields() {
-      document.getElementById('profile-email-disp').value = currentUser ? currentUser.email : '';
-      document.getElementById('profile-shop-input').value = appConfig.owner.shop || '';
-      document.getElementById('profile-mobile-input').value = appConfig.owner.mobile || '';
-      document.getElementById('profile-address-input').value = appConfig.owner.address || '';
-    }
-
-    function handleUpdateProfile(e) {
-      e.preventDefault();
-      appConfig.owner.shop = document.getElementById('profile-shop-input').value;
-      appConfig.owner.mobile = document.getElementById('profile-mobile-input').value;
-      appConfig.owner.address = document.getElementById('profile-address-input').value;
-
-      persistConfig();
-
-      document.getElementById('disp-shop-title').innerText = appConfig.owner.shop.toUpperCase();
-      document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop}`;
-
-      alert("Profile details updated successfully!");
-    }
-
-    function clearDashboardDataOnly() {
-      if (confirm("Are you sure you want to clear all dashboard and customer order data? Your account profile will remain saved.")) {
-        customerDatabase = [];
-        persistCustomers();
-        renderDashboard();
-        alert("Dashboard and order data cleared successfully.");
-      }
-    }
-
-    function clearEntireAccountDatabase() {
-      if (confirm("WARNING: This will permanently delete ALL data, orders, and shop settings for this account. Continue?")) {
-        localStorage.removeItem(getUserStorageKey('config'));
-        localStorage.removeItem(getUserStorageKey('customers'));
-        alert("Entire account database wiped successfully.");
-        handleLogout();
-      }
-    }
-
-    function changeLanguage(langCode) {
-      appConfig.lang = langCode;
-      document.getElementById('select-lang').value = langCode;
-      document.getElementById('dash-select-lang').value = langCode;
-
-      const dict = translations[langCode] || translations.en;
-      const htmlRoot = document.getElementById('html-root');
-      htmlRoot.setAttribute('dir', (langCode === 'ar' || langCode === 'ur') ? 'rtl' : 'ltr');
-
-      document.getElementById('welcome-subtext').innerText = dict.welcomeSub;
-      document.getElementById('btn-welcome-continue').innerText = dict.enterPortal;
-      document.getElementById('settings-title').innerText = dict.settingsTitle;
-      document.getElementById('settings-subtitle').innerText = dict.settingsSubtitle;
-      document.getElementById('lbl-select-lang').innerText = dict.selectLang;
-      document.getElementById('lbl-select-curr').innerText = dict.selectCurr;
-      document.getElementById('btn-settings-continue').innerText = dict.btnContinueAuth;
-      document.getElementById('auth-title').innerText = dict.authTitle;
-      document.getElementById('auth-subtitle').innerText = dict.authSubtitle;
-      document.getElementById('lbl-shop-name').innerText = dict.lblShopName;
-      document.getElementById('lbl-mobile').innerText = dict.lblMobile;
-      document.getElementById('lbl-email').innerText = dict.lblEmail;
-      document.getElementById('lbl-address').innerText = dict.lblAddress;
-      document.getElementById('btn-send-otp').innerText = dict.btnSendOtp;
-      document.getElementById('lbl-otp-input').innerText = dict.lblEnterOtp;
-      document.getElementById('btn-verify-otp').innerText = dict.btnVerifyOtp;
-      document.getElementById('tab-dashboard').innerText = dict.tabDashboard;
-      document.getElementById('tab-new-customer').innerText = dict.tabNewOrder;
-      document.getElementById('tab-history').innerText = dict.tabDatabase;
-      document.getElementById('tab-account').innerText = dict.tabAccount || "Profile & Settings";
-      document.getElementById('lbl-active-orders').innerText = dict.lblActiveOrders;
-      document.getElementById('lbl-outstanding-dues').innerText = dict.lblOutstandingDues;
-      document.getElementById('lbl-completed-orders').innerText = dict.lblCompletedOrders;
-      document.getElementById('hdr-current-active').innerText = dict.hdrCurrentActive;
-      document.getElementById('hdr-patient-entry').innerText = dict.hdrPatientEntry;
-      document.getElementById('lbl-cust-name').innerText = dict.lblCustName;
-      document.getElementById('lbl-cust-phone').innerText = dict.lblCustPhone;
-      document.getElementById('lbl-cust-email').innerText = dict.lblCustEmail;
-      document.getElementById('lbl-cust-age').innerText = dict.lblCustAge;
-      document.getElementById('lbl-cust-address').innerText = dict.lblCustAddress;
-      document.getElementById('hdr-rx-details').innerText = dict.hdrRxDetails;
-      document.getElementById('lbl-prescribed-by').innerText = dict.lblPrescribedBy;
-      document.getElementById('hdr-order-billing').innerText = dict.hdrOrderBilling;
-      document.getElementById('lbl-item-desc').innerText = dict.lblItemDesc;
-      document.getElementById('lbl-total-amount').innerText = dict.lblTotalAmount;
-      document.getElementById('lbl-amount-paid').innerText = dict.lblAmountPaid;
-      document.getElementById('lbl-order-status').innerText = dict.lblOrderStatus;
-      document.getElementById('lbl-remaining-bal').innerText = dict.lblRemainingBal;
-      document.getElementById('btn-form-cancel').innerText = dict.btnFormCancel;
-      document.getElementById('btn-form-save').innerText = dict.btnFormSave;
-      document.getElementById('history-search-input').placeholder = dict.searchPlaceholder;
-      document.getElementById('btn-logout').innerText = dict.btnLogout;
-
-      persistConfig();
-      renderDashboard();
-    }
-
-    function changeCurrency(currCode) {
-      const oldCurr = appConfig.currency || 'PKR';
-      if (oldCurr !== currCode) {
-        customerDatabase.forEach(cust => {
-          cust.purchases.forEach(p => {
-            const baseUSDTotal = p.total / (currencyRates[oldCurr] || 1);
-            const baseUSDPaid = p.paid / (currencyRates[oldCurr] || 1);
-            p.total = Math.round(baseUSDTotal * (currencyRates[currCode] || 1));
-            p.paid = Math.round(baseUSDPaid * (currencyRates[currCode] || 1));
-          });
-        });
-      }
-
-      appConfig.currency = currCode;
-      appConfig.currSymbol = currCode;
-
-      document.getElementById('select-curr').value = currCode;
-      document.getElementById('dash-select-curr').value = currCode;
-
-      calcBalance();
-      persistConfig();
-      persistCustomers();
-      renderDashboard();
-    }
-
-    function init3DLogo() {
-      const container = document.getElementById('login-canvas-container');
-      if (!container || typeof THREE === 'undefined') return;
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-
-      renderer.setSize(container.clientWidth, container.clientHeight);
-      container.appendChild(renderer.domElement);
-
-      const geometry = new THREE.TorusGeometry(1.8, 0.4, 16, 100);
-      const material = new THREE.MeshBasicMaterial({ color: 0xd4af37, wireframe: true });
-      const torus = new THREE.Mesh(geometry, material);
-      scene.add(torus);
-
-      camera.position.z = 4.5;
-
-      function animate() {
-        requestAnimationFrame(animate);
-        torus.rotation.x += 0.01;
-        torus.rotation.y += 0.01;
-        renderer.render(scene, camera);
-      }
-      animate();
-    }
-
-    window.addEventListener('DOMContentLoaded', async () => {
-      init3DLogo();
-
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      
-      if (session && session.user) {
-        await loadUserData(session.user.email);
-        document.getElementById('step-welcome').classList.add('hidden');
-        document.getElementById('step-app-dashboard').classList.remove('hidden');
-        document.getElementById('disp-shop-title').innerText = (appConfig.owner.shop || 'OptiPulse').toUpperCase();
-        document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop || session.user.email}`;
-        renderDashboard();
-      } else {
-        let progress = 0;
-        const interval = setInterval(() => {
-          progress += 25;
-          document.getElementById('loading-bar').style.width = progress + '%';
-          if (progress >= 100) {
-            clearInterval(interval);
-            document.getElementById('welcome-loading-box').classList.add('hidden');
-            document.getElementById('btn-welcome-continue').classList.remove('hidden');
-          }
-        }, 200);
-      }
-    });
-
-    function nextStep(current, next) {
-      document.getElementById(`step-${current}`).classList.add('hidden');
-      document.getElementById(`step-${next}`).classList.remove('hidden');
-    }
-
-    async function handleOwnerRegister(e) {
-      e.preventDefault();
-      const email = document.getElementById('owner-email').value;
-      const btn = document.getElementById('btn-send-otp');
-      
-      if (!email) return alert("Please enter a valid email address.");
-
-      btn.innerText = "...";
-      btn.disabled = true;
-
-      const { error } = await supabaseClient.auth.signInWithOtp({
-        email: email,
-        options: { shouldCreateUser: true }
-      });
-
-      btn.innerText = translations[appConfig.lang].btnSendOtp;
-      btn.disabled = false;
-
-      if (error) {
-        alert("Error sending OTP: " + error.message);
-      } else {
-        alert("A 6-digit OTP code has been sent to " + email + ". Check your inbox!");
-        document.getElementById('otp-verification-box').classList.remove('hidden');
-      }
-    }
-
-    async function verifyOTP() {
-      const otp = document.getElementById('otp-input').value.trim();
-      const email = document.getElementById('owner-email').value;
-      const verifyBtn = document.getElementById('btn-verify-otp');
-
-      if (!otp) return alert("Please enter the 6-digit code sent to your email.");
-
-      verifyBtn.innerText = "...";
-      verifyBtn.disabled = true;
-
-      const { data, error } = await supabaseClient.auth.verifyOtp({
-        email: email,
-        token: otp,
-        type: 'email'
-      });
-
-      verifyBtn.innerText = translations[appConfig.lang].btnVerifyOtp;
-      verifyBtn.disabled = false;
-
-      if (error) {
-        alert("Invalid or expired OTP: " + error.message);
-        return;
-      }
-
-      await loadUserData(email);
-
-      appConfig.owner = {
-        shop: document.getElementById('owner-shop').value || 'Vision Care Optics',
-        mobile: document.getElementById('owner-mobile').value,
-        email: email,
-        address: document.getElementById('owner-address').value
-      };
-
-      persistConfig();
-
-      document.getElementById('disp-shop-title').innerText = appConfig.owner.shop.toUpperCase();
-      document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop}`;
-      
-      nextStep('owner-login', 'app-dashboard');
-      renderDashboard();
-    }
-
-    async function handleLogout() {
-      await supabaseClient.auth.signOut();
-      currentUser = null;
-      customerDatabase = [];
-      location.reload();
-    }
-
-    function switchAppTab(tabName) {
-      document.getElementById('view-tab-dashboard').classList.add('hidden');
-      document.getElementById('view-tab-new-customer').classList.add('hidden');
-      document.getElementById('view-tab-history').classList.add('hidden');
-      document.getElementById('view-tab-account').classList.add('hidden');
-
-      document.getElementById('tab-dashboard').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
-      document.getElementById('tab-new-customer').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
-      document.getElementById('tab-history').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
-      document.getElementById('tab-account').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
-
-      document.getElementById(`view-tab-${tabName}`).classList.remove('hidden');
-      document.getElementById(`tab-${tabName}`).className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold whitespace-nowrap";
-
-      if (tabName === 'history') renderHistory();
-      if (tabName === 'account') populateProfileFields();
-    }
-
     function calcBalance() {
-      const total = Number(document.getElementById('order-total').value || 0);
-      const paid = Number(document.getElementById('order-paid').value || 0);
+      const total = parseFloat(document.getElementById('order-total').value) || 0;
+      const paid = parseFloat(document.getElementById('order-paid').value) || 0;
       const due = Math.max(0, total - paid);
-      document.getElementById('order-due-display').innerText = `${appConfig.currSymbol} ${due.toLocaleString()}`;
-    }
-
-    function deliverOrder(custId, orderId) {
-      const cust = customerDatabase.find(c => c.id === custId);
-      if (cust) {
-        const order = cust.purchases.find(p => p.orderId === orderId);
-        if (order) {
-          order.status = 'Delivered';
-          persistCustomers();
-          renderDashboard();
-        }
-      }
-    }
-
-    function editCustomerFromDashboard(custId, orderId) {
-      const cust = customerDatabase.find(c => c.id === custId);
-      if (!cust) return;
-
-      const order = cust.purchases.find(p => p.orderId === orderId);
-
-      document.getElementById('editing-cust-id').value = cust.id;
-      document.getElementById('editing-order-id').value = orderId;
-      
-      document.getElementById('cust-name').value = cust.name;
-      document.getElementById('cust-phone').value = cust.phone;
-      document.getElementById('cust-email').value = cust.email || '';
-      document.getElementById('cust-address').value = cust.address || '';
-
-      if (order) {
-        document.getElementById('order-for-type').value = order.forType || 'Self';
-        toggleFamilyMemberFields(order.forType || 'Self');
-        document.getElementById('family-relation').value = order.familyRelation || 'Son';
-        document.getElementById('family-member-name').value = order.patientName || '';
-        document.getElementById('cust-age').value = order.patientAge || '';
-
-        document.getElementById('order-item').value = order.item || '';
-        document.getElementById('order-total').value = order.total || 0;
-        document.getElementById('order-paid').value = order.paid || 0;
-        document.getElementById('order-status').value = order.status || 'In Progress';
-
-        if (order.rx) {
-          document.getElementById('rx-od-sph').value = order.rx.odSph || '';
-          document.getElementById('rx-od-cyl').value = order.rx.odCyl || '';
-          document.getElementById('rx-od-axis').value = order.rx.odAxis || '';
-          document.getElementById('rx-od-add').value = order.rx.odAdd || '';
-          document.getElementById('rx-os-sph').value = order.rx.osSph || '';
-          document.getElementById('rx-os-cyl').value = order.rx.osCyl || '';
-          document.getElementById('rx-os-axis').value = order.rx.osAxis || '';
-          document.getElementById('rx-os-add').value = order.rx.osAdd || '';
-          document.getElementById('rx-pd').value = order.rx.pd || '';
-          document.getElementById('rx-doctor').value = order.rx.doctor || '';
-        }
-      }
-
-      calcBalance();
-      switchAppTab('new-customer');
+      document.getElementById('order-due-display').innerText = formatAmount(due);
     }
 
     function handleSaveCustomer(e) {
       e.preventDefault();
+      const custId = document.getElementById('editing-cust-id').value || Date.now().toString();
+      const name = document.getElementById('cust-name').value;
+      const phone = document.getElementById('cust-phone').value;
+      const email = document.getElementById('cust-email').value;
+      const address = document.getElementById('cust-address').value;
+      const orderFor = document.getElementById('order-for-type').value;
+      const relation = orderFor === 'Family Member' ? document.getElementById('family-relation').value : 'Self';
+      const patientName = orderFor === 'Family Member' ? document.getElementById('family-member-name').value : name;
+      const age = document.getElementById('cust-age').value;
 
-      const nameEl = document.getElementById('cust-name');
-      const phoneEl = document.getElementById('cust-phone');
-      if (!nameEl.value.trim() || !phoneEl.value.trim()) return;
+      const total = parseFloat(document.getElementById('order-total').value) || 0;
+      const paid = parseFloat(document.getElementById('order-paid').value) || 0;
+      const status = document.getElementById('order-status').value;
 
-      const existingCustId = document.getElementById('editing-cust-id').value;
-      const existingOrderId = document.getElementById('editing-order-id').value;
-      const total = Number(document.getElementById('order-total').value || 0);
-      const paid = Number(document.getElementById('order-paid').value || 0);
-
-      const forType = document.getElementById('order-for-type').value;
-      const familyRel = document.getElementById('family-relation').value;
-      const familyName = document.getElementById('family-member-name').value.trim();
-
-      const patientDisplayName = forType === 'Family Member' && familyName ? `${familyName} (${familyRel})` : nameEl.value;
-
-      const purchaseData = {
-        orderId: existingOrderId ? Number(existingOrderId) : Date.now(),
-        date: new Date().toISOString().split('T')[0],
-        forType: forType,
-        familyRelation: familyRel,
-        patientName: familyName || nameEl.value,
-        patientDisplayName: patientDisplayName,
-        patientAge: document.getElementById('cust-age').value,
-        item: document.getElementById('order-item').value || 'Eyewear Frame & Lenses',
-        total: total,
-        paid: paid,
-        status: document.getElementById('order-status').value,
+      const newRecord = {
+        id: custId,
+        name, phone, email, address, orderFor, relation, patientName, age,
         rx: {
           odSph: document.getElementById('rx-od-sph').value,
           odCyl: document.getElementById('rx-od-cyl').value,
           odAxis: document.getElementById('rx-od-axis').value,
           odAdd: document.getElementById('rx-od-add').value,
+          pd: document.getElementById('rx-pd').value,
           osSph: document.getElementById('rx-os-sph').value,
           osCyl: document.getElementById('rx-os-cyl').value,
           osAxis: document.getElementById('rx-os-axis').value,
           osAdd: document.getElementById('rx-os-add').value,
-          pd: document.getElementById('rx-pd').value,
-          doctor: document.getElementById('rx-doctor').value
+          doctor: document.getElementById('rx-doctor').value,
+        },
+        order: {
+          item: document.getElementById('order-item').value,
+          total, paid, due: Math.max(0, total - paid), status
         }
       };
 
-      if (existingCustId) {
-        const cust = customerDatabase.find(c => c.id === Number(existingCustId));
-        if (cust) {
-          cust.name = nameEl.value;
-          cust.phone = phoneEl.value;
-          cust.email = document.getElementById('cust-email').value;
-          cust.address = document.getElementById('cust-address').value;
-
-          if (existingOrderId) {
-            const orderIndex = cust.purchases.findIndex(p => p.orderId === Number(existingOrderId));
-            if (orderIndex !== -1) cust.purchases[orderIndex] = purchaseData;
-            else cust.purchases.push(purchaseData);
-          } else {
-            cust.purchases.push(purchaseData);
-          }
-        }
+      const existingIndex = customersData.findIndex(c => c.id === custId);
+      if (existingIndex > -1) {
+        customersData[existingIndex] = newRecord;
       } else {
-        customerDatabase.push({
-          id: Date.now(),
-          name: nameEl.value,
-          phone: phoneEl.value,
-          email: document.getElementById('cust-email').value,
-          address: document.getElementById('cust-address').value,
-          purchases: [purchaseData]
-        });
+        customersData.push(newRecord);
       }
 
-      persistCustomers();
-      resetCustomerForm();
-      switchAppTab('dashboard');
-      renderDashboard();
-    }
-
-    function resetCustomerForm() {
       document.getElementById('customer-form').reset();
       document.getElementById('editing-cust-id').value = '';
-      document.getElementById('editing-order-id').value = '';
-      toggleFamilyMemberFields('Self');
       calcBalance();
+      renderDashboard();
+      renderHistory();
+      switchAppTab('dashboard');
     }
 
-    function prepareNewPurchaseForCustomer(custId) {
-      resetCustomerForm();
-      const cust = customerDatabase.find(c => c.id === custId);
-      if (cust) {
-        document.getElementById('editing-cust-id').value = cust.id;
-        document.getElementById('cust-name').value = cust.name;
-        document.getElementById('cust-phone').value = cust.phone;
-        document.getElementById('cust-email').value = cust.email || '';
-        document.getElementById('cust-address').value = cust.address || '';
-        switchAppTab('new-customer');
-      }
-    }
-
+    // --- RENDER FUNCTIONS ---
     function renderDashboard() {
+      const activeList = document.getElementById('dashboard-active-list');
+      activeList.innerHTML = '';
+
       let activeCount = 0;
       let totalDue = 0;
       let deliveredCount = 0;
-      const dict = translations[appConfig.lang] || translations.en;
-      const activeListContainer = document.getElementById('dashboard-active-list');
-      activeListContainer.innerHTML = '';
 
-      customerDatabase.forEach(cust => {
-        cust.purchases.forEach(purchase => {
-          const due = Math.max(0, purchase.total - purchase.paid);
-          if (purchase.status !== 'Delivered') {
-            activeCount++;
-            totalDue += due;
+      customersData.forEach(item => {
+        if (item.order.status === 'Delivered') {
+          deliveredCount++;
+        } else {
+          activeCount++;
+          totalDue += item.order.due;
 
-            const isFamily = purchase.forType === 'Family Member';
-            const displayTag = isFamily ? `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[10px] uppercase ml-1">${purchase.patientDisplayName}</span>` : '';
-
-            const itemCard = document.createElement('div');
-            itemCard.className = "flex flex-col md:flex-row justify-between items-start md:items-center p-4 rounded-xl bg-neutral-900 border border-neutral-800 gap-4";
-            itemCard.innerHTML = `
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-full bg-neutral-800 border gold-border flex items-center justify-center font-bold text-amber-400 text-sm">${cust.name.charAt(0)}</div>
-                <div>
-                  <h4 class="font-bold text-stone-100 text-sm">${cust.name} ${displayTag} <span class="text-xs text-stone-400 font-normal">(${cust.phone})</span></h4>
-                  <p class="text-xs text-amber-400 font-medium">${purchase.item}</p>
-                  <p class="text-[11px] text-stone-400">Date: ${purchase.date} | Status: <span class="text-amber-400 font-semibold">${purchase.status}</span></p>
-                </div>
+          const card = document.createElement('div');
+          card.className = "p-4 rounded-xl bg-neutral-900 border border-neutral-800 flex flex-wrap justify-between items-center gap-4";
+          card.innerHTML = `
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-stone-100 text-sm">${item.patientName} (${item.relation})</h4>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 font-semibold border border-amber-500/20">${item.order.status}</span>
               </div>
-              <div class="flex flex-col md:flex-row items-end md:items-center gap-3 w-full md:w-auto justify-between md:justify-end">
-                <div class="text-right">
-                  <p class="text-xs text-stone-400">Due: <span class="font-bold text-amber-400">${appConfig.currSymbol} ${due.toLocaleString()}</span></p>
-                  <p class="text-[10px] text-stone-500">Total: ${appConfig.currSymbol} ${purchase.total.toLocaleString()}</p>
-                </div>
-                <div class="flex flex-col gap-2 w-full md:w-auto">
-                  <button onclick="deliverOrder(${cust.id}, ${purchase.orderId})" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider">
-                    ${dict.btnMarkDelivered}
-                  </button>
-                  <button onclick="editCustomerFromDashboard(${cust.id}, ${purchase.orderId})" class="px-4 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-semibold text-xs border border-amber-500/30">
-                    ${dict.btnEditRecord}
-                  </button>
-                </div>
+              <p class="text-xs text-stone-400 mt-1">Primary Contact: ${item.name} (${item.phone})</p>
+              <p class="text-xs text-stone-300 font-mono mt-0.5">Item: ${item.order.item || 'N/A'}</p>
+            </div>
+            <div class="text-right flex items-center gap-4">
+              <div>
+                <p class="text-[10px] text-stone-400 uppercase">Balance Due</p>
+                <p class="text-sm font-bold text-amber-400">${formatAmount(item.order.due)}</p>
               </div>
-            `;
-            activeListContainer.appendChild(itemCard);
-          } else {
-            deliveredCount++;
-          }
-        });
+              <button onclick="markDelivered('${item.id}')" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 font-semibold text-xs">
+                Mark Delivered
+              </button>
+            </div>
+          `;
+          activeList.appendChild(card);
+        }
       });
 
-      if (activeCount === 0) {
-        activeListContainer.innerHTML = `<p class="text-xs text-stone-500 py-4 text-center">No active orders right now.</p>`;
-      }
-
       document.getElementById('stat-active-count').innerText = activeCount;
-      document.getElementById('stat-total-due').innerText = `${appConfig.currSymbol} ${totalDue.toLocaleString()}`;
+      document.getElementById('stat-total-due').innerText = formatAmount(totalDue);
       document.getElementById('stat-delivered-count').innerText = deliveredCount;
     }
 
-    function renderHistory() { filterCustomerHistory(); }
+    function markDelivered(id) {
+      const record = customersData.find(c => c.id === id);
+      if (record) {
+        record.order.status = 'Delivered';
+        renderDashboard();
+        renderHistory();
+      }
+    }
+
+    function renderHistory() {
+      filterCustomerHistory();
+    }
 
     function filterCustomerHistory() {
       const query = (document.getElementById('history-search-input').value || '').toLowerCase();
-      const container = document.getElementById('history-results-list');
-      container.innerHTML = '';
+      const list = document.getElementById('history-results-list');
+      list.innerHTML = '';
 
-      const filtered = customerDatabase.filter(c => 
-        c.name.toLowerCase().includes(query) || 
-        c.phone.toLowerCase().includes(query) ||
-        c.purchases.some(p => p.patientName && p.patientName.toLowerCase().includes(query))
+      const filtered = customersData.filter(c => 
+        c.name.toLowerCase().includes(query) ||
+        c.patientName.toLowerCase().includes(query) ||
+        c.phone.includes(query)
       );
 
-      if (filtered.length === 0) {
-        container.innerHTML = `<p class="text-xs text-stone-500 py-6 text-center">No customer record found.</p>`;
-        return;
-      }
-
-      filtered.forEach(cust => {
-        const custCard = document.createElement('div');
-        custCard.className = "p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-4";
-        
-        let purchasesHtml = cust.purchases.map(p => `
-          <div class="border-t border-neutral-800 pt-3 mt-3 space-y-2 text-xs">
-            <div class="flex justify-between items-center">
-              <div>
-                <p class="font-bold text-amber-400">${p.item} (${p.date})</p>
-                <p class="text-[11px] text-stone-300 font-medium">Patient: <span class="text-stone-100 font-semibold">${p.patientDisplayName || cust.name}</span> ${p.patientAge ? '| Age: ' + p.patientAge : ''}</p>
-              </div>
-              <div class="text-right">
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.status === 'Delivered' ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-400'}">${p.status}</span>
-                <p class="text-stone-300 font-semibold mt-1">${appConfig.currSymbol} ${p.total.toLocaleString()}</p>
-              </div>
-            </div>
-            <div class="bg-neutral-950 p-2.5 rounded-xl border border-neutral-800 font-mono text-[11px] text-stone-300 grid grid-cols-2 gap-2">
-              <div>OD (Right): SPH ${p.rx.odSph || '-'}, CYL ${p.rx.odCyl || '-'}, AXIS ${p.rx.odAxis || '-'}, ADD ${p.rx.odAdd || '-'}</div>
-              <div>OS (Left): SPH ${p.rx.osSph || '-'}, CYL ${p.rx.osCyl || '-'}, AXIS ${p.rx.osAxis || '-'}, ADD ${p.rx.osAdd || '-'}</div>
-            </div>
-          </div>
-        `).join('');
-
-        custCard.innerHTML = `
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = "p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3";
+        card.innerHTML = `
           <div class="flex justify-between items-start">
             <div>
-              <h4 class="font-bold text-stone-100 text-base">${cust.name} <span class="text-xs font-mono text-amber-400/80">(Primary ID)</span></h4>
-              <p class="text-xs text-stone-400">${cust.phone} ${cust.email ? '| ' + cust.email : ''}</p>
-              <p class="text-xs text-stone-500">${cust.address || 'No address provided'}</p>
+              <h4 class="font-bold text-stone-100 text-base">${item.patientName} <span class="text-xs text-stone-400 font-normal">(${item.relation})</span></h4>
+              <p class="text-xs text-stone-400">Primary Account: ${item.name} | Mobile: ${item.phone}</p>
             </div>
-            <button onclick="prepareNewPurchaseForCustomer(${cust.id})" class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-semibold text-xs">
-              + New Order for Family/Self
+            <button onclick="editCustomer('${item.id}')" class="px-3 py-1 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs font-semibold">
+              Edit Record
             </button>
           </div>
-          <div>${purchasesHtml}</div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs bg-neutral-950 p-3 rounded-xl font-mono text-stone-300">
+            <div>OD: SPH ${item.rx.odSph || '0'} | CYL ${item.rx.odCyl || '0'} | AXIS ${item.rx.odAxis || '0'}</div>
+            <div>OS: SPH ${item.rx.osSph || '0'} | CYL ${item.rx.osCyl || '0'} | AXIS ${item.rx.osAxis || '0'}</div>
+            <div>Item: ${item.order.item || 'N/A'}</div>
+            <div>Status: <span class="${item.order.status === 'Delivered' ? 'text-emerald-400' : 'text-amber-400'}">${item.order.status}</span></div>
+          </div>
         `;
-        container.appendChild(custCard);
+        list.appendChild(card);
       });
+    }
+
+    function editCustomer(id) {
+      const item = customersData.find(c => c.id === id);
+      if (!item) return;
+
+      document.getElementById('editing-cust-id').value = item.id;
+      document.getElementById('cust-name').value = item.name;
+      document.getElementById('cust-phone').value = item.phone;
+      document.getElementById('cust-email').value = item.email || '';
+      document.getElementById('cust-address').value = item.address || '';
+      document.getElementById('order-for-type').value = item.orderFor;
+      toggleFamilyMemberFields(item.orderFor);
+      document.getElementById('family-relation').value = item.relation;
+      document.getElementById('family-member-name').value = item.patientName;
+      document.getElementById('cust-age').value = item.age || '';
+
+      document.getElementById('rx-od-sph').value = item.rx.odSph || '';
+      document.getElementById('rx-od-cyl').value = item.rx.odCyl || '';
+      document.getElementById('rx-od-axis').value = item.rx.odAxis || '';
+      document.getElementById('rx-od-add').value = item.rx.odAdd || '';
+      document.getElementById('rx-pd').value = item.rx.pd || '';
+      document.getElementById('rx-os-sph').value = item.rx.osSph || '';
+      document.getElementById('rx-os-cyl').value = item.rx.osCyl || '';
+      document.getElementById('rx-os-axis').value = item.rx.osAxis || '';
+      document.getElementById('rx-os-add').value = item.rx.osAdd || '';
+      document.getElementById('rx-doctor').value = item.rx.doctor || '';
+
+      document.getElementById('order-item').value = item.order.item || '';
+      document.getElementById('order-total').value = item.order.total || '';
+      document.getElementById('order-paid').value = item.order.paid || '';
+      document.getElementById('order-status').value = item.order.status;
+
+      calcBalance();
+      switchAppTab('new-customer');
+    }
+
+    // --- ACCOUNT & DATA MANAGEMENT ---
+    function handleUpdateProfile(e) {
+      e.preventDefault();
+      if (!currentOwner) return;
+      currentOwner.shop = document.getElementById('profile-shop-input').value;
+      currentOwner.mobile = document.getElementById('profile-mobile-input').value;
+      currentOwner.address = document.getElementById('profile-address-input').value;
+      setupOwnerProfile();
+      alert("Profile updated successfully.");
+    }
+
+    function clearDashboardDataOnly() {
+      if (confirm("Are you sure you want to clear all orders and customer database records?")) {
+        customersData = [];
+        renderDashboard();
+        renderHistory();
+        alert("Dashboard data and customer database have been cleared.");
+      }
+    }
+
+    function clearEntireAccountDatabase() {
+      if (confirm("DANGER: This will wipe all database data and profile settings associated with this session. Continue?")) {
+        customersData = [];
+        currentOwner = null;
+        alert("Entire account database wiped.");
+        location.reload();
+      }
     }
   </script>
 </body>
