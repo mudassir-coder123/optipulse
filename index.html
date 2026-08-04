@@ -132,7 +132,7 @@
         <p id="disp-managing-badge" class="text-xs text-stone-400">Managing Practice</p>
       </div>
 
-      <!-- Quick Language & Currency Switcher on Dashboard -->
+      <!-- Quick Language & Currency Switcher -->
       <div class="flex items-center gap-3">
         <select id="dash-select-lang" onchange="changeLanguage(this.value)" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 border border-neutral-700 text-amber-400 text-xs font-semibold focus:outline-none">
           <option value="en">English</option>
@@ -156,10 +156,11 @@
 
     <!-- Navigation Tabs -->
     <div class="border-b border-neutral-800 bg-neutral-900 px-4 md:px-8 pt-4">
-      <div class="flex gap-6">
-        <button id="tab-dashboard" onclick="switchAppTab('dashboard')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold">Dashboard</button>
-        <button id="tab-new-customer" onclick="switchAppTab('new-customer')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold">+ New Order</button>
-        <button id="tab-history" onclick="switchAppTab('history')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold">Customer Database</button>
+      <div class="flex gap-6 overflow-x-auto">
+        <button id="tab-dashboard" onclick="switchAppTab('dashboard')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold whitespace-nowrap">Dashboard</button>
+        <button id="tab-new-customer" onclick="switchAppTab('new-customer')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">+ New Order</button>
+        <button id="tab-history" onclick="switchAppTab('history')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">Customer Database</button>
+        <button id="tab-account" onclick="switchAppTab('account')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">Profile & Settings</button>
       </div>
     </div>
 
@@ -290,6 +291,67 @@
         </div>
       </div>
 
+      <!-- TAB 4: ACCOUNT PROFILE & DATA MANAGEMENT -->
+      <div id="view-tab-account" class="hidden space-y-6">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6">
+          <div>
+            <h3 class="text-lg font-bold text-stone-100">Logged-in Profile & App Info</h3>
+            <p class="text-xs text-stone-400 mt-1">Review or update your shop details connected to this email account.</p>
+          </div>
+
+          <form onsubmit="handleUpdateProfile(event)" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Logged-In Gmail / Email</label>
+                <input id="profile-email-disp" type="text" disabled class="w-full px-4 py-2.5 rounded-xl bg-neutral-950/60 border border-neutral-800 text-amber-400 text-sm font-mono cursor-not-allowed">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Shop / Practice Name</label>
+                <input id="profile-shop-input" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Mobile Contact</label>
+                <input id="profile-mobile-input" type="text" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-400 mb-1">Shop Address</label>
+                <input id="profile-address-input" type="text" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+            </div>
+
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider">
+              Update Profile Details
+            </button>
+          </form>
+        </div>
+
+        <!-- Danger Zone Data Clearing Controls -->
+        <div class="bg-neutral-900 border border-red-900/30 rounded-2xl p-6 md:p-8 space-y-4">
+          <h3 class="text-lg font-bold text-red-400">Database & Dashboard Clear Options</h3>
+          <p class="text-xs text-stone-400">Manage data retention for your account. Perform backups if necessary before clearing.</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <!-- Clear Dashboard Orders Only -->
+            <div class="p-4 rounded-xl bg-neutral-950 border border-neutral-800 space-y-3">
+              <h4 class="text-sm font-bold text-stone-200">1. Clear Dashboard Data Only</h4>
+              <p class="text-xs text-stone-400">Deletes all pending/active orders & customer database records, but keeps your login profile intact.</p>
+              <button onclick="clearDashboardDataOnly()" class="w-full py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold text-xs uppercase tracking-wider">
+                Clear Dashboard Data Only
+              </button>
+            </div>
+
+            <!-- Clear Entire Account Database -->
+            <div class="p-4 rounded-xl bg-neutral-950 border border-neutral-800 space-y-3">
+              <h4 class="text-sm font-bold text-red-400">2. Wipe Entire Database & App Data</h4>
+              <p class="text-xs text-stone-400">Permanently clears all customers, prescriptions, settings, and profile details associated with this Gmail.</p>
+              <button onclick="clearEntireAccountDatabase()" class="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider">
+                Wipe Entire Database
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 
@@ -307,13 +369,13 @@
 
     const translations = {
       en: {
-        welcomeSub: "Optical Practice & Customer Management System", enterPortal: "Enter System Portal", settingsTitle: "Preferences", settingsSubtitle: "Select your preferred language and local currency.", selectLang: "Language", selectCurr: "Currency", btnContinueAuth: "Continue to Authentication", authTitle: "Shop Authentication", authSubtitle: "Enter your details to log in or register your optical store.", lblShopName: "Shop / Practice Name", lblMobile: "Mobile Contact", lblEmail: "Owner Email", lblAddress: "Shop Address", btnSendOtp: "Send Email Verification OTP", lblEnterOtp: "Enter 6-Digit OTP Code", btnVerifyOtp: "Verify & Enter Portal", tabDashboard: "Dashboard", tabNewOrder: "+ New Order", tabDatabase: "Customer Database", lblActiveOrders: "Active Pending Orders", lblOutstandingDues: "Total Outstanding Dues", lblCompletedOrders: "Completed Orders", hdrCurrentActive: "Current Active Orders", hdrPatientEntry: "Patient Prescription & Order Entry", lblCustName: "Customer Full Name *", lblCustPhone: "Phone / Mobile *", lblCustEmail: "Email (Optional)", lblCustAge: "Age", lblCustGender: "Gender", lblCustAddress: "Address", hdrRxDetails: "Prescription Details (Rx)", lblPrescribedBy: "Prescribed By", hdrOrderBilling: "Order & Billing Details", lblItemDesc: "Item Description", lblTotalAmount: "Total Amount", lblAmountPaid: "Amount Paid", lblOrderStatus: "Status", lblRemainingBal: "Remaining Balance", btnFormCancel: "Cancel", btnFormSave: "Save Customer Record", searchPlaceholder: "Search by patient name or phone number...", btnMarkDelivered: "Mark Delivered", btnEditRecord: "Edit Record", btnLogout: "Logout"
+        welcomeSub: "Optical Practice & Customer Management System", enterPortal: "Enter System Portal", settingsTitle: "Preferences", settingsSubtitle: "Select your preferred language and local currency.", selectLang: "Language", selectCurr: "Currency", btnContinueAuth: "Continue to Authentication", authTitle: "Shop Authentication", authSubtitle: "Enter your details to log in or register your optical store.", lblShopName: "Shop / Practice Name", lblMobile: "Mobile Contact", lblEmail: "Owner Email", lblAddress: "Shop Address", btnSendOtp: "Send Email Verification OTP", lblEnterOtp: "Enter 6-Digit OTP Code", btnVerifyOtp: "Verify & Enter Portal", tabDashboard: "Dashboard", tabNewOrder: "+ New Order", tabDatabase: "Customer Database", tabAccount: "Profile & Settings", lblActiveOrders: "Active Pending Orders", lblOutstandingDues: "Total Outstanding Dues", lblCompletedOrders: "Completed Orders", hdrCurrentActive: "Current Active Orders", hdrPatientEntry: "Patient Prescription & Order Entry", lblCustName: "Customer Full Name *", lblCustPhone: "Phone / Mobile *", lblCustEmail: "Email (Optional)", lblCustAge: "Age", lblCustGender: "Gender", lblCustAddress: "Address", hdrRxDetails: "Prescription Details (Rx)", lblPrescribedBy: "Prescribed By", hdrOrderBilling: "Order & Billing Details", lblItemDesc: "Item Description", lblTotalAmount: "Total Amount", lblAmountPaid: "Amount Paid", lblOrderStatus: "Status", lblRemainingBal: "Remaining Balance", btnFormCancel: "Cancel", btnFormSave: "Save Customer Record", searchPlaceholder: "Search by patient name or phone number...", btnMarkDelivered: "Mark Delivered", btnEditRecord: "Edit Record", btnLogout: "Logout"
       },
       ur: {
-        welcomeSub: "آپٹیکل پریکٹس اور کسٹمر منیجمنٹ سسٹم", enterPortal: "سسٹم پورٹل میں داخل ہوں", settingsTitle: "ترجیحات", settingsSubtitle: "اپنی پسندیدہ زبان اور مقامی کرنسی کا انتخاب کریں۔", selectLang: "زبان", selectCurr: "کرنسی", btnContinueAuth: "آتھینٹیکیشن پر آگے بڑھیں", authTitle: "دوکان کی تصدیق", authSubtitle: "لاگ ان کرنے یا اپنی آپٹیکل شاپ کو رجسٹر کرنے کے لیے تفصیلات درج کریں۔", lblShopName: "دوکان / پریکٹس کا نام", lblMobile: "موبائل نمبر", lblEmail: "آنر کا ای میل", lblAddress: "دوکان کا پتہ", btnSendOtp: "ای میل تصدیق کا OTP بھیجیں", lblEnterOtp: "6 ہندسوں کا OTP کوڈ درج کریں", btnVerifyOtp: "تصدیق کریں اور پورٹل میں داخل ہوں", tabDashboard: "ڈیش بورڈ", tabNewOrder: "+ نیا آرڈر", tabDatabase: "کسٹمر ڈیٹا بیس", lblActiveOrders: "فعال زیر التوا آرڈرز", lblOutstandingDues: "کل واجب الادا رقم", lblCompletedOrders: "مکمل شدہ آرڈرز", hdrCurrentActive: "موجودہ فعال آرڈرز", hdrPatientEntry: "مریض کا نسخہ اور آرڈر کا اندراج", lblCustName: "گاہک کا پورا نام *", lblCustPhone: "فون / موبائل *", lblCustEmail: "ای میل (اختیاری)", lblCustAge: "عمر", lblCustGender: "جنس", lblCustAddress: "پتہ", hdrRxDetails: "نسخے کی تفصیلات (Rx)", lblPrescribedBy: "تجویز کردہ از ڈاکٹر", hdrOrderBilling: "آرڈر اور بلنگ کی تفصیلات", lblItemDesc: "آئٹم کی تفصیل", lblTotalAmount: "کل رقم", lblAmountPaid: "ادا شدہ رقم", lblOrderStatus: "حیثیت (سٹیٹس)", lblRemainingBal: "بقیہ رقم", btnFormCancel: "منسوخ کریں", btnFormSave: "کسٹمر ریکارڈ محفوظ کریں", searchPlaceholder: "مریض کا نام یا فون نمبر کے ذریعہ تلاش کریں...", btnMarkDelivered: "ڈیلیور نشان زد کریں", btnEditRecord: "ریکارڈ میں ترمیم کریں", btnLogout: "لاگ آؤٹ"
+        welcomeSub: "آپٹیکل پریکٹس اور کسٹمر منیجمنٹ سسٹم", enterPortal: "سسٹم پورٹل میں داخل ہوں", settingsTitle: "ترجیحات", settingsSubtitle: "اپنی پسندیدہ زبان اور مقامی کرنسی کا انتخاب کریں۔", selectLang: "زبان", selectCurr: "کرنسی", btnContinueAuth: "آتھینٹیکیشن پر آگے بڑھیں", authTitle: "دوکان کی تصدیق", authSubtitle: "لاگ ان کرنے یا اپنی آپٹیکل شاپ کو رجسٹر کرنے کے لیے تفصیلات درج کریں۔", lblShopName: "دوکان / پریکٹس کا نام", lblMobile: "موبائل نمبر", lblEmail: "آنر کا ای میل", lblAddress: "دوکان کا پتہ", btnSendOtp: "ای میل تصدیق کا OTP بھیجیں", lblEnterOtp: "6 ہندسوں کا OTP کوڈ درج کریں", btnVerifyOtp: "تصدیق کریں اور پورٹل میں داخل ہوں", tabDashboard: "ڈیش بورڈ", tabNewOrder: "+ نیا آرڈر", tabDatabase: "کسٹمر ڈیٹا بیس", tabAccount: "پروفائل اور ترتیبات", lblActiveOrders: "فعال زیر التوا آرڈرز", lblOutstandingDues: "کل واجب الادا رقم", lblCompletedOrders: "مکمل شدہ آرڈرز", hdrCurrentActive: "موجودہ فعال آرڈرز", hdrPatientEntry: "مریض کا نسخہ اور آرڈر کا اندراج", lblCustName: "گاہک کا پورا نام *", lblCustPhone: "فون / موبائل *", lblCustEmail: "ای میل (اختیاری)", lblCustAge: "عمر", lblCustGender: "جنس", lblCustAddress: "پتہ", hdrRxDetails: "نسخے کی تفصیلات (Rx)", lblPrescribedBy: "تجویز کردہ از ڈاکٹر", hdrOrderBilling: "آرڈر اور بلنگ کی تفصیلات", lblItemDesc: "آئٹم کی تفصیل", lblTotalAmount: "کل رقم", lblAmountPaid: "ادا شدہ رقم", lblOrderStatus: "حیثیت (سٹیٹس)", lblRemainingBal: "بقیہ رقم", btnFormCancel: "منسوخ کریں", btnFormSave: "کسٹمر ریکارڈ محفوظ کریں", searchPlaceholder: "مریض کا نام یا فون نمبر کے ذریعہ تلاش کریں...", btnMarkDelivered: "ڈیلیور نشان زد کریں", btnEditRecord: "ریکارڈ میں ترمیم کریں", btnLogout: "لاگ آؤٹ"
       },
       ar: {
-        welcomeSub: "نظام إدارة الممارسة البصرية والعملاء", enterPortal: "الدخول إلى البوابة", settingsTitle: "التفضيلات", settingsSubtitle: "حدد لغتك المفضلة والعملة المحلية.", selectLang: "اللغة", selectCurr: "العملة", btnContinueAuth: "الانتقال إلى المصادقة", authTitle: "مصادقة المتجر", authSubtitle: "أدخل بياناتك لتسجيل الدخول أو تسجيل متجر البصريات الخاص بك.", lblShopName: "اسم المتجر / العيادة", lblMobile: "رقم الهاتف المحمول", lblEmail: "البريد الإلكتروني للمالك", lblAddress: "عنوان المتجر", btnSendOtp: "إرسال رمز التحقق (OTP) إلى البريد", lblEnterOtp: "أدخل رمز OTP المكون من 6 أرقام", btnVerifyOtp: "التحقق والدخول إلى البوابة", tabDashboard: "لوحة التحكم", tabNewOrder: "+ طلب جديد", tabDatabase: "قاعدة بيانات العملاء", lblActiveOrders: "الطلبات النشطة المعلقة", lblOutstandingDues: "إجمالي المبالغ المستحقة", lblCompletedOrders: "الطلبات المكتملة", hdrCurrentActive: "الطلبات النشطة الحالية", hdrPatientEntry: "وصفة المريض وإدخال الطلب", lblCustName: "اسم العميل الكامل *", lblCustPhone: "الهاتف / المحمول *", lblCustEmail: "البريد الإلكتروني (اختياري)", lblCustAge: "العمر", lblCustGender: "الجنس", lblCustAddress: "العنوان", hdrRxDetails: "تفاصيل الوصفة الطبية (Rx)", lblPrescribedBy: "تم الوصف بواسطة الطبيب", hdrOrderBilling: "تفاصيل الطلب والفلترة", lblItemDesc: "وصف العنصر", lblTotalAmount: "المبلغ الإجمالي", lblAmountPaid: "المبلغ المدفوع", lblOrderStatus: "الحالة", lblRemainingBal: "الرصيد المتبقي", btnFormCancel: "إلغاء", btnFormSave: "حفظ سجل العميل", searchPlaceholder: "البحث باسم المريض أو رقم الهاتف...", btnMarkDelivered: "تحديد كتم التسليم", btnEditRecord: "تعديل السجل", btnLogout: "تسجيل الخروج"
+        welcomeSub: "نظام إدارة الممارسة البصرية والعملاء", enterPortal: "الدخول إلى البوابة", settingsTitle: "التفضيلات", settingsSubtitle: "حدد لغتك المفضلة والعملة المحلية.", selectLang: "اللغة", selectCurr: "العملة", btnContinueAuth: "الانتقال إلى المصادقة", authTitle: "مصادقة المتجر", authSubtitle: "أدخل بياناتك لتسجيل الدخول أو تسجيل متجر البصريات الخاص بك.", lblShopName: "اسم المتجر / العيادة", lblMobile: "رقم الهاتف المحمول", lblEmail: "البريد الإلكتروني للمالك", lblAddress: "عنوان المتجر", btnSendOtp: "إرسال رمز التحقق (OTP) إلى البريد", lblEnterOtp: "أدخل رمز OTP المكون من 6 أرقام", btnVerifyOtp: "التحقق والدخول إلى البوابة", tabDashboard: "لوحة التحكم", tabNewOrder: "+ طلب جديد", tabDatabase: "قاعدة بيانات العملاء", tabAccount: "الملف الشخصي والإعدادات", lblActiveOrders: "الطلبات النشطة المعلقة", lblOutstandingDues: "إجمالي المبالغ المستحقة", lblCompletedOrders: "الطلبات المكتملة", hdrCurrentActive: "الطلبات النشطة الحالية", hdrPatientEntry: "وصفة المريض وإدخال الطلب", lblCustName: "اسم العميل الكامل *", lblCustPhone: "الهاتف / المحمول *", lblCustEmail: "البريد الإلكتروني (اختياري)", lblCustAge: "العمر", lblCustGender: "الجنس", lblCustAddress: "العنوان", hdrRxDetails: "تفاصيل الوصفة الطبية (Rx)", lblPrescribedBy: "تم الوصف بواسطة الطبيب", hdrOrderBilling: "تفاصيل الطلب والفلترة", lblItemDesc: "وصف العنصر", lblTotalAmount: "المبلغ الإجمالي", lblAmountPaid: "المبلغ المدفوع", lblOrderStatus: "الحالة", lblRemainingBal: "الرصيد المتبقي", btnFormCancel: "إلغاء", btnFormSave: "حفظ سجل العميل", searchPlaceholder: "البحث باسم المريض أو رقم الهاتف...", btnMarkDelivered: "تحديد كتم التسليم", btnEditRecord: "تعديل السجل", btnLogout: "تسجيل الخروج"
       }
     };
 
@@ -355,8 +417,48 @@
         customerDatabase = [];
       }
 
+      populateProfileFields();
       changeLanguage(appConfig.lang || 'en');
       changeCurrency(appConfig.currency || 'PKR');
+    }
+
+    function populateProfileFields() {
+      document.getElementById('profile-email-disp').value = currentUser ? currentUser.email : '';
+      document.getElementById('profile-shop-input').value = appConfig.owner.shop || '';
+      document.getElementById('profile-mobile-input').value = appConfig.owner.mobile || '';
+      document.getElementById('profile-address-input').value = appConfig.owner.address || '';
+    }
+
+    function handleUpdateProfile(e) {
+      e.preventDefault();
+      appConfig.owner.shop = document.getElementById('profile-shop-input').value;
+      appConfig.owner.mobile = document.getElementById('profile-mobile-input').value;
+      appConfig.owner.address = document.getElementById('profile-address-input').value;
+
+      persistConfig();
+
+      document.getElementById('disp-shop-title').innerText = appConfig.owner.shop.toUpperCase();
+      document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop}`;
+
+      alert("Profile details updated successfully!");
+    }
+
+    function clearDashboardDataOnly() {
+      if (confirm("Are you sure you want to clear all dashboard and customer order data? Your account profile will remain saved.")) {
+        customerDatabase = [];
+        persistCustomers();
+        renderDashboard();
+        alert("Dashboard and order data cleared successfully.");
+      }
+    }
+
+    function clearEntireAccountDatabase() {
+      if (confirm("WARNING: This will permanently delete ALL data, orders, and shop settings for this account. Continue?")) {
+        localStorage.removeItem(getUserStorageKey('config'));
+        localStorage.removeItem(getUserStorageKey('customers'));
+        alert("Entire account database wiped successfully.");
+        handleLogout();
+      }
     }
 
     function changeLanguage(langCode) {
@@ -387,6 +489,7 @@
       document.getElementById('tab-dashboard').innerText = dict.tabDashboard;
       document.getElementById('tab-new-customer').innerText = dict.tabNewOrder;
       document.getElementById('tab-history').innerText = dict.tabDatabase;
+      document.getElementById('tab-account').innerText = dict.tabAccount || "Profile & Settings";
       document.getElementById('lbl-active-orders').innerText = dict.lblActiveOrders;
       document.getElementById('lbl-outstanding-dues').innerText = dict.lblOutstandingDues;
       document.getElementById('lbl-completed-orders').innerText = dict.lblCompletedOrders;
@@ -577,15 +680,18 @@
       document.getElementById('view-tab-dashboard').classList.add('hidden');
       document.getElementById('view-tab-new-customer').classList.add('hidden');
       document.getElementById('view-tab-history').classList.add('hidden');
+      document.getElementById('view-tab-account').classList.add('hidden');
 
-      document.getElementById('tab-dashboard').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold";
-      document.getElementById('tab-new-customer').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold";
-      document.getElementById('tab-history').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold";
+      document.getElementById('tab-dashboard').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
+      document.getElementById('tab-new-customer').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
+      document.getElementById('tab-history').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
+      document.getElementById('tab-account').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
 
       document.getElementById(`view-tab-${tabName}`).classList.remove('hidden');
-      document.getElementById(`tab-${tabName}`).className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold";
+      document.getElementById(`tab-${tabName}`).className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold whitespace-nowrap";
 
       if (tabName === 'history') renderHistory();
+      if (tabName === 'account') populateProfileFields();
     }
 
     function calcBalance() {
