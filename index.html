@@ -413,7 +413,7 @@
     };
 
     let currentUser = null;
-    let appConfig = { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: {} };
+    let appConfig = { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: {}, nextCustomerNumber: 1 };
     let customerDatabase = [];
 
     // ---- CLOUD PERSISTENCE (Supabase) ----
@@ -477,19 +477,44 @@
       if (error) {
         console.error('Error loading data from Supabase:', error);
         alert('Could not load your data from the cloud database: ' + error.message);
-        appConfig = { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: { shop: 'OptiPulse Store', email: userEmail } };
+        appConfig = { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: { shop: 'OptiPulse Store', email: userEmail }, nextCustomerNumber: 1 };
         customerDatabase = [];
       } else {
         const configRow = (data || []).find(r => r.customer_name === '__CONFIG__');
-        appConfig = configRow ? configRow.order_data : { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: { shop: 'OptiPulse Store', email: userEmail } };
+        appConfig = configRow ? configRow.order_data : { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: { shop: 'OptiPulse Store', email: userEmail }, nextCustomerNumber: 1 };
+        if (!appConfig.nextCustomerNumber) appConfig.nextCustomerNumber = 1;
         customerDatabase = (data || [])
           .filter(r => r.customer_name !== '__CONFIG__')
           .map(r => r.order_data);
       }
 
+      await ensureCustomerNumbers();
+
       populateProfileFields();
       changeLanguage(appConfig.lang || 'en');
       changeCurrency(appConfig.currency || 'PKR');
+    }
+
+    // Gives every customer a permanent, human-friendly ID (OPT-0001, OPT-0002, ...).
+    // Backfills older records that were saved before this feature existed.
+    async function ensureCustomerNumbers() {
+      let changed = false;
+      const toSave = [];
+      customerDatabase.forEach(cust => {
+        if (!cust.customerNumber) {
+          cust.customerNumber = appConfig.nextCustomerNumber++;
+          toSave.push(cust);
+          changed = true;
+        }
+      });
+      if (changed) {
+        await persistConfig();
+        for (const c of toSave) await persistCustomer(c);
+      }
+    }
+
+    function displayCustomerId(cust) {
+      return 'OPT-' + String(cust.customerNumber || 0).padStart(4, '0');
     }
 
     function toggleFamilyMemberFields(val) {
@@ -807,6 +832,131 @@
       }
     }
 
+    async function deleteOrder(custId, orderId) {
+      const cust = customerDatabase.find(c => c.id === custId);
+      if (!cust) return;
+      if (!confirm('Delete this order permanently? This cannot be undone.')) return;
+
+      cust.purchases = cust.purchases.filter(p => p.orderId !== orderId);
+      await persistCustomer(cust);
+
+      renderDashboard();
+      if (!document.getElementById('view-tab-history').classList.contains('hidden')) {
+        filterCustomerHistory();
+      }
+    }
+
+    function printCustomerRecord(custId) {
+      const cust = customerDatabase.find(c => c.id === custId);
+      if (!cust) return;
+
+      const shopName = (appConfig.owner && appConfig.owner.shop) || 'OptiPulse Store';
+      const shopAddress = (appConfig.owner && appConfig.owner.address) || '';
+      const shopMobile = (appConfig.owner && appConfig.owner.mobile) || '';
+
+      let totalAll = 0, paidAll = 0;
+      const purchaseRows = (cust.purchases || []).map(p => {
+        const due = Math.max(0, p.total - p.paid);
+        totalAll += Number(p.total) || 0;
+        paidAll += Number(p.paid) || 0;
+        const rx = p.rx || {};
+        return `
+          <tr>
+            <td>${p.date || '-'}</td>
+            <td>${p.patientDisplayName || cust.name}</td>
+            <td>${p.item || '-'}</td>
+            <td>${p.status || '-'}</td>
+            <td style="text-align:right">${appConfig.currSymbol} ${Number(p.total || 0).toLocaleString()}</td>
+            <td style="text-align:right">${appConfig.currSymbol} ${Number(p.paid || 0).toLocaleString()}</td>
+            <td style="text-align:right">${appConfig.currSymbol} ${due.toLocaleString()}</td>
+          </tr>
+          <tr>
+            <td colspan="7" style="font-size:11px;color:#555;padding-bottom:12px;border-bottom:1px solid #eee;">
+              Rx &mdash; OD: SPH ${rx.odSph || '-'}, CYL ${rx.odCyl || '-'}, AXIS ${rx.odAxis || '-'}, ADD ${rx.odAdd || '-'}
+              &nbsp;|&nbsp; OS: SPH ${rx.osSph || '-'}, CYL ${rx.osCyl || '-'}, AXIS ${rx.osAxis || '-'}, ADD ${rx.osAdd || '-'}
+              &nbsp;|&nbsp; PD: ${rx.pd || '-'} &nbsp;|&nbsp; Prescribed by: ${rx.doctor || '-'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      const familyRows = (cust.familyMembers || []).map(f => {
+        const rx = f.rx || {};
+        return `
+          <tr>
+            <td>${f.name}</td>
+            <td>${f.relation}</td>
+            <td>OD SPH ${rx.odSph || '-'} / OS SPH ${rx.osSph || '-'}</td>
+          </tr>
+        `;
+      }).join('');
+
+      const dueAll = Math.max(0, totalAll - paidAll);
+
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        alert('Please allow pop-ups for this site to print the record.');
+        return;
+      }
+
+      printWindow.document.write(`
+        <html>
+        <head>
+          <title>${cust.name} - Customer Record</title>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: Arial, Helvetica, sans-serif; padding: 32px; color: #111; }
+            h1 { margin: 0; font-size: 22px; }
+            h2 { margin: 20px 0 4px; font-size: 18px; }
+            h3 { margin: 20px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: #333; }
+            .muted { color: #666; font-size: 12px; margin: 2px 0; }
+            table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+            th, td { padding: 6px 8px; font-size: 12.5px; text-align: left; vertical-align: top; }
+            th { background: #f3f3f3; border-bottom: 2px solid #ccc; }
+            .header-flex { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #222; padding-bottom:12px; margin-bottom:16px; }
+            .totals { margin-top: 16px; font-size: 14px; text-align: right; border-top: 2px solid #222; padding-top: 10px; }
+            @media print { body { padding: 10px; } }
+          </style>
+        </head>
+        <body>
+          <div class="header-flex">
+            <div>
+              <h1>${shopName}</h1>
+              <p class="muted">${shopAddress}${shopMobile ? ' | ' + shopMobile : ''}</p>
+            </div>
+            <div style="text-align:right">
+              <p class="muted">Printed: ${new Date().toLocaleDateString()}</p>
+              <p class="muted">Customer ID: ${displayCustomerId(cust)}</p>
+            </div>
+          </div>
+
+          <h2>${cust.name}</h2>
+          <p class="muted">${cust.phone}${cust.email ? ' | ' + cust.email : ''}</p>
+          <p class="muted">${cust.address || ''}</p>
+
+          ${familyRows ? `<h3>Family Members</h3><table><tr><th>Name</th><th>Relation</th><th>Base Rx (SPH OD/OS)</th></tr>${familyRows}</table>` : ''}
+
+          <h3>Order &amp; Prescription History</h3>
+          <table>
+            <tr><th>Date</th><th>Recipient</th><th>Item</th><th>Status</th><th style="text-align:right">Total</th><th style="text-align:right">Paid</th><th style="text-align:right">Due</th></tr>
+            ${purchaseRows || '<tr><td colspan="7">No orders recorded.</td></tr>'}
+          </table>
+
+          <div class="totals">
+            <strong>
+              Grand Total: ${appConfig.currSymbol} ${totalAll.toLocaleString()}
+              &nbsp;&nbsp;|&nbsp;&nbsp; Total Paid: ${appConfig.currSymbol} ${paidAll.toLocaleString()}
+              &nbsp;&nbsp;|&nbsp;&nbsp; Total Due: ${appConfig.currSymbol} ${dueAll.toLocaleString()}
+            </strong>
+          </div>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => printWindow.print(), 300);
+    }
+
     function editCustomerFromDashboard(custId, orderId) {
       const cust = customerDatabase.find(c => c.id === custId);
       if (!cust) return;
@@ -906,6 +1056,7 @@
       if (!cust) {
         cust = {
           id: Date.now(),
+          customerNumber: appConfig.nextCustomerNumber++,
           name: nameEl.value,
           phone: phoneEl.value,
           email: document.getElementById('cust-email').value,
@@ -914,6 +1065,7 @@
           purchases: []
         };
         customerDatabase.push(cust);
+        await persistConfig();
       } else {
         cust.name = nameEl.value;
         cust.phone = phoneEl.value;
@@ -1000,6 +1152,7 @@
                   <h4 class="font-bold text-stone-100 text-sm">${cust.name} ${displayTag} <span class="text-xs text-stone-400 font-normal">(${cust.phone})</span></h4>
                   <p class="text-xs text-amber-400 font-medium">${purchase.item}</p>
                   <p class="text-[11px] text-stone-400">Date: ${purchase.date} | Status: <span class="text-amber-400 font-semibold">${purchase.status}</span></p>
+                  <p class="text-[10px] text-stone-500 font-mono mt-0.5">ID: ${displayCustomerId(cust)}</p>
                 </div>
               </div>
               <div class="flex flex-col md:flex-row items-end md:items-center gap-3 w-full md:w-auto justify-between md:justify-end">
@@ -1013,6 +1166,9 @@
                   </button>
                   <button onclick="editCustomerFromDashboard(${cust.id}, ${purchase.orderId})" class="px-4 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-semibold text-xs border border-amber-500/30">
                     ${dict.btnEditRecord}
+                  </button>
+                  <button onclick="deleteOrder(${cust.id}, ${purchase.orderId})" class="px-4 py-1.5 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-400 font-semibold text-xs border border-red-600/30">
+                    Delete
                   </button>
                 </div>
               </div>
@@ -1065,7 +1221,7 @@
           const due = Math.max(0, p.total - p.paid);
           return `
           <div class="border-t border-neutral-800 pt-3 mt-3 space-y-2 text-xs">
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center flex-wrap gap-2">
               <div>
                 <p class="font-bold text-amber-400">${p.item} <span class="text-stone-400 font-normal">(${p.date})</span></p>
                 <p class="text-[11px] text-stone-300 font-medium">Recipient: <span class="text-stone-100 font-semibold">${p.patientDisplayName || cust.name}</span> ${p.patientAge ? '| Age: ' + p.patientAge : ''}</p>
@@ -1073,6 +1229,10 @@
               <div class="text-right">
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.status === 'Delivered' ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-400'}">${p.status}</span>
                 <p class="text-stone-300 font-semibold mt-1">Total: ${appConfig.currSymbol} ${p.total.toLocaleString()} | Paid: ${appConfig.currSymbol} ${p.paid.toLocaleString()} | <span class="text-amber-400">Due: ${appConfig.currSymbol} ${due.toLocaleString()}</span></p>
+                <div class="flex gap-2 justify-end mt-1.5">
+                  <button onclick="editCustomerFromDashboard(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-400 text-[10px] font-semibold border border-amber-500/30">Edit</button>
+                  <button onclick="deleteOrder(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-400 text-[10px] font-semibold border border-red-600/30">Delete</button>
+                </div>
               </div>
             </div>
             <div class="bg-neutral-950 p-2.5 rounded-xl border border-neutral-800 font-mono text-[11px] text-stone-300 grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -1085,14 +1245,19 @@
         custCard.innerHTML = `
           <div class="flex justify-between items-start flex-wrap gap-3">
             <div>
-              <h4 class="font-bold text-stone-100 text-base">${cust.name} <span class="text-xs font-mono text-amber-400/80">(Account ID: #${cust.id})</span></h4>
+              <h4 class="font-bold text-stone-100 text-base">${cust.name} <span class="text-xs font-mono text-amber-400/80">(Account ID: ${displayCustomerId(cust)})</span></h4>
               <p class="text-xs text-stone-400">${cust.phone} ${cust.email ? '| ' + cust.email : ''}</p>
               <p class="text-xs text-stone-500">${cust.address || 'No address provided'}</p>
               ${familyPills ? `<div class="flex flex-wrap gap-1.5 mt-2"><span class="text-[11px] text-stone-400 font-medium">Saved Family Profiles:</span> ${familyPills}</div>` : ''}
             </div>
-            <button onclick="prepareNewPurchaseForCustomer(${cust.id})" class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-semibold text-xs">
-              + New Order for Family/Self
-            </button>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <button onclick="printCustomerRecord(${cust.id})" class="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-200 border border-neutral-700 font-semibold text-xs whitespace-nowrap">
+                🖨️ Print Full Record
+              </button>
+              <button onclick="prepareNewPurchaseForCustomer(${cust.id})" class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-semibold text-xs whitespace-nowrap">
+                + New Order for Family/Self
+              </button>
+            </div>
           </div>
           <div class="pt-2"><h5 class="text-xs font-bold uppercase tracking-wider text-stone-400">Order & Prescription History Log</h5>${purchasesHtml}</div>
         `;
