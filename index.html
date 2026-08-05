@@ -489,11 +489,11 @@
       if (error) {
         console.error('Error loading data from Supabase:', error);
         alert('Could not load your data from the cloud database: ' + error.message);
-        appConfig = { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: { shop: 'OptiPulse Store', email: userEmail }, nextCustomerNumber: 1 };
+        appConfig = { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: { shop: 'My Optical Shop', email: userEmail }, nextCustomerNumber: 1 };
         customerDatabase = [];
       } else {
         const configRow = (data || []).find(r => r.customer_name === '__CONFIG__');
-        appConfig = configRow ? configRow.order_data : { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: { shop: 'OptiPulse Store', email: userEmail }, nextCustomerNumber: 1 };
+        appConfig = configRow ? configRow.order_data : { lang: 'en', currency: 'PKR', currSymbol: 'PKR', owner: { shop: 'My Optical Shop', email: userEmail }, nextCustomerNumber: 1 };
         if (!appConfig.nextCustomerNumber) appConfig.nextCustomerNumber = 1;
         customerDatabase = (data || [])
           .filter(r => r.customer_name !== '__CONFIG__')
@@ -710,7 +710,7 @@
         await loadUserData(session.user.email);
         document.getElementById('step-welcome').classList.add('hidden');
         document.getElementById('step-app-dashboard').classList.remove('hidden');
-        document.getElementById('disp-shop-title').innerText = (appConfig.owner.shop || 'OptiPulse').toUpperCase();
+        document.getElementById('disp-shop-title').innerText = (appConfig.owner.shop || 'My Optical Shop').toUpperCase();
         document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop || session.user.email}`;
         renderDashboard();
       } else {
@@ -858,6 +858,46 @@
       }
     }
 
+    // Shared letterhead styling for all printed pages - shop-branded, no app name shown.
+    function printStyles() {
+      return `
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, Helvetica, sans-serif; margin:0; padding:0; color:#292524; background:#fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .letterhead { background: linear-gradient(120deg, #b8860b, #d4af37 55%, #f0c14b); padding: 30px 40px; color:#1a1508; }
+        .letterhead h1 { margin:0; font-size:28px; font-weight:800; letter-spacing:0.3px; }
+        .letterhead .tag { font-size:11px; text-transform:uppercase; letter-spacing:1.6px; opacity:0.75; margin-top:4px; font-weight:700; }
+        .letterhead .contact { margin-top:12px; font-size:12.5px; opacity:0.9; }
+        .meta-strip { display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; background:#fdf6e3; border-bottom:3px solid #d4af37; padding:10px 40px; font-size:12px; color:#7a5f10; font-weight:700; }
+        .content { padding: 26px 40px 40px; }
+        .customer-box { background:#faf9f7; border:1px solid #eee; border-left:4px solid #d4af37; border-radius:10px; padding:16px 20px; margin-top:6px; }
+        .customer-box h3 { margin:0 0 4px; font-size:18px; color:#1a1a1a; }
+        .customer-box p { margin:2px 0; font-size:12.5px; color:#555; }
+        h2.section-title { font-size:13px; text-transform:uppercase; letter-spacing:0.08em; color:#b8860b; border-bottom:2px solid #f0dca0; padding-bottom:6px; margin: 24px 0 10px; }
+        table { width:100%; border-collapse:collapse; margin-top:6px; }
+        th { background:#d4af37; color:#1a1508; font-size:11.5px; text-transform:uppercase; letter-spacing:0.03em; padding:9px 10px; text-align:left; }
+        td { padding:9px 10px; font-size:12.5px; border-bottom:1px solid #eee; vertical-align: top; }
+        tr:nth-child(even) td { background:#fdf9ee; }
+        .status-pill { display:inline-block; padding:3px 11px; border-radius:999px; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.02em; }
+        .status-delivered { background:#dcfce7; color:#166534; }
+        .status-progress { background:#fef3c7; color:#92400e; }
+        .status-pickup { background:#dbeafe; color:#1e40af; }
+        .rx-box { background:#fffaf0; border:1px solid #f0dca0; border-radius:8px; padding:12px 16px; margin-top:8px; font-family: 'Courier New', monospace; font-size:11.5px; color:#5c4a12; }
+        .rx-box .rx-row { margin-bottom:3px; }
+        .totals-box { margin-top:20px; background:#1c1917; color:#f0c14b; border-radius:12px; padding:18px 22px; display:flex; justify-content:space-around; flex-wrap:wrap; gap:14px; text-align:center; }
+        .totals-box .item-label { font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em; opacity:0.7; margin-bottom:4px; }
+        .totals-box .item-value { font-size:16px; font-weight:800; }
+        .totals-box .due .item-value { color:#ffd76a; font-size:19px; }
+        .footer-note { margin-top:30px; text-align:center; font-size:10.5px; color:#999; border-top:1px dashed #ddd; padding-top:12px; }
+        @media print { body { padding:0; } }
+      `;
+    }
+
+    function statusPillClass(status) {
+      if (status === 'Delivered') return 'status-delivered';
+      if (status === 'Ready for Pickup') return 'status-pickup';
+      return 'status-progress';
+    }
+
     // Prints just ONE order's details - used by the Print button on the Dashboard.
     function printSingleOrder(custId, orderId) {
       const cust = customerDatabase.find(c => c.id === custId);
@@ -865,9 +905,10 @@
       const p = (cust.purchases || []).find(o => o.orderId === orderId);
       if (!p) return;
 
-      const shopName = (appConfig.owner && appConfig.owner.shop) || 'OptiPulse Store';
+      const shopName = (appConfig.owner && appConfig.owner.shop) || 'Optical Shop';
       const shopAddress = (appConfig.owner && appConfig.owner.address) || '';
       const shopMobile = (appConfig.owner && appConfig.owner.mobile) || '';
+      const shopEmail = (appConfig.owner && appConfig.owner.email) || '';
       const rx = p.rx || {};
       const due = Math.max(0, p.total - p.paid);
 
@@ -879,61 +920,50 @@
         <head>
           <title>${cust.name} - Order Receipt</title>
           <meta charset="UTF-8">
-          <style>
-            body { font-family: Arial, Helvetica, sans-serif; padding: 32px; color: #111; }
-            h1 { margin: 0; font-size: 22px; }
-            h2 { margin: 20px 0 4px; font-size: 18px; }
-            h3 { margin: 20px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: #333; }
-            .muted { color: #666; font-size: 12px; margin: 2px 0; }
-            table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-            th, td { padding: 6px 8px; font-size: 12.5px; text-align: left; vertical-align: top; }
-            th { background: #f3f3f3; border-bottom: 2px solid #ccc; }
-            .header-flex { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #222; padding-bottom:12px; margin-bottom:16px; }
-            .totals { margin-top: 16px; font-size: 14px; text-align: right; border-top: 2px solid #222; padding-top: 10px; }
-            @media print { body { padding: 10px; } }
-          </style>
+          <style>${printStyles()}</style>
         </head>
         <body>
-          <div class="header-flex">
-            <div>
-              <h1>${shopName}</h1>
-              <p class="muted">${shopAddress}${shopMobile ? ' | ' + shopMobile : ''}</p>
-            </div>
-            <div style="text-align:right">
-              <p class="muted">Printed: ${new Date().toLocaleDateString()}</p>
-              <p class="muted">Customer ID: ${displayCustomerId(cust)}</p>
-            </div>
+          <div class="letterhead">
+            <h1>${shopName}</h1>
+            <div class="tag">Optical Practice &amp; Eyewear</div>
+            <div class="contact">${[shopAddress, shopMobile, shopEmail].filter(Boolean).join(' &nbsp;&bull;&nbsp; ')}</div>
           </div>
+          <div class="meta-strip">
+            <span>Customer ID: <strong>${displayCustomerId(cust)}</strong></span>
+            <span>Printed: ${new Date().toLocaleDateString()}</span>
+          </div>
+          <div class="content">
+            <div class="customer-box">
+              <h3>${cust.name}</h3>
+              <p>${cust.phone}${cust.email ? ' &middot; ' + cust.email : ''}</p>
+              <p>${cust.address || ''}</p>
+            </div>
 
-          <h2>${cust.name}</h2>
-          <p class="muted">${cust.phone}${cust.email ? ' | ' + cust.email : ''}</p>
-          <p class="muted">${cust.address || ''}</p>
+            <h2 class="section-title">Order Details</h2>
+            <table>
+              <tr><th>Date</th><th>Recipient</th><th>Item</th><th>Status</th></tr>
+              <tr>
+                <td>${p.date || '-'}</td>
+                <td>${p.patientDisplayName || cust.name}${p.patientAge ? ' (Age ' + p.patientAge + ')' : ''}</td>
+                <td>${p.item || '-'}</td>
+                <td><span class="status-pill ${statusPillClass(p.status)}">${p.status || '-'}</span></td>
+              </tr>
+            </table>
 
-          <h3>Order Details</h3>
-          <table>
-            <tr><th>Date</th><th>Recipient</th><th>Item</th><th>Status</th></tr>
-            <tr>
-              <td>${p.date || '-'}</td>
-              <td>${p.patientDisplayName || cust.name}${p.patientAge ? ' (Age ' + p.patientAge + ')' : ''}</td>
-              <td>${p.item || '-'}</td>
-              <td>${p.status || '-'}</td>
-            </tr>
-          </table>
+            <h2 class="section-title">Prescription (Rx)</h2>
+            <div class="rx-box">
+              <div class="rx-row">OD (Right): SPH ${rx.odSph || '-'}, CYL ${rx.odCyl || '-'}, AXIS ${rx.odAxis || '-'}, ADD ${rx.odAdd || '-'}</div>
+              <div class="rx-row">OS (Left): &nbsp;SPH ${rx.osSph || '-'}, CYL ${rx.osCyl || '-'}, AXIS ${rx.osAxis || '-'}, ADD ${rx.osAdd || '-'}</div>
+              <div class="rx-row">PD: ${rx.pd || '-'} mm &nbsp;&bull;&nbsp; Prescribed by: ${rx.doctor || '-'}</div>
+            </div>
 
-          <h3>Prescription (Rx)</h3>
-          <table>
-            <tr><th></th><th>SPH</th><th>CYL</th><th>AXIS</th><th>ADD</th></tr>
-            <tr><td>OD (Right)</td><td>${rx.odSph || '-'}</td><td>${rx.odCyl || '-'}</td><td>${rx.odAxis || '-'}</td><td>${rx.odAdd || '-'}</td></tr>
-            <tr><td>OS (Left)</td><td>${rx.osSph || '-'}</td><td>${rx.osCyl || '-'}</td><td>${rx.osAxis || '-'}</td><td>${rx.osAdd || '-'}</td></tr>
-          </table>
-          <p class="muted">PD: ${rx.pd || '-'} mm &nbsp;|&nbsp; Prescribed by: ${rx.doctor || '-'}</p>
+            <div class="totals-box">
+              <div><div class="item-label">Total</div><div class="item-value">${appConfig.currSymbol} ${Number(p.total || 0).toLocaleString()}</div></div>
+              <div><div class="item-label">Paid</div><div class="item-value">${appConfig.currSymbol} ${Number(p.paid || 0).toLocaleString()}</div></div>
+              <div class="due"><div class="item-label">Due</div><div class="item-value">${appConfig.currSymbol} ${due.toLocaleString()}</div></div>
+            </div>
 
-          <div class="totals">
-            <strong>
-              Total: ${appConfig.currSymbol} ${Number(p.total || 0).toLocaleString()}
-              &nbsp;&nbsp;|&nbsp;&nbsp; Paid: ${appConfig.currSymbol} ${Number(p.paid || 0).toLocaleString()}
-              &nbsp;&nbsp;|&nbsp;&nbsp; Due: ${appConfig.currSymbol} ${due.toLocaleString()}
-            </strong>
+            <div class="footer-note">Thank you for choosing ${shopName}.</div>
           </div>
         </body>
         </html>
@@ -996,9 +1026,10 @@
       const cust = customerDatabase.find(c => c.id === custId);
       if (!cust) return;
 
-      const shopName = (appConfig.owner && appConfig.owner.shop) || 'OptiPulse Store';
+      const shopName = (appConfig.owner && appConfig.owner.shop) || 'Optical Shop';
       const shopAddress = (appConfig.owner && appConfig.owner.address) || '';
       const shopMobile = (appConfig.owner && appConfig.owner.mobile) || '';
+      const shopEmail = (appConfig.owner && appConfig.owner.email) || '';
 
       const filterLabel = !filterName || filterName === 'ALL'
         ? 'All Family Members'
@@ -1022,16 +1053,18 @@
             <td>${p.date || '-'}</td>
             <td>${p.patientDisplayName || cust.name}</td>
             <td>${p.item || '-'}</td>
-            <td>${p.status || '-'}</td>
+            <td><span class="status-pill ${statusPillClass(p.status)}">${p.status || '-'}</span></td>
             <td style="text-align:right">${appConfig.currSymbol} ${Number(p.total || 0).toLocaleString()}</td>
             <td style="text-align:right">${appConfig.currSymbol} ${Number(p.paid || 0).toLocaleString()}</td>
             <td style="text-align:right">${appConfig.currSymbol} ${due.toLocaleString()}</td>
           </tr>
           <tr>
-            <td colspan="7" style="font-size:11px;color:#555;padding-bottom:12px;border-bottom:1px solid #eee;">
-              Rx &mdash; OD: SPH ${rx.odSph || '-'}, CYL ${rx.odCyl || '-'}, AXIS ${rx.odAxis || '-'}, ADD ${rx.odAdd || '-'}
-              &nbsp;|&nbsp; OS: SPH ${rx.osSph || '-'}, CYL ${rx.osCyl || '-'}, AXIS ${rx.osAxis || '-'}, ADD ${rx.osAdd || '-'}
-              &nbsp;|&nbsp; PD: ${rx.pd || '-'} &nbsp;|&nbsp; Prescribed by: ${rx.doctor || '-'}
+            <td colspan="7" style="padding-top:0; padding-bottom:14px;">
+              <div class="rx-box" style="margin-top:2px;">
+                <div class="rx-row">OD (Right): SPH ${rx.odSph || '-'}, CYL ${rx.odCyl || '-'}, AXIS ${rx.odAxis || '-'}, ADD ${rx.odAdd || '-'}</div>
+                <div class="rx-row">OS (Left): &nbsp;SPH ${rx.osSph || '-'}, CYL ${rx.osCyl || '-'}, AXIS ${rx.osAxis || '-'}, ADD ${rx.osAdd || '-'}</div>
+                <div class="rx-row">PD: ${rx.pd || '-'} mm &nbsp;&bull;&nbsp; Prescribed by: ${rx.doctor || '-'}</div>
+              </div>
             </td>
           </tr>
         `;
@@ -1061,52 +1094,44 @@
         <head>
           <title>${cust.name} - Customer Record</title>
           <meta charset="UTF-8">
-          <style>
-            body { font-family: Arial, Helvetica, sans-serif; padding: 32px; color: #111; }
-            h1 { margin: 0; font-size: 22px; }
-            h2 { margin: 20px 0 4px; font-size: 18px; }
-            h3 { margin: 20px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: #333; }
-            .muted { color: #666; font-size: 12px; margin: 2px 0; }
-            table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-            th, td { padding: 6px 8px; font-size: 12.5px; text-align: left; vertical-align: top; }
-            th { background: #f3f3f3; border-bottom: 2px solid #ccc; }
-            .header-flex { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #222; padding-bottom:12px; margin-bottom:16px; }
-            .totals { margin-top: 16px; font-size: 14px; text-align: right; border-top: 2px solid #222; padding-top: 10px; }
-            @media print { body { padding: 10px; } }
-          </style>
+          <style>${printStyles()}</style>
         </head>
         <body>
-          <div class="header-flex">
-            <div>
-              <h1>${shopName}</h1>
-              <p class="muted">${shopAddress}${shopMobile ? ' | ' + shopMobile : ''}</p>
-            </div>
-            <div style="text-align:right">
-              <p class="muted">Printed: ${new Date().toLocaleDateString()}</p>
-              <p class="muted">Customer ID: ${displayCustomerId(cust)}</p>
-              <p class="muted"><strong>Showing: ${filterLabel}</strong></p>
-            </div>
+          <div class="letterhead">
+            <h1>${shopName}</h1>
+            <div class="tag">Optical Practice &amp; Eyewear</div>
+            <div class="contact">${[shopAddress, shopMobile, shopEmail].filter(Boolean).join(' &nbsp;&bull;&nbsp; ')}</div>
           </div>
+          <div class="meta-strip">
+            <span>Customer ID: <strong>${displayCustomerId(cust)}</strong></span>
+            <span>Showing: <strong>${filterLabel}</strong></span>
+            <span>Printed: ${new Date().toLocaleDateString()}</span>
+          </div>
+          <div class="content">
+            <div class="customer-box">
+              <h3>${cust.name}</h3>
+              <p>${cust.phone}${cust.email ? ' &middot; ' + cust.email : ''}</p>
+              <p>${cust.address || ''}</p>
+            </div>
 
-          <h2>${cust.name}</h2>
-          <p class="muted">${cust.phone}${cust.email ? ' | ' + cust.email : ''}</p>
-          <p class="muted">${cust.address || ''}</p>
+            ${(!filterName || filterName === 'ALL') && familyRows ? `
+              <h2 class="section-title">Family Members</h2>
+              <table><tr><th>Name</th><th>Relation</th><th>Base Rx (SPH OD/OS)</th></tr>${familyRows}</table>
+            ` : ''}
 
-          ${(!filterName || filterName === 'ALL') && familyRows ? `<h3>Family Members</h3><table><tr><th>Name</th><th>Relation</th><th>Base Rx (SPH OD/OS)</th></tr>${familyRows}</table>` : ''}
+            <h2 class="section-title">Order &amp; Prescription History ${filterName && filterName !== 'ALL' ? '&mdash; ' + filterLabel : ''}</h2>
+            <table>
+              <tr><th>Date</th><th>Recipient</th><th>Item</th><th>Status</th><th style="text-align:right">Total</th><th style="text-align:right">Paid</th><th style="text-align:right">Due</th></tr>
+              ${purchaseRows || '<tr><td colspan="7">No orders recorded.</td></tr>'}
+            </table>
 
-          <h3>Order &amp; Prescription History ${filterName && filterName !== 'ALL' ? '(' + filterLabel + ')' : ''}</h3>
-          <table>
-            <tr><th>Date</th><th>Recipient</th><th>Item</th><th>Status</th><th style="text-align:right">Total</th><th style="text-align:right">Paid</th><th style="text-align:right">Due</th></tr>
-            ${purchaseRows || '<tr><td colspan="7">No orders recorded.</td></tr>'}
-          </table>
+            <div class="totals-box">
+              <div><div class="item-label">Grand Total</div><div class="item-value">${appConfig.currSymbol} ${totalAll.toLocaleString()}</div></div>
+              <div><div class="item-label">Total Paid</div><div class="item-value">${appConfig.currSymbol} ${paidAll.toLocaleString()}</div></div>
+              <div class="due"><div class="item-label">Total Due</div><div class="item-value">${appConfig.currSymbol} ${dueAll.toLocaleString()}</div></div>
+            </div>
 
-
-          <div class="totals">
-            <strong>
-              Grand Total: ${appConfig.currSymbol} ${totalAll.toLocaleString()}
-              &nbsp;&nbsp;|&nbsp;&nbsp; Total Paid: ${appConfig.currSymbol} ${paidAll.toLocaleString()}
-              &nbsp;&nbsp;|&nbsp;&nbsp; Total Due: ${appConfig.currSymbol} ${dueAll.toLocaleString()}
-            </strong>
+            <div class="footer-note">Thank you for choosing ${shopName}.</div>
           </div>
         </body>
         </html>
