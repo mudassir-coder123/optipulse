@@ -14,6 +14,9 @@
   <!-- Supabase JS Client library CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
   <style>
     .gold-border { border-color: #d4af37; }
     .gold-text { color: #d4af37; }
@@ -160,6 +163,7 @@
         <button id="tab-dashboard" onclick="switchAppTab('dashboard')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold whitespace-nowrap">Dashboard</button>
         <button id="tab-new-customer" onclick="switchAppTab('new-customer')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">+ New Order</button>
         <button id="tab-history" onclick="switchAppTab('history')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">Customer Database & History</button>
+        <button id="tab-sales" onclick="switchAppTab('sales')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">Sales Report</button>
         <button id="tab-account" onclick="switchAppTab('account')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">Profile & Settings</button>
       </div>
     </div>
@@ -321,8 +325,41 @@
       <!-- TAB 3: CUSTOMER HISTORY & COMPLETE DATABASE -->
       <div id="view-tab-history" class="hidden space-y-4">
         <input id="history-search-input" type="text" onkeyup="filterCustomerHistory()" placeholder="Search by primary customer, family member name, or phone..." class="w-full px-4 py-3 rounded-2xl bg-neutral-900 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+
+        <div class="flex flex-wrap items-center gap-3 p-4 rounded-2xl bg-neutral-900 border border-neutral-800">
+          <div>
+            <label class="block text-[10px] font-semibold uppercase tracking-wider text-stone-500 mb-1">Status</label>
+            <select id="filter-status" onchange="filterCustomerHistory()" class="px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-stone-100 text-xs focus:outline-none focus:border-amber-500">
+              <option value="">All Statuses</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Ready for Pickup">Ready for Pickup</option>
+              <option value="Delivered">Delivered</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold uppercase tracking-wider text-stone-500 mb-1">From Date</label>
+            <input id="filter-date-from" type="date" onchange="filterCustomerHistory()" class="px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-stone-100 text-xs focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold uppercase tracking-wider text-stone-500 mb-1">To Date</label>
+            <input id="filter-date-to" type="date" onchange="filterCustomerHistory()" class="px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-stone-100 text-xs focus:outline-none focus:border-amber-500">
+          </div>
+          <div class="flex items-center gap-2 mt-4">
+            <input id="filter-dues-only" type="checkbox" onchange="filterCustomerHistory()" class="w-4 h-4 accent-amber-500">
+            <label for="filter-dues-only" class="text-xs text-stone-300 font-medium">Only orders with dues</label>
+          </div>
+          <button onclick="clearHistoryFilters()" class="mt-4 px-3 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-300 text-xs font-semibold">Clear Filters</button>
+        </div>
+
         <div id="history-results-list" class="space-y-4">
           <!-- Filtered records render here -->
+        </div>
+      </div>
+
+      <!-- TAB 5: SALES REPORT -->
+      <div id="view-tab-sales" class="hidden space-y-6">
+        <div id="sales-report-container" class="space-y-6">
+          <!-- Rendered dynamically by renderSalesReport() -->
         </div>
       </div>
 
@@ -346,7 +383,7 @@
             <p class="text-xs text-stone-400 mt-1">Review or update your shop details connected to this email account.</p>
           </div>
 
-          <form onsubmit="handleUpdateProfile(event)" class="space-y-4">
+          <form onsubmit="handleUpdateProfile(event)" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-xs font-semibold text-stone-400 mb-1">Logged-In Gmail / Email</label>
@@ -366,10 +403,62 @@
               </div>
             </div>
 
+            <div class="border-t border-neutral-800 pt-5 space-y-2">
+              <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Payment Details (Bank & Easypaisa)</h4>
+              <p class="text-[11px] text-stone-500 mb-2">Shown on printed receipts when a customer has a due balance, so they know where to send payment.</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-stone-400 mb-1">Bank Name</label>
+                  <input id="profile-bank-name" type="text" placeholder="e.g. Meezan Bank" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-stone-400 mb-1">Account Title</label>
+                  <input id="profile-bank-title" type="text" placeholder="Account holder name" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-stone-400 mb-1">Bank Account Number / IBAN</label>
+                  <input id="profile-bank-account" type="text" placeholder="PKxx xxxx xxxx xxxx" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-stone-400 mb-1">Easypaisa Number</label>
+                  <input id="profile-easypaisa" type="text" placeholder="03xx xxxxxxx" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                </div>
+              </div>
+            </div>
+
             <button type="submit" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider">
               Update Profile Details
             </button>
           </form>
+        </div>
+
+        <!-- Notifications -->
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-4">
+          <div>
+            <h3 class="text-lg font-bold text-stone-100">Notifications</h3>
+            <p class="text-xs text-stone-400 mt-1">Get alerts sent to this device (browser notification) when orders are saved or delivered. This is a device notification, not WhatsApp or SMS.</p>
+          </div>
+          <div class="flex items-center justify-between p-4 rounded-xl bg-neutral-950 border border-neutral-800">
+            <div>
+              <p class="text-sm font-semibold text-stone-200">Enable Notifications</p>
+              <p id="notif-status-text" class="text-xs text-stone-500 mt-0.5">Currently off</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="toggle-notifications" onchange="toggleNotifications(this.checked)" class="sr-only peer">
+              <div class="w-11 h-6 bg-neutral-700 rounded-full peer peer-checked:bg-amber-500 transition-all after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Data & Backup -->
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-4">
+          <div>
+            <h3 class="text-lg font-bold text-stone-100">Data & Backup</h3>
+            <p class="text-xs text-stone-400 mt-1">Download your full customer & order database as an Excel-compatible file.</p>
+          </div>
+          <button onclick="exportToExcel()" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider">
+            📊 Export to Excel (CSV)
+          </button>
         </div>
 
         <!-- Danger Zone Controls -->
@@ -546,6 +635,16 @@
       document.getElementById('profile-shop-input').value = appConfig.owner.shop || '';
       document.getElementById('profile-mobile-input').value = appConfig.owner.mobile || '';
       document.getElementById('profile-address-input').value = appConfig.owner.address || '';
+      document.getElementById('profile-bank-name').value = appConfig.owner.bankName || '';
+      document.getElementById('profile-bank-title').value = appConfig.owner.bankTitle || '';
+      document.getElementById('profile-bank-account').value = appConfig.owner.bankAccount || '';
+      document.getElementById('profile-easypaisa').value = appConfig.owner.easypaisa || '';
+
+      const notifToggle = document.getElementById('toggle-notifications');
+      const notifText = document.getElementById('notif-status-text');
+      const isOn = !!appConfig.notificationsEnabled && typeof Notification !== 'undefined' && Notification.permission === 'granted';
+      notifToggle.checked = isOn;
+      notifText.innerText = isOn ? 'Currently on - this device will get alerts' : 'Currently off';
     }
 
     async function handleUpdateProfile(e) {
@@ -553,6 +652,10 @@
       appConfig.owner.shop = document.getElementById('profile-shop-input').value;
       appConfig.owner.mobile = document.getElementById('profile-mobile-input').value;
       appConfig.owner.address = document.getElementById('profile-address-input').value;
+      appConfig.owner.bankName = document.getElementById('profile-bank-name').value;
+      appConfig.owner.bankTitle = document.getElementById('profile-bank-title').value;
+      appConfig.owner.bankAccount = document.getElementById('profile-bank-account').value;
+      appConfig.owner.easypaisa = document.getElementById('profile-easypaisa').value;
 
       await persistConfig();
 
@@ -560,6 +663,48 @@
       document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop}`;
 
       alert("Profile details updated successfully!");
+    }
+
+    // ---- DEVICE NOTIFICATIONS (on/off toggle, not WhatsApp/SMS) ----
+    // Uses the browser's built-in Notification API. This shows alerts on this
+    // device while the app is open (or running in a background tab / installed
+    // to your home screen). It cannot send anything if the app/browser is fully closed,
+    // since that would need a paid push-notification server - there's no backend here.
+    async function toggleNotifications(wantsOn) {
+      const notifText = document.getElementById('notif-status-text');
+      const notifToggle = document.getElementById('toggle-notifications');
+
+      if (!wantsOn) {
+        appConfig.notificationsEnabled = false;
+        notifText.innerText = 'Currently off';
+        await persistConfig();
+        return;
+      }
+
+      if (typeof Notification === 'undefined') {
+        alert('Notifications are not supported on this browser/device.');
+        notifToggle.checked = false;
+        return;
+      }
+
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        appConfig.notificationsEnabled = true;
+        notifText.innerText = 'Currently on - this device will get alerts';
+        await persistConfig();
+        new Notification('Notifications turned on', { body: 'You will now get alerts on this device for new and delivered orders.' });
+      } else {
+        appConfig.notificationsEnabled = false;
+        notifToggle.checked = false;
+        notifText.innerText = 'Currently off';
+        alert('Notification permission was blocked. Enable it in your browser/site settings to turn this on.');
+      }
+    }
+
+    function sendAppNotification(title, body) {
+      if (!appConfig.notificationsEnabled) return;
+      if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+      try { new Notification(title, { body }); } catch (e) { console.error('Notification error:', e); }
     }
 
     async function clearDashboardDataOnly() {
@@ -811,17 +956,18 @@
       document.getElementById('view-tab-dashboard').classList.add('hidden');
       document.getElementById('view-tab-new-customer').classList.add('hidden');
       document.getElementById('view-tab-history').classList.add('hidden');
+      document.getElementById('view-tab-sales').classList.add('hidden');
       document.getElementById('view-tab-account').classList.add('hidden');
 
-      document.getElementById('tab-dashboard').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
-      document.getElementById('tab-new-customer').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
-      document.getElementById('tab-history').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
-      document.getElementById('tab-account').className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
+      ['tab-dashboard', 'tab-new-customer', 'tab-history', 'tab-sales', 'tab-account'].forEach(id => {
+        document.getElementById(id).className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
+      });
 
       document.getElementById(`view-tab-${tabName}`).classList.remove('hidden');
       document.getElementById(`tab-${tabName}`).className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold whitespace-nowrap";
 
       if (tabName === 'history') renderHistory();
+      if (tabName === 'sales') renderSalesReport();
       if (tabName === 'account') populateProfileFields();
     }
 
@@ -839,6 +985,7 @@
         if (order) {
           order.status = 'Delivered';
           await persistCustomer(cust);
+          sendAppNotification('Order Delivered ✅', `${order.item} for ${order.patientDisplayName || cust.name} marked as delivered.`);
           renderDashboard();
         }
       }
@@ -896,6 +1043,20 @@
       if (status === 'Delivered') return 'status-delivered';
       if (status === 'Ready for Pickup') return 'status-pickup';
       return 'status-progress';
+    }
+
+    // Shown on printed receipts only when there's an outstanding balance, so the
+    // customer knows where to send payment (bank transfer / Easypaisa).
+    function paymentInfoHtml(due) {
+      const owner = appConfig.owner || {};
+      if (due <= 0 || (!owner.bankAccount && !owner.easypaisa)) return '';
+      const rows = [];
+      if (owner.bankAccount) rows.push(`<div class="rx-row"><strong>Bank:</strong> ${owner.bankName || ''} &nbsp;&bull;&nbsp; ${owner.bankTitle || ''} &nbsp;&bull;&nbsp; ${owner.bankAccount}</div>`);
+      if (owner.easypaisa) rows.push(`<div class="rx-row"><strong>Easypaisa:</strong> ${owner.easypaisa}</div>`);
+      return `
+        <h2 class="section-title">Payment Options</h2>
+        <div class="rx-box">${rows.join('')}</div>
+      `;
     }
 
     // Prints just ONE order's details - used by the Print button on the Dashboard.
@@ -962,6 +1123,8 @@
               <div><div class="item-label">Paid</div><div class="item-value">${appConfig.currSymbol} ${Number(p.paid || 0).toLocaleString()}</div></div>
               <div class="due"><div class="item-label">Due</div><div class="item-value">${appConfig.currSymbol} ${due.toLocaleString()}</div></div>
             </div>
+
+            ${paymentInfoHtml(due)}
 
             <div class="footer-note">Thank you for choosing ${shopName}.</div>
           </div>
@@ -1131,6 +1294,8 @@
               <div class="due"><div class="item-label">Total Due</div><div class="item-value">${appConfig.currSymbol} ${dueAll.toLocaleString()}</div></div>
             </div>
 
+            ${paymentInfoHtml(dueAll)}
+
             <div class="footer-note">Thank you for choosing ${shopName}.</div>
           </div>
         </body>
@@ -1283,6 +1448,9 @@
       }
 
       await persistCustomer(cust);
+      if (!existingOrderId) {
+        sendAppNotification('New Order Saved 🧾', `${purchaseData.item} for ${purchaseData.patientDisplayName} - ${appConfig.currSymbol} ${purchaseData.total.toLocaleString()}`);
+      }
       resetCustomerForm();
       switchAppTab('dashboard');
       renderDashboard();
@@ -1354,6 +1522,9 @@
                   <button onclick="printSingleOrder(${cust.id}, ${purchase.orderId})" class="px-4 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-200 font-semibold text-xs border border-neutral-700">
                     🖨️ Print
                   </button>
+                  <button onclick="shareOrderReceipt(${cust.id}, ${purchase.orderId})" class="px-4 py-1.5 rounded-lg bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 font-semibold text-xs border border-emerald-600/30">
+                    📤 Share
+                  </button>
                   <button onclick="deleteOrder(${cust.id}, ${purchase.orderId})" class="px-4 py-1.5 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-400 font-semibold text-xs border border-red-600/30">
                     Delete
                   </button>
@@ -1378,24 +1549,53 @@
 
     function renderHistory() { filterCustomerHistory(); }
 
+    function clearHistoryFilters() {
+      document.getElementById('history-search-input').value = '';
+      document.getElementById('filter-status').value = '';
+      document.getElementById('filter-date-from').value = '';
+      document.getElementById('filter-date-to').value = '';
+      document.getElementById('filter-dues-only').checked = false;
+      filterCustomerHistory();
+    }
+
     function filterCustomerHistory() {
       const query = (document.getElementById('history-search-input').value || '').toLowerCase();
+      const statusFilter = document.getElementById('filter-status').value;
+      const dateFrom = document.getElementById('filter-date-from').value;
+      const dateTo = document.getElementById('filter-date-to').value;
+      const duesOnly = document.getElementById('filter-dues-only').checked;
+      const filtersActive = !!(statusFilter || dateFrom || dateTo || duesOnly);
       const container = document.getElementById('history-results-list');
       container.innerHTML = '';
 
-      const filtered = customerDatabase.filter(c => 
-        c.name.toLowerCase().includes(query) || 
+      const matchesSearch = c =>
+        c.name.toLowerCase().includes(query) ||
         c.phone.toLowerCase().includes(query) ||
         (c.familyMembers && c.familyMembers.some(f => f.name.toLowerCase().includes(query))) ||
-        c.purchases.some(p => p.patientName && p.patientName.toLowerCase().includes(query))
-      );
+        c.purchases.some(p => p.patientName && p.patientName.toLowerCase().includes(query));
 
-      if (filtered.length === 0) {
+      const purchaseMatchesFilters = p => {
+        if (statusFilter && p.status !== statusFilter) return false;
+        if (dateFrom && p.date < dateFrom) return false;
+        if (dateTo && p.date > dateTo) return false;
+        if (duesOnly && Math.max(0, p.total - p.paid) <= 0) return false;
+        return true;
+      };
+
+      const rows = customerDatabase
+        .filter(matchesSearch)
+        .map(cust => ({
+          cust,
+          purchases: filtersActive ? (cust.purchases || []).filter(purchaseMatchesFilters) : (cust.purchases || [])
+        }))
+        .filter(row => !filtersActive || row.purchases.length > 0);
+
+      if (rows.length === 0) {
         container.innerHTML = `<p class="text-xs text-stone-500 py-6 text-center">No customer record found.</p>`;
         return;
       }
 
-      filtered.forEach(cust => {
+      rows.forEach(({ cust, purchases }) => {
         const custCard = document.createElement('div');
         custCard.className = "rounded-2xl bg-neutral-900 border border-neutral-800 overflow-hidden";
 
@@ -1404,7 +1604,7 @@
           familyPills = cust.familyMembers.map(f => `<span class="px-2.5 py-1 rounded-full bg-neutral-800 text-amber-400 text-[11px] font-semibold border border-neutral-700">${f.name} <span class="text-stone-500 font-normal">(${f.relation})</span></span>`).join(' ');
         }
 
-        const sortedPurchases = [...cust.purchases].sort((a, b) => (b.orderId || 0) - (a.orderId || 0));
+        const sortedPurchases = [...purchases].sort((a, b) => (b.orderId || 0) - (a.orderId || 0));
 
         let purchasesHtml = sortedPurchases.map(p => {
           const due = Math.max(0, p.total - p.paid);
@@ -1430,6 +1630,7 @@
               <div class="flex gap-1.5 shrink-0">
                 <button onclick="editCustomerFromDashboard(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-400 text-[10px] font-semibold border border-amber-500/30">Edit</button>
                 <button onclick="printSingleOrder(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-200 text-[10px] font-semibold border border-neutral-700">🖨️ Print</button>
+                <button onclick="shareOrderReceipt(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 text-[10px] font-semibold border border-emerald-600/30">📤 Share</button>
                 <button onclick="deleteOrder(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-400 text-[10px] font-semibold border border-red-600/30">Delete</button>
               </div>
             </div>
@@ -1469,11 +1670,215 @@
           </div>
           <div class="p-5 space-y-3">
             <h5 class="text-[11px] font-bold uppercase tracking-wider text-stone-500">Orders (${sortedPurchases.length})</h5>
-            <div class="space-y-3">${purchasesHtml || '<p class="text-xs text-stone-500 py-2">No orders yet.</p>'}</div>
+            <div class="space-y-3">${purchasesHtml || '<p class="text-xs text-stone-500 py-2">No matching orders.</p>'}</div>
           </div>
         `;
         container.appendChild(custCard);
       });
+    }
+
+    // ---- DIGITAL RECEIPT SHARING (WhatsApp) ----
+    function shareOrderReceipt(custId, orderId) {
+      const cust = customerDatabase.find(c => c.id === custId);
+      if (!cust) return;
+      const p = (cust.purchases || []).find(o => o.orderId === orderId);
+      if (!p) return;
+
+      const due = Math.max(0, p.total - p.paid);
+      const shopName = (appConfig.owner && appConfig.owner.shop) || 'Optical Shop';
+      const owner = appConfig.owner || {};
+
+      const lines = [
+        `*${shopName}*`,
+        `Receipt for: ${p.patientDisplayName || cust.name}`,
+        `Item: ${p.item}`,
+        `Date: ${p.date}`,
+        `Status: ${p.status}`,
+        `Total: ${appConfig.currSymbol} ${p.total.toLocaleString()}`,
+        `Paid: ${appConfig.currSymbol} ${p.paid.toLocaleString()}`,
+        `Due: ${appConfig.currSymbol} ${due.toLocaleString()}`
+      ];
+
+      if (due > 0 && (owner.bankAccount || owner.easypaisa)) {
+        lines.push('', 'Payment Options:');
+        if (owner.bankAccount) lines.push(`Bank: ${owner.bankName || ''} - ${owner.bankTitle || ''} - ${owner.bankAccount}`);
+        if (owner.easypaisa) lines.push(`Easypaisa: ${owner.easypaisa}`);
+      }
+
+      if (owner.address || owner.mobile) {
+        lines.push('', [owner.address, owner.mobile].filter(Boolean).join(' | '));
+      }
+
+      const text = encodeURIComponent(lines.join('\n'));
+      let phone = (cust.phone || '').replace(/[^0-9]/g, '');
+      if (phone.startsWith('0')) phone = '92' + phone.slice(1);
+      const url = phone ? `https://wa.me/${phone}?text=${text}` : `https://wa.me/?text=${text}`;
+      window.open(url, '_blank');
+    }
+
+    // ---- EXPORT TO EXCEL ----
+    function exportToExcel() {
+      if (typeof XLSX === 'undefined') { alert('Export library did not load. Check your internet connection and try again.'); return; }
+
+      const rows = [];
+      customerDatabase.forEach(cust => {
+        if (!cust.purchases || cust.purchases.length === 0) {
+          rows.push({
+            'Customer ID': displayCustomerId(cust), 'Customer Name': cust.name, 'Phone': cust.phone,
+            'Email': cust.email || '', 'Address': cust.address || '', 'Recipient': '', 'Item': '',
+            'Date': '', 'Status': '', 'Total': '', 'Paid': '', 'Due': '',
+            'OD SPH': '', 'OD CYL': '', 'OD AXIS': '', 'OD ADD': '',
+            'OS SPH': '', 'OS CYL': '', 'OS AXIS': '', 'OS ADD': '', 'PD': '', 'Doctor': ''
+          });
+          return;
+        }
+        cust.purchases.forEach(p => {
+          const rx = p.rx || {};
+          rows.push({
+            'Customer ID': displayCustomerId(cust), 'Customer Name': cust.name, 'Phone': cust.phone,
+            'Email': cust.email || '', 'Address': cust.address || '',
+            'Recipient': p.patientDisplayName || cust.name, 'Item': p.item,
+            'Date': p.date, 'Status': p.status,
+            'Total': p.total, 'Paid': p.paid, 'Due': Math.max(0, p.total - p.paid),
+            'OD SPH': rx.odSph || '', 'OD CYL': rx.odCyl || '', 'OD AXIS': rx.odAxis || '', 'OD ADD': rx.odAdd || '',
+            'OS SPH': rx.osSph || '', 'OS CYL': rx.osCyl || '', 'OS AXIS': rx.osAxis || '', 'OS ADD': rx.osAdd || '',
+            'PD': rx.pd || '', 'Doctor': rx.doctor || ''
+          });
+        });
+      });
+
+      if (rows.length === 0) { alert('No customer data to export yet.'); return; }
+
+      const sheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, sheet, 'Orders');
+      const shopName = ((appConfig.owner && appConfig.owner.shop) || 'Shop').replace(/[^a-z0-9]+/gi, '-');
+      XLSX.writeFile(workbook, `${shopName}-Customer-Export.xlsx`);
+    }
+
+    // ---- SALES REPORT + REPEAT CUSTOMER INSIGHTS (scoped to this logged-in shop only) ----
+    function renderSalesReport() {
+      const container = document.getElementById('sales-report-container');
+      const rangeDays = Number(document.getElementById('sales-range')?.value || 0);
+
+      const cutoff = rangeDays ? new Date(Date.now() - rangeDays * 86400000) : null;
+      const inRange = dateStr => !cutoff || (dateStr && new Date(dateStr) >= cutoff);
+
+      let totalRevenue = 0, totalPaid = 0, orderCount = 0;
+      const monthly = {};
+      const customerStats = [];
+
+      customerDatabase.forEach(cust => {
+        let custOrders = 0, custSpend = 0;
+        (cust.purchases || []).forEach(p => {
+          if (!inRange(p.date)) return;
+          totalRevenue += Number(p.total) || 0;
+          totalPaid += Number(p.paid) || 0;
+          orderCount++;
+          custOrders++;
+          custSpend += Number(p.total) || 0;
+
+          const monthKey = (p.date || '').slice(0, 7) || 'Unknown';
+          if (!monthly[monthKey]) monthly[monthKey] = { count: 0, revenue: 0, collected: 0 };
+          monthly[monthKey].count++;
+          monthly[monthKey].revenue += Number(p.total) || 0;
+          monthly[monthKey].collected += Number(p.paid) || 0;
+        });
+        if (custOrders > 0) customerStats.push({ cust, orders: custOrders, spend: custSpend });
+      });
+
+      const totalDue = Math.max(0, totalRevenue - totalPaid);
+      const avgOrderValue = orderCount ? Math.round(totalRevenue / orderCount) : 0;
+
+      const monthRows = Object.keys(monthly).sort().reverse().map(m => `
+        <tr>
+          <td class="py-2 px-3 text-xs text-stone-300">${m}</td>
+          <td class="py-2 px-3 text-xs text-stone-300 text-right">${monthly[m].count}</td>
+          <td class="py-2 px-3 text-xs text-stone-100 text-right font-semibold">${appConfig.currSymbol} ${monthly[m].revenue.toLocaleString()}</td>
+          <td class="py-2 px-3 text-xs text-emerald-400 text-right font-semibold">${appConfig.currSymbol} ${monthly[m].collected.toLocaleString()}</td>
+        </tr>
+      `).join('');
+
+      const repeatCustomers = customerStats
+        .filter(cs => cs.orders > 1)
+        .sort((a, b) => b.orders - a.orders || b.spend - a.spend)
+        .slice(0, 10);
+
+      const repeatRows = repeatCustomers.map(cs => `
+        <tr>
+          <td class="py-2 px-3 text-xs text-stone-100 font-semibold">${cs.cust.name} <span class="text-amber-400/80 font-mono text-[10px]">(${displayCustomerId(cs.cust)})</span></td>
+          <td class="py-2 px-3 text-xs text-stone-400">${cs.cust.phone}</td>
+          <td class="py-2 px-3 text-xs text-stone-300 text-right">${cs.orders}</td>
+          <td class="py-2 px-3 text-xs text-amber-400 text-right font-semibold">${appConfig.currSymbol} ${cs.spend.toLocaleString()}</td>
+        </tr>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <label class="block text-[10px] font-semibold uppercase tracking-wider text-stone-500 mb-1">Time Range</label>
+            <select id="sales-range" onchange="renderSalesReport()" class="px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-stone-100 text-xs focus:outline-none focus:border-amber-500">
+              <option value="0">All Time</option>
+              <option value="30">Last 30 Days</option>
+              <option value="90">Last 90 Days</option>
+              <option value="365">Last 12 Months</option>
+            </select>
+          </div>
+          <button onclick="exportToExcel()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider">
+            📊 Export to Excel
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
+            <p class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Total Revenue</p>
+            <h3 class="text-2xl font-black text-amber-400 mt-2">${appConfig.currSymbol} ${totalRevenue.toLocaleString()}</h3>
+          </div>
+          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
+            <p class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Total Collected</p>
+            <h3 class="text-2xl font-black text-emerald-400 mt-2">${appConfig.currSymbol} ${totalPaid.toLocaleString()}</h3>
+          </div>
+          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
+            <p class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Outstanding Dues</p>
+            <h3 class="text-2xl font-black text-red-400 mt-2">${appConfig.currSymbol} ${totalDue.toLocaleString()}</h3>
+          </div>
+          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
+            <p class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Orders / Avg Value</p>
+            <h3 class="text-2xl font-black text-stone-100 mt-2">${orderCount} <span class="text-sm text-stone-500 font-semibold">/ ${appConfig.currSymbol} ${avgOrderValue.toLocaleString()}</span></h3>
+          </div>
+        </div>
+
+        <div class="rounded-2xl bg-neutral-900 border border-neutral-800 overflow-hidden">
+          <h4 class="px-5 pt-5 pb-2 text-sm font-bold text-stone-100">Monthly Breakdown</h4>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead><tr class="border-b border-neutral-800 text-left">
+                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-stone-500">Month</th>
+                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-stone-500 text-right">Orders</th>
+                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-stone-500 text-right">Revenue</th>
+                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-stone-500 text-right">Collected</th>
+              </tr></thead>
+              <tbody>${monthRows || `<tr><td colspan="4" class="py-4 px-3 text-xs text-stone-500 text-center">No orders in this range.</td></tr>`}</tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="rounded-2xl bg-neutral-900 border border-neutral-800 overflow-hidden">
+          <h4 class="px-5 pt-5 pb-1 text-sm font-bold text-stone-100">Repeat Customer Insights</h4>
+          <p class="px-5 pb-3 text-[11px] text-stone-500">Customers with more than one order in this range, ranked by order count.</p>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead><tr class="border-b border-neutral-800 text-left">
+                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-stone-500">Customer</th>
+                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-stone-500">Phone</th>
+                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-stone-500 text-right">Orders</th>
+                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-stone-500 text-right">Total Spend</th>
+              </tr></thead>
+              <tbody>${repeatRows || `<tr><td colspan="4" class="py-4 px-3 text-xs text-stone-500 text-center">No repeat customers yet in this range.</td></tr>`}</tbody>
+            </table>
+          </div>
+        </div>
+      `;
     }
   </script>
 </body>
