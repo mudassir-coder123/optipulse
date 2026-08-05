@@ -326,6 +326,18 @@
         </div>
       </div>
 
+      <!-- PRINT OPTIONS MODAL -->
+      <div id="print-options-overlay" class="hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-6">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-2xl">
+          <div>
+            <h3 class="text-sm font-bold text-stone-100">Choose what to print</h3>
+            <p id="print-options-subtitle" class="text-xs text-stone-400 mt-1">This customer has multiple people on file.</p>
+          </div>
+          <div id="print-options-list" class="space-y-2"></div>
+          <button onclick="closePrintOptions()" class="w-full py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-stone-300 text-xs font-semibold">Cancel</button>
+        </div>
+      </div>
+
       <!-- TAB 4: ACCOUNT PROFILE & DATA MANAGEMENT -->
       <div id="view-tab-account" class="hidden space-y-6">
         <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6">
@@ -846,7 +858,141 @@
       }
     }
 
-    function printCustomerRecord(custId) {
+    // Prints just ONE order's details - used by the Print button on the Dashboard.
+    function printSingleOrder(custId, orderId) {
+      const cust = customerDatabase.find(c => c.id === custId);
+      if (!cust) return;
+      const p = (cust.purchases || []).find(o => o.orderId === orderId);
+      if (!p) return;
+
+      const shopName = (appConfig.owner && appConfig.owner.shop) || 'OptiPulse Store';
+      const shopAddress = (appConfig.owner && appConfig.owner.address) || '';
+      const shopMobile = (appConfig.owner && appConfig.owner.mobile) || '';
+      const rx = p.rx || {};
+      const due = Math.max(0, p.total - p.paid);
+
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) { alert('Please allow pop-ups for this site to print.'); return; }
+
+      printWindow.document.write(`
+        <html>
+        <head>
+          <title>${cust.name} - Order Receipt</title>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: Arial, Helvetica, sans-serif; padding: 32px; color: #111; }
+            h1 { margin: 0; font-size: 22px; }
+            h2 { margin: 20px 0 4px; font-size: 18px; }
+            h3 { margin: 20px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: #333; }
+            .muted { color: #666; font-size: 12px; margin: 2px 0; }
+            table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+            th, td { padding: 6px 8px; font-size: 12.5px; text-align: left; vertical-align: top; }
+            th { background: #f3f3f3; border-bottom: 2px solid #ccc; }
+            .header-flex { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #222; padding-bottom:12px; margin-bottom:16px; }
+            .totals { margin-top: 16px; font-size: 14px; text-align: right; border-top: 2px solid #222; padding-top: 10px; }
+            @media print { body { padding: 10px; } }
+          </style>
+        </head>
+        <body>
+          <div class="header-flex">
+            <div>
+              <h1>${shopName}</h1>
+              <p class="muted">${shopAddress}${shopMobile ? ' | ' + shopMobile : ''}</p>
+            </div>
+            <div style="text-align:right">
+              <p class="muted">Printed: ${new Date().toLocaleDateString()}</p>
+              <p class="muted">Customer ID: ${displayCustomerId(cust)}</p>
+            </div>
+          </div>
+
+          <h2>${cust.name}</h2>
+          <p class="muted">${cust.phone}${cust.email ? ' | ' + cust.email : ''}</p>
+          <p class="muted">${cust.address || ''}</p>
+
+          <h3>Order Details</h3>
+          <table>
+            <tr><th>Date</th><th>Recipient</th><th>Item</th><th>Status</th></tr>
+            <tr>
+              <td>${p.date || '-'}</td>
+              <td>${p.patientDisplayName || cust.name}${p.patientAge ? ' (Age ' + p.patientAge + ')' : ''}</td>
+              <td>${p.item || '-'}</td>
+              <td>${p.status || '-'}</td>
+            </tr>
+          </table>
+
+          <h3>Prescription (Rx)</h3>
+          <table>
+            <tr><th></th><th>SPH</th><th>CYL</th><th>AXIS</th><th>ADD</th></tr>
+            <tr><td>OD (Right)</td><td>${rx.odSph || '-'}</td><td>${rx.odCyl || '-'}</td><td>${rx.odAxis || '-'}</td><td>${rx.odAdd || '-'}</td></tr>
+            <tr><td>OS (Left)</td><td>${rx.osSph || '-'}</td><td>${rx.osCyl || '-'}</td><td>${rx.osAxis || '-'}</td><td>${rx.osAdd || '-'}</td></tr>
+          </table>
+          <p class="muted">PD: ${rx.pd || '-'} mm &nbsp;|&nbsp; Prescribed by: ${rx.doctor || '-'}</p>
+
+          <div class="totals">
+            <strong>
+              Total: ${appConfig.currSymbol} ${Number(p.total || 0).toLocaleString()}
+              &nbsp;&nbsp;|&nbsp;&nbsp; Paid: ${appConfig.currSymbol} ${Number(p.paid || 0).toLocaleString()}
+              &nbsp;&nbsp;|&nbsp;&nbsp; Due: ${appConfig.currSymbol} ${due.toLocaleString()}
+            </strong>
+          </div>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => printWindow.print(), 300);
+    }
+
+    // Lists everyone this customer has ordered for (Self + each family member)
+    // so the shop owner can choose whose records to print.
+    function getRecipientOptions(cust) {
+      const names = new Set();
+      let hasSelf = false;
+      (cust.purchases || []).forEach(p => {
+        if (p.forType === 'Family Member' && p.patientName) names.add(p.patientName);
+        else hasSelf = true;
+      });
+      (cust.familyMembers || []).forEach(f => names.add(f.name));
+      return { hasSelf: hasSelf || (cust.purchases || []).length === 0, familyNames: Array.from(names) };
+    }
+
+    function openPrintOptions(custId) {
+      const cust = customerDatabase.find(c => c.id === custId);
+      if (!cust) return;
+
+      const { hasSelf, familyNames } = getRecipientOptions(cust);
+      const totalPeople = (hasSelf ? 1 : 0) + familyNames.length;
+
+      // Only one person on file (or none) - just print everything directly, no need to ask.
+      if (totalPeople <= 1) {
+        printCustomerRecord(custId, 'ALL');
+        return;
+      }
+
+      document.getElementById('print-options-subtitle').innerText = `${cust.name} has ${totalPeople} people on file. Choose what to print.`;
+      const list = document.getElementById('print-options-list');
+      list.innerHTML = '';
+
+      const makeBtn = (label, filterVal) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-amber-500/50 text-stone-100 text-sm font-semibold transition-all";
+        btn.innerText = label;
+        btn.onclick = () => { closePrintOptions(); printCustomerRecord(custId, filterVal); };
+        return btn;
+      };
+
+      if (hasSelf) list.appendChild(makeBtn(`${cust.name} (Self) Only`, 'Self'));
+      familyNames.forEach(name => list.appendChild(makeBtn(`${name} Only`, name)));
+      list.appendChild(makeBtn('Everyone (Full Combined Record)', 'ALL'));
+
+      document.getElementById('print-options-overlay').classList.remove('hidden');
+    }
+
+    function closePrintOptions() {
+      document.getElementById('print-options-overlay').classList.add('hidden');
+    }
+
+    function printCustomerRecord(custId, filterName) {
       const cust = customerDatabase.find(c => c.id === custId);
       if (!cust) return;
 
@@ -854,8 +1000,19 @@
       const shopAddress = (appConfig.owner && appConfig.owner.address) || '';
       const shopMobile = (appConfig.owner && appConfig.owner.mobile) || '';
 
+      const filterLabel = !filterName || filterName === 'ALL'
+        ? 'All Family Members'
+        : (filterName === 'Self' ? `${cust.name} (Self) Only` : `${filterName} Only`);
+
+      const purchasesToPrint = (!filterName || filterName === 'ALL')
+        ? (cust.purchases || [])
+        : (cust.purchases || []).filter(p => {
+            if (filterName === 'Self') return p.forType !== 'Family Member';
+            return p.forType === 'Family Member' && p.patientName === filterName;
+          });
+
       let totalAll = 0, paidAll = 0;
-      const purchaseRows = (cust.purchases || []).map(p => {
+      const purchaseRows = purchasesToPrint.map(p => {
         const due = Math.max(0, p.total - p.paid);
         totalAll += Number(p.total) || 0;
         paidAll += Number(p.paid) || 0;
@@ -927,6 +1084,7 @@
             <div style="text-align:right">
               <p class="muted">Printed: ${new Date().toLocaleDateString()}</p>
               <p class="muted">Customer ID: ${displayCustomerId(cust)}</p>
+              <p class="muted"><strong>Showing: ${filterLabel}</strong></p>
             </div>
           </div>
 
@@ -934,13 +1092,14 @@
           <p class="muted">${cust.phone}${cust.email ? ' | ' + cust.email : ''}</p>
           <p class="muted">${cust.address || ''}</p>
 
-          ${familyRows ? `<h3>Family Members</h3><table><tr><th>Name</th><th>Relation</th><th>Base Rx (SPH OD/OS)</th></tr>${familyRows}</table>` : ''}
+          ${(!filterName || filterName === 'ALL') && familyRows ? `<h3>Family Members</h3><table><tr><th>Name</th><th>Relation</th><th>Base Rx (SPH OD/OS)</th></tr>${familyRows}</table>` : ''}
 
-          <h3>Order &amp; Prescription History</h3>
+          <h3>Order &amp; Prescription History ${filterName && filterName !== 'ALL' ? '(' + filterLabel + ')' : ''}</h3>
           <table>
             <tr><th>Date</th><th>Recipient</th><th>Item</th><th>Status</th><th style="text-align:right">Total</th><th style="text-align:right">Paid</th><th style="text-align:right">Due</th></tr>
             ${purchaseRows || '<tr><td colspan="7">No orders recorded.</td></tr>'}
           </table>
+
 
           <div class="totals">
             <strong>
@@ -1167,6 +1326,9 @@
                   <button onclick="editCustomerFromDashboard(${cust.id}, ${purchase.orderId})" class="px-4 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-semibold text-xs border border-amber-500/30">
                     ${dict.btnEditRecord}
                   </button>
+                  <button onclick="printSingleOrder(${cust.id}, ${purchase.orderId})" class="px-4 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-200 font-semibold text-xs border border-neutral-700">
+                    🖨️ Print
+                  </button>
                   <button onclick="deleteOrder(${cust.id}, ${purchase.orderId})" class="px-4 py-1.5 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-400 font-semibold text-xs border border-red-600/30">
                     Delete
                   </button>
@@ -1210,56 +1372,80 @@
 
       filtered.forEach(cust => {
         const custCard = document.createElement('div');
-        custCard.className = "p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-4";
-        
+        custCard.className = "rounded-2xl bg-neutral-900 border border-neutral-800 overflow-hidden";
+
         let familyPills = '';
         if (cust.familyMembers && cust.familyMembers.length > 0) {
-          familyPills = cust.familyMembers.map(f => `<span class="px-2 py-1 rounded-lg bg-neutral-800 text-amber-400 text-xs font-semibold border border-neutral-700">${f.name} (${f.relation})</span>`).join(' ');
+          familyPills = cust.familyMembers.map(f => `<span class="px-2.5 py-1 rounded-full bg-neutral-800 text-amber-400 text-[11px] font-semibold border border-neutral-700">${f.name} <span class="text-stone-500 font-normal">(${f.relation})</span></span>`).join(' ');
         }
 
-        let purchasesHtml = cust.purchases.map(p => {
+        const sortedPurchases = [...cust.purchases].sort((a, b) => (b.orderId || 0) - (a.orderId || 0));
+
+        let purchasesHtml = sortedPurchases.map(p => {
           const due = Math.max(0, p.total - p.paid);
+          const statusClasses = p.status === 'Delivered'
+            ? 'bg-emerald-950 text-emerald-400 border-emerald-900'
+            : (p.status === 'Ready for Pickup' ? 'bg-sky-950 text-sky-400 border-sky-900' : 'bg-amber-950 text-amber-400 border-amber-900');
           return `
-          <div class="border-t border-neutral-800 pt-3 mt-3 space-y-2 text-xs">
-            <div class="flex justify-between items-center flex-wrap gap-2">
-              <div>
-                <p class="font-bold text-amber-400">${p.item} <span class="text-stone-400 font-normal">(${p.date})</span></p>
-                <p class="text-[11px] text-stone-300 font-medium">Recipient: <span class="text-stone-100 font-semibold">${p.patientDisplayName || cust.name}</span> ${p.patientAge ? '| Age: ' + p.patientAge : ''}</p>
+          <div class="rounded-xl border border-neutral-800 bg-neutral-950/50 p-3.5 space-y-3">
+            <div class="flex items-start justify-between gap-3 flex-wrap">
+              <div class="min-w-0">
+                <p class="text-sm font-bold text-amber-400 truncate">${p.item}</p>
+                <p class="text-[11px] text-stone-400 mt-0.5">${p.date} &nbsp;·&nbsp; <span class="text-stone-300 font-medium">${p.patientDisplayName || cust.name}</span>${p.patientAge ? ' · Age ' + p.patientAge : ''}</p>
               </div>
-              <div class="text-right">
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.status === 'Delivered' ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-400'}">${p.status}</span>
-                <p class="text-stone-300 font-semibold mt-1">Total: ${appConfig.currSymbol} ${p.total.toLocaleString()} | Paid: ${appConfig.currSymbol} ${p.paid.toLocaleString()} | <span class="text-amber-400">Due: ${appConfig.currSymbol} ${due.toLocaleString()}</span></p>
-                <div class="flex gap-2 justify-end mt-1.5">
-                  <button onclick="editCustomerFromDashboard(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-400 text-[10px] font-semibold border border-amber-500/30">Edit</button>
-                  <button onclick="deleteOrder(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-400 text-[10px] font-semibold border border-red-600/30">Delete</button>
-                </div>
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border shrink-0 ${statusClasses}">${p.status}</span>
+            </div>
+
+            <div class="flex items-center justify-between flex-wrap gap-2 pt-2.5 border-t border-neutral-800/80">
+              <p class="text-xs text-stone-300">
+                Total <span class="font-semibold text-stone-100">${appConfig.currSymbol} ${p.total.toLocaleString()}</span>
+                &nbsp;·&nbsp; Paid <span class="font-semibold text-stone-100">${appConfig.currSymbol} ${p.paid.toLocaleString()}</span>
+                &nbsp;·&nbsp; Due <span class="font-bold text-amber-400">${appConfig.currSymbol} ${due.toLocaleString()}</span>
+              </p>
+              <div class="flex gap-1.5 shrink-0">
+                <button onclick="editCustomerFromDashboard(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-400 text-[10px] font-semibold border border-amber-500/30">Edit</button>
+                <button onclick="printSingleOrder(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-200 text-[10px] font-semibold border border-neutral-700">🖨️ Print</button>
+                <button onclick="deleteOrder(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-400 text-[10px] font-semibold border border-red-600/30">Delete</button>
               </div>
             </div>
-            <div class="bg-neutral-950 p-2.5 rounded-xl border border-neutral-800 font-mono text-[11px] text-stone-300 grid grid-cols-1 md:grid-cols-2 gap-2">
-              <div>OD (Right): SPH ${p.rx.odSph || '-'}, CYL ${p.rx.odCyl || '-'}, AXIS ${p.rx.odAxis || '-'}, ADD ${p.rx.odAdd || '-'}</div>
-              <div>OS (Left): SPH ${p.rx.osSph || '-'}, CYL ${p.rx.osCyl || '-'}, AXIS ${p.rx.osAxis || '-'}, ADD ${p.rx.osAdd || '-'}</div>
+
+            <div class="bg-neutral-950 p-2.5 rounded-lg border border-neutral-800/80 font-mono text-[11px] text-stone-400 space-y-1">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-1">
+                <div>OD (Right): SPH ${p.rx.odSph || '-'}, CYL ${p.rx.odCyl || '-'}, AXIS ${p.rx.odAxis || '-'}, ADD ${p.rx.odAdd || '-'}</div>
+                <div>OS (Left): SPH ${p.rx.osSph || '-'}, CYL ${p.rx.osCyl || '-'}, AXIS ${p.rx.osAxis || '-'}, ADD ${p.rx.osAdd || '-'}</div>
+              </div>
+              <div class="text-stone-500">PD: ${p.rx.pd || '-'} mm &nbsp;·&nbsp; Prescribed by: ${p.rx.doctor || '-'}</div>
             </div>
           </div>
         `}).join('');
 
         custCard.innerHTML = `
-          <div class="flex justify-between items-start flex-wrap gap-3">
-            <div>
-              <h4 class="font-bold text-stone-100 text-base">${cust.name} <span class="text-xs font-mono text-amber-400/80">(Account ID: ${displayCustomerId(cust)})</span></h4>
-              <p class="text-xs text-stone-400">${cust.phone} ${cust.email ? '| ' + cust.email : ''}</p>
-              <p class="text-xs text-stone-500">${cust.address || 'No address provided'}</p>
-              ${familyPills ? `<div class="flex flex-wrap gap-1.5 mt-2"><span class="text-[11px] text-stone-400 font-medium">Saved Family Profiles:</span> ${familyPills}</div>` : ''}
+          <div class="p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-neutral-800">
+            <div class="flex items-start gap-3 min-w-0">
+              <div class="w-11 h-11 shrink-0 rounded-full bg-neutral-800 border gold-border flex items-center justify-center font-bold text-amber-400 text-sm">${cust.name.charAt(0)}</div>
+              <div class="min-w-0">
+                <div class="flex items-center flex-wrap gap-2">
+                  <h4 class="font-bold text-stone-100 text-base truncate">${cust.name}</h4>
+                  <span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 text-[10px] font-mono font-bold border border-amber-500/20 shrink-0">${displayCustomerId(cust)}</span>
+                </div>
+                <p class="text-xs text-stone-400 mt-0.5">${cust.phone}${cust.email ? ' · ' + cust.email : ''}</p>
+                <p class="text-xs text-stone-500">${cust.address || 'No address provided'}</p>
+                ${familyPills ? `<div class="flex flex-wrap gap-1.5 mt-2.5">${familyPills}</div>` : ''}
+              </div>
             </div>
-            <div class="flex flex-col sm:flex-row gap-2">
-              <button onclick="printCustomerRecord(${cust.id})" class="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-200 border border-neutral-700 font-semibold text-xs whitespace-nowrap">
-                🖨️ Print Full Record
+            <div class="flex sm:flex-col gap-2 shrink-0 w-full sm:w-auto">
+              <button onclick="openPrintOptions(${cust.id})" class="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-stone-200 border border-neutral-700 font-semibold text-xs whitespace-nowrap">
+                🖨️ Print Record
               </button>
-              <button onclick="prepareNewPurchaseForCustomer(${cust.id})" class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-semibold text-xs whitespace-nowrap">
-                + New Order for Family/Self
+              <button onclick="prepareNewPurchaseForCustomer(${cust.id})" class="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-semibold text-xs whitespace-nowrap">
+                + New Order
               </button>
             </div>
           </div>
-          <div class="pt-2"><h5 class="text-xs font-bold uppercase tracking-wider text-stone-400">Order & Prescription History Log</h5>${purchasesHtml}</div>
+          <div class="p-5 space-y-3">
+            <h5 class="text-[11px] font-bold uppercase tracking-wider text-stone-500">Orders (${sortedPurchases.length})</h5>
+            <div class="space-y-3">${purchasesHtml || '<p class="text-xs text-stone-500 py-2">No orders yet.</p>'}</div>
+          </div>
         `;
         container.appendChild(custCard);
       });
