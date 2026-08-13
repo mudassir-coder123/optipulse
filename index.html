@@ -1009,6 +1009,11 @@
       }
     }
 
+    function setText(id, text) {
+      const el = document.getElementById(id);
+      if (el) el.innerText = text;
+    }
+
     function changeLanguage(langCode) {
       appConfig.lang = langCode;
       document.getElementById('select-lang').value = langCode;
@@ -1018,48 +1023,48 @@
       const htmlRoot = document.getElementById('html-root');
       htmlRoot.setAttribute('dir', (langCode === 'ar' || langCode === 'ur') ? 'rtl' : 'ltr');
 
-      document.getElementById('welcome-subtext').innerText = dict.welcomeSub;
-      document.getElementById('btn-welcome-continue').innerText = dict.enterPortal;
-      document.getElementById('settings-title').innerText = dict.settingsTitle;
-      document.getElementById('settings-subtitle').innerText = dict.settingsSubtitle;
-      document.getElementById('lbl-select-lang').innerText = dict.selectLang;
-      document.getElementById('lbl-select-curr').innerText = dict.selectCurr;
-      document.getElementById('btn-settings-continue').innerText = dict.btnContinueAuth;
-      document.getElementById('auth-title').innerText = dict.authTitle;
-      document.getElementById('auth-subtitle').innerText = dict.authSubtitle;
-      document.getElementById('lbl-shop-name').innerText = dict.lblShopName;
-      document.getElementById('lbl-mobile').innerText = dict.lblMobile;
-      document.getElementById('lbl-email').innerText = dict.lblEmail;
-      document.getElementById('lbl-address').innerText = dict.lblAddress;
-      document.getElementById('btn-send-otp').innerText = dict.btnSendOtp;
-      document.getElementById('lbl-otp-input').innerText = dict.lblEnterOtp;
-      document.getElementById('btn-verify-otp').innerText = dict.btnVerifyOtp;
-      document.getElementById('tab-dashboard').innerText = dict.tabDashboard;
-      document.getElementById('tab-new-customer').innerText = dict.tabNewOrder;
-      document.getElementById('tab-history').innerText = dict.tabDatabase;
-      document.getElementById('tab-account').innerText = dict.tabAccount || "Profile & Settings";
-      document.getElementById('lbl-active-orders').innerText = dict.lblActiveOrders;
-      document.getElementById('lbl-outstanding-dues').innerText = dict.lblOutstandingDues;
-      document.getElementById('lbl-completed-orders').innerText = dict.lblCompletedOrders;
-      document.getElementById('hdr-current-active').innerText = dict.hdrCurrentActive;
-      document.getElementById('hdr-patient-entry').innerText = dict.hdrPatientEntry;
-      document.getElementById('lbl-cust-name').innerText = dict.lblCustName;
-      document.getElementById('lbl-cust-phone').innerText = dict.lblCustPhone;
-      document.getElementById('lbl-cust-email').innerText = dict.lblCustEmail;
-      document.getElementById('lbl-cust-age').innerText = dict.lblCustAge;
-      document.getElementById('lbl-cust-address').innerText = dict.lblCustAddress;
-      document.getElementById('hdr-rx-details').innerText = dict.hdrRxDetails;
-      document.getElementById('lbl-prescribed-by').innerText = dict.lblPrescribedBy;
-      document.getElementById('hdr-order-billing').innerText = dict.hdrOrderBilling;
-      document.getElementById('lbl-item-desc').innerText = dict.lblItemDesc;
-      document.getElementById('lbl-total-amount').innerText = dict.lblTotalAmount;
-      document.getElementById('lbl-amount-paid').innerText = dict.lblAmountPaid;
-      document.getElementById('lbl-order-status').innerText = dict.lblOrderStatus;
-      document.getElementById('lbl-remaining-bal').innerText = dict.lblRemainingBal;
-      document.getElementById('btn-form-cancel').innerText = dict.btnFormCancel;
-      document.getElementById('btn-form-save').innerText = dict.btnFormSave;
-      document.getElementById('history-search-input').placeholder = dict.searchPlaceholder;
-      document.getElementById('btn-logout').innerText = dict.btnLogout;
+      setText('welcome-subtext', dict.welcomeSub);
+      setText('btn-welcome-continue', dict.enterPortal);
+      setText('settings-title', dict.settingsTitle);
+      setText('settings-subtitle', dict.settingsSubtitle);
+      setText('lbl-select-lang', dict.selectLang);
+      setText('lbl-select-curr', dict.selectCurr);
+      setText('btn-settings-continue', dict.btnContinueAuth);
+      setText('auth-title', dict.authTitle);
+      setText('auth-subtitle', dict.authSubtitle);
+      setText('lbl-shop-name', dict.lblShopName);
+      setText('lbl-mobile', dict.lblMobile);
+      setText('lbl-email', dict.lblEmail);
+      setText('lbl-address', dict.lblAddress);
+      setText('btn-send-otp', dict.btnSendOtp);
+      setText('lbl-otp-input', dict.lblEnterOtp);
+      setText('btn-verify-otp', dict.btnVerifyOtp);
+      setText('tab-dashboard', dict.tabDashboard);
+      setText('tab-new-customer', dict.tabNewOrder);
+      setText('tab-history', dict.tabDatabase);
+      setText('tab-account', dict.tabAccount || "Profile & Settings");
+      setText('lbl-active-orders', dict.lblActiveOrders);
+      setText('lbl-outstanding-dues', dict.lblOutstandingDues);
+      setText('lbl-completed-orders', dict.lblCompletedOrders);
+      setText('hdr-current-active', dict.hdrCurrentActive);
+      setText('hdr-patient-entry', dict.hdrPatientEntry);
+      setText('lbl-cust-name', dict.lblCustName);
+      setText('lbl-cust-phone', dict.lblCustPhone);
+      setText('lbl-cust-email', dict.lblCustEmail);
+      setText('lbl-cust-age', dict.lblCustAge);
+      setText('lbl-cust-address', dict.lblCustAddress);
+      setText('hdr-rx-details', dict.hdrRxDetails);
+      setText('lbl-prescribed-by', dict.lblPrescribedBy);
+      setText('hdr-order-billing', dict.hdrOrderBilling);
+      setText('lbl-total-amount', dict.lblTotalAmount);
+      setText('lbl-amount-paid', dict.lblAmountPaid);
+      setText('lbl-order-status', dict.lblOrderStatus);
+      setText('lbl-remaining-bal', dict.lblRemainingBal);
+      setText('btn-form-cancel', dict.btnFormCancel);
+      setText('btn-form-save', dict.btnFormSave);
+      const historySearchInput = document.getElementById('history-search-input');
+      if (historySearchInput) historySearchInput.placeholder = dict.searchPlaceholder;
+      setText('btn-logout', dict.btnLogout);
 
       persistConfig();
       renderDashboard();
