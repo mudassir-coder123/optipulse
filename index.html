@@ -126,9 +126,13 @@
         <div>
           <label id="lbl-otp-input" class="block text-xs font-semibold uppercase tracking-wider text-amber-400 mb-1">Enter 6-Digit OTP Code</label>
           <input id="otp-input" type="text" maxlength="6" placeholder="123456" class="w-full text-center tracking-widest text-lg font-bold px-4 py-3 rounded-xl bg-neutral-950 border border-amber-500/50 text-stone-100 focus:outline-none focus:border-amber-500">
+          <p class="text-[11px] text-stone-500 mt-1.5">Check your inbox for the code. If you have more than one OTP email, always use the one from the <strong>most recent</strong> email - older codes stop working as soon as a new one is sent.</p>
         </div>
         <button id="btn-verify-otp" onclick="verifyOTP()" class="w-full py-3 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all text-xs uppercase tracking-wider">
           Verify & Enter Portal
+        </button>
+        <button id="btn-resend-otp" type="button" onclick="resendOTP()" class="w-full py-2 rounded-xl bg-transparent hover:bg-neutral-800 text-stone-400 hover:text-amber-400 text-xs font-semibold transition-all">
+          Didn't get it? Resend code
         </button>
       </div>
     </div>
@@ -1145,29 +1149,81 @@
       document.getElementById(`step-${next}`).classList.remove('hidden');
     }
 
+    let otpResendCooldownUntil = 0;
+
     async function handleOwnerRegister(e) {
       e.preventDefault();
       const email = document.getElementById('owner-email').value;
       const btn = document.getElementById('btn-send-otp');
-      
+
       if (!email) return alert("Please enter a valid email address.");
 
       btn.innerText = "...";
       btn.disabled = true;
 
-      const { error } = await supabaseClient.auth.signInWithOtp({
-        email: email,
-        options: { shouldCreateUser: true }
-      });
+      try {
+        const { error } = await supabaseClient.auth.signInWithOtp({
+          email: email,
+          options: { shouldCreateUser: true }
+        });
 
-      btn.innerText = translations[appConfig.lang].btnSendOtp;
-      btn.disabled = false;
+        if (error) {
+          alert("Error sending OTP: " + error.message);
+        } else {
+          document.getElementById('otp-input').value = '';
+          alert("A 6-digit OTP code has been sent to " + email + ". Check your inbox - if you request another code later, always use the newest one.");
+          document.getElementById('otp-verification-box').classList.remove('hidden');
+          otpResendCooldownUntil = Date.now() + 30000;
+          updateResendButtonState();
+        }
+      } catch (err) {
+        console.error('Send OTP error:', err);
+        alert("Something went wrong sending the OTP. Please check your connection and try again.");
+      } finally {
+        btn.innerText = translations[appConfig.lang].btnSendOtp;
+        btn.disabled = false;
+      }
+    }
 
-      if (error) {
-        alert("Error sending OTP: " + error.message);
+    function updateResendButtonState() {
+      const resendBtn = document.getElementById('btn-resend-otp');
+      const remaining = Math.ceil((otpResendCooldownUntil - Date.now()) / 1000);
+      if (remaining > 0) {
+        resendBtn.disabled = true;
+        resendBtn.innerText = `Resend available in ${remaining}s`;
+        setTimeout(updateResendButtonState, 1000);
       } else {
-        alert("A 6-digit OTP code has been sent to " + email + ". Check your inbox!");
-        document.getElementById('otp-verification-box').classList.remove('hidden');
+        resendBtn.disabled = false;
+        resendBtn.innerText = "Didn't get it? Resend code";
+      }
+    }
+
+    async function resendOTP() {
+      if (Date.now() < otpResendCooldownUntil) return;
+      const email = document.getElementById('owner-email').value;
+      if (!email) return alert("Please enter your email above first.");
+
+      const resendBtn = document.getElementById('btn-resend-otp');
+      resendBtn.disabled = true;
+      resendBtn.innerText = "Sending...";
+
+      try {
+        const { error } = await supabaseClient.auth.signInWithOtp({
+          email: email,
+          options: { shouldCreateUser: true }
+        });
+        if (error) {
+          alert("Error resending OTP: " + error.message);
+        } else {
+          document.getElementById('otp-input').value = '';
+          alert("A new code has been sent to " + email + ". Use this newest code - the old one no longer works.");
+        }
+      } catch (err) {
+        console.error('Resend OTP error:', err);
+        alert("Something went wrong resending the OTP. Please try again.");
+      } finally {
+        otpResendCooldownUntil = Date.now() + 30000;
+        updateResendButtonState();
       }
     }
 
@@ -1181,36 +1237,43 @@
       verifyBtn.innerText = "...";
       verifyBtn.disabled = true;
 
-      const { data, error } = await supabaseClient.auth.verifyOtp({
-        email: email,
-        token: otp,
-        type: 'email'
-      });
+      try {
+        const { data, error } = await supabaseClient.auth.verifyOtp({
+          email: email,
+          token: otp,
+          type: 'email'
+        });
 
-      verifyBtn.innerText = translations[appConfig.lang].btnVerifyOtp;
-      verifyBtn.disabled = false;
+        if (error) {
+          alert("Invalid or expired OTP: " + error.message + "\n\nIf you requested more than one code, make sure you're using the most recent one - tap 'Resend code' below to get a fresh one.");
+          document.getElementById('otp-input').value = '';
+          document.getElementById('otp-input').focus();
+          return;
+        }
 
-      if (error) {
-        alert("Invalid or expired OTP: " + error.message);
-        return;
+        await loadUserData(email);
+
+        appConfig.owner = {
+          shop: document.getElementById('owner-shop').value || 'Vision Care Optics',
+          mobile: document.getElementById('owner-mobile').value,
+          email: email,
+          address: document.getElementById('owner-address').value
+        };
+
+        await persistConfig();
+
+        document.getElementById('disp-shop-title').innerText = appConfig.owner.shop.toUpperCase();
+        document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop}`;
+
+        nextStep('owner-login', 'app-dashboard');
+        renderDashboard();
+      } catch (err) {
+        console.error('Verify OTP error:', err);
+        alert("Your code was verified, but something went wrong loading your account. Please close this tab, reopen the site, and it should log you straight in.\n\nDetails: " + (err && err.message ? err.message : err));
+      } finally {
+        verifyBtn.innerText = translations[appConfig.lang].btnVerifyOtp;
+        verifyBtn.disabled = false;
       }
-
-      await loadUserData(email);
-
-      appConfig.owner = {
-        shop: document.getElementById('owner-shop').value || 'Vision Care Optics',
-        mobile: document.getElementById('owner-mobile').value,
-        email: email,
-        address: document.getElementById('owner-address').value
-      };
-
-      await persistConfig();
-
-      document.getElementById('disp-shop-title').innerText = appConfig.owner.shop.toUpperCase();
-      document.getElementById('disp-managing-badge').innerText = `Managing ${appConfig.owner.shop}`;
-      
-      nextStep('owner-login', 'app-dashboard');
-      renderDashboard();
     }
 
     async function handleLogout() {
