@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" id="html-root" class="h-full bg-neutral-950 text-stone-100">
+<html lang="en" id="html-root" class="h-full bg-slate-50 text-slate-800">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,44 +26,44 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
-    .gold-border { border-color: #d4af37; }
-    .gold-text { color: #d4af37; }
+    .gold-border { border-color: #1e3a8a; }
+    .gold-text { color: #1e3a8a; }
   </style>
 </head>
-<body class="h-full font-sans antialiased bg-neutral-950 text-stone-100 selection:bg-amber-500 selection:text-neutral-950">
+<body class="h-full font-sans antialiased bg-slate-50 text-slate-800 selection:bg-blue-800 selection:text-white">
 
   <!-- ================= STEP 1: WELCOME / INITIAL LOADING SCREEN ================= -->
-  <div id="step-welcome" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 bg-neutral-950">
+  <div id="step-welcome" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 bg-slate-50">
     <div id="login-canvas-container" class="absolute inset-0 opacity-40 pointer-events-none"></div>
     
     <div class="relative z-10 text-center max-w-md w-full space-y-6">
-      <h1 class="text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600">
+      <h1 class="text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900">
         OPTIPULSE
       </h1>
-      <p id="welcome-subtext" class="text-sm text-stone-400">Optical Practice & Customer Management System</p>
+      <p id="welcome-subtext" class="text-sm text-slate-500">Optical Practice & Customer Management System</p>
 
-      <div id="welcome-loading-box" class="w-full bg-neutral-900 h-2 rounded-full overflow-hidden border border-neutral-800">
-        <div id="loading-bar" class="bg-amber-500 h-full w-0 transition-all duration-300"></div>
+      <div id="welcome-loading-box" class="w-full bg-white h-2 rounded-full overflow-hidden border border-slate-200">
+        <div id="loading-bar" class="bg-blue-800 h-full w-0 transition-all duration-300"></div>
       </div>
 
-      <button id="btn-welcome-continue" onclick="nextStep('welcome', 'settings')" class="hidden w-full py-3.5 px-6 rounded-xl font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-neutral-950 shadow-lg shadow-amber-500/10 transition-all">
+      <button id="btn-welcome-continue" onclick="nextStep('welcome', 'settings')" class="hidden w-full py-3.5 px-6 rounded-xl font-bold bg-gradient-to-r from-blue-800 to-blue-900 hover:from-blue-900 hover:to-blue-800 text-white shadow-lg shadow-blue-800/10 transition-all">
         Enter System Portal
       </button>
     </div>
   </div>
 
   <!-- ================= STEP 2: LANGUAGE & CURRENCY SETTINGS ================= -->
-  <div id="step-settings" class="hidden min-h-screen flex items-center justify-center p-6 bg-neutral-950">
-    <div class="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl">
+  <div id="step-settings" class="hidden min-h-screen flex items-center justify-center p-6 bg-slate-50">
+    <div class="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl">
       <div>
-        <h2 id="settings-title" class="text-2xl font-bold text-stone-100">Preferences</h2>
-        <p id="settings-subtitle" class="text-xs text-stone-400 mt-1">Select your preferred language and local currency.</p>
+        <h2 id="settings-title" class="text-2xl font-bold text-slate-800">Preferences</h2>
+        <p id="settings-subtitle" class="text-xs text-slate-500 mt-1">Select your preferred language and local currency.</p>
       </div>
 
       <div class="space-y-4">
         <div>
-          <label id="lbl-select-lang" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Language</label>
-          <select id="select-lang" onchange="changeLanguage(this.value)" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+          <label id="lbl-select-lang" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Language</label>
+          <select id="select-lang" onchange="changeLanguage(this.value)" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-blue-700 text-sm">
             <option value="en">English</option>
             <option value="ur">اردو (Urdu)</option>
             <option value="ar">العربية (Arabic)</option>
@@ -71,8 +71,8 @@
         </div>
 
         <div>
-          <label id="lbl-select-curr" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Currency</label>
-          <select id="select-curr" onchange="changeCurrency(this.value)" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+          <label id="lbl-select-curr" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Currency</label>
+          <select id="select-curr" onchange="changeCurrency(this.value)" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-blue-700 text-sm">
             <option value="PKR">PKR - Pakistani Rupee</option>
             <option value="USD">USD - US Dollar ($)</option>
             <option value="INR">INR - Indian Rupee (₹)</option>
@@ -83,7 +83,7 @@
           </select>
         </div>
 
-        <button id="btn-settings-continue" onclick="nextStep('settings', 'owner-login')" class="w-full py-3.5 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-neutral-950 transition-all text-sm uppercase tracking-wider mt-4">
+        <button id="btn-settings-continue" onclick="nextStep('settings', 'owner-login')" class="w-full py-3.5 rounded-xl font-bold bg-blue-800 hover:bg-blue-900 text-white transition-all text-sm uppercase tracking-wider mt-4">
           Continue to Authentication
         </button>
       </div>
@@ -91,47 +91,47 @@
   </div>
 
   <!-- ================= STEP 3: OWNER LOGIN / REGISTER (OTP) ================= -->
-  <div id="step-owner-login" class="hidden min-h-screen flex items-center justify-center p-6 bg-neutral-950">
-    <div class="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl">
+  <div id="step-owner-login" class="hidden min-h-screen flex items-center justify-center p-6 bg-slate-50">
+    <div class="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl">
       <div>
-        <h2 id="auth-title" class="text-2xl font-bold text-stone-100">Shop Authentication</h2>
-        <p id="auth-subtitle" class="text-xs text-stone-400 mt-1">Enter your details to log in or register your optical store.</p>
+        <h2 id="auth-title" class="text-2xl font-bold text-slate-800">Shop Authentication</h2>
+        <p id="auth-subtitle" class="text-xs text-slate-500 mt-1">Enter your details to log in or register your optical store.</p>
       </div>
 
       <form onsubmit="handleOwnerRegister(event)" class="space-y-4">
         <div>
-          <label id="lbl-shop-name" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Shop / Practice Name</label>
-          <input id="owner-shop" type="text" required placeholder="e.g. Vision Care Optics" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+          <label id="lbl-shop-name" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Shop / Practice Name</label>
+          <input id="owner-shop" type="text" required placeholder="e.g. Vision Care Optics" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-blue-700 text-sm">
         </div>
         <div>
-          <label id="lbl-mobile" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Mobile Contact</label>
-          <input id="owner-mobile" type="text" required placeholder="+92 300 1234567" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+          <label id="lbl-mobile" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Mobile Contact</label>
+          <input id="owner-mobile" type="text" required placeholder="+92 300 1234567" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-blue-700 text-sm">
         </div>
         <div>
-          <label id="lbl-email" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Owner Email</label>
-          <input id="owner-email" type="email" required placeholder="owner@optipulse.com" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+          <label id="lbl-email" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Owner Email</label>
+          <input id="owner-email" type="email" required placeholder="owner@optipulse.com" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-blue-700 text-sm">
         </div>
         <div>
-          <label id="lbl-address" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">Shop Address</label>
-          <input id="owner-address" type="text" required placeholder="Shop #12, Commercial Area" class="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 focus:outline-none focus:border-amber-500 text-sm">
+          <label id="lbl-address" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Shop Address</label>
+          <input id="owner-address" type="text" required placeholder="Shop #12, Commercial Area" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-blue-700 text-sm">
         </div>
 
-        <button id="btn-send-otp" type="submit" class="w-full py-3.5 rounded-xl font-bold bg-amber-500 hover:bg-amber-400 text-neutral-950 transition-all text-sm uppercase tracking-wider">
+        <button id="btn-send-otp" type="submit" class="w-full py-3.5 rounded-xl font-bold bg-blue-800 hover:bg-blue-900 text-white transition-all text-sm uppercase tracking-wider">
           Send Email Verification OTP
         </button>
       </form>
 
       <!-- OTP Box -->
-      <div id="otp-verification-box" class="hidden border-t border-neutral-800 pt-6 space-y-4">
+      <div id="otp-verification-box" class="hidden border-t border-slate-200 pt-6 space-y-4">
         <div>
-          <label id="lbl-otp-input" class="block text-xs font-semibold uppercase tracking-wider text-amber-400 mb-1">Enter 6-Digit OTP Code</label>
-          <input id="otp-input" type="text" maxlength="6" placeholder="123456" class="w-full text-center tracking-widest text-lg font-bold px-4 py-3 rounded-xl bg-neutral-950 border border-amber-500/50 text-stone-100 focus:outline-none focus:border-amber-500">
-          <p class="text-[11px] text-stone-500 mt-1.5">Check your inbox for the code. If you have more than one OTP email, always use the one from the <strong>most recent</strong> email - older codes stop working as soon as a new one is sent.</p>
+          <label id="lbl-otp-input" class="block text-xs font-semibold uppercase tracking-wider text-blue-800 mb-1">Enter 6-Digit OTP Code</label>
+          <input id="otp-input" type="text" maxlength="6" placeholder="123456" class="w-full text-center tracking-widest text-lg font-bold px-4 py-3 rounded-xl bg-slate-50 border border-blue-800/50 text-slate-800 focus:outline-none focus:border-blue-700">
+          <p class="text-[11px] text-slate-400 mt-1.5">Check your inbox for the code. If you have more than one OTP email, always use the one from the <strong>most recent</strong> email - older codes stop working as soon as a new one is sent.</p>
         </div>
         <button id="btn-verify-otp" onclick="verifyOTP()" class="w-full py-3 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all text-xs uppercase tracking-wider">
           Verify & Enter Portal
         </button>
-        <button id="btn-resend-otp" type="button" onclick="resendOTP()" class="w-full py-2 rounded-xl bg-transparent hover:bg-neutral-800 text-stone-400 hover:text-amber-400 text-xs font-semibold transition-all">
+        <button id="btn-resend-otp" type="button" onclick="resendOTP()" class="w-full py-2 rounded-xl bg-transparent hover:bg-slate-100 text-slate-500 hover:text-blue-800 text-xs font-semibold transition-all">
           Didn't get it? Resend code
         </button>
       </div>
@@ -139,23 +139,23 @@
   </div>
 
   <!-- ================= STEP 4: MAIN APP DASHBOARD ================= -->
-  <div id="step-app-dashboard" class="hidden min-h-screen flex flex-col bg-neutral-950">
+  <div id="step-app-dashboard" class="hidden min-h-screen flex flex-col bg-slate-50">
     <!-- Header -->
-    <header class="border-b border-neutral-800 bg-neutral-900/80 backdrop-blur sticky top-0 z-40 px-4 md:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
+    <header class="border-b border-slate-200 bg-white/90 backdrop-blur sticky top-0 z-40 px-4 md:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
       <div>
-        <h2 id="disp-shop-title" class="text-xl font-black tracking-wider text-amber-400">OPTIPULSE</h2>
-        <p id="disp-managing-badge" class="text-xs text-stone-400">Managing Practice</p>
+        <h2 id="disp-shop-title" class="text-xl font-black tracking-wider text-blue-800">OPTIPULSE</h2>
+        <p id="disp-managing-badge" class="text-xs text-slate-500">Managing Practice</p>
       </div>
 
       <!-- Quick Language & Currency Switcher -->
       <div class="flex items-center gap-3">
-        <select id="dash-select-lang" onchange="changeLanguage(this.value)" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 border border-neutral-700 text-amber-400 text-xs font-semibold focus:outline-none">
+        <select id="dash-select-lang" onchange="changeLanguage(this.value)" class="px-2.5 py-1.5 rounded-lg bg-slate-100 border border-slate-300 text-blue-800 text-xs font-semibold focus:outline-none">
           <option value="en">English</option>
           <option value="ur">اردو</option>
           <option value="ar">العربية</option>
         </select>
 
-        <select id="dash-select-curr" onchange="changeCurrency(this.value)" class="px-2.5 py-1.5 rounded-lg bg-neutral-800 border border-neutral-700 text-amber-400 text-xs font-bold focus:outline-none">
+        <select id="dash-select-curr" onchange="changeCurrency(this.value)" class="px-2.5 py-1.5 rounded-lg bg-slate-100 border border-slate-300 text-blue-800 text-xs font-bold focus:outline-none">
           <option value="PKR">PKR</option>
           <option value="USD">USD ($)</option>
           <option value="INR">INR (₹)</option>
@@ -165,45 +165,45 @@
           <option value="AED">AED</option>
         </select>
 
-        <button id="btn-install-app" onclick="handleInstallClick()" class="hidden px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold">📲 Install App</button>
-        <button id="btn-logout" onclick="handleLogout()" class="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-300 text-xs font-semibold">Logout</button>
+        <button id="btn-install-app" onclick="handleInstallClick()" class="hidden px-3 py-1.5 rounded-lg bg-blue-800/10 hover:bg-blue-800/20 text-blue-800 border border-blue-800/30 text-xs font-bold">📲 Install App</button>
+        <button id="btn-logout" onclick="handleLogout()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold">Logout</button>
       </div>
     </header>
 
     <!-- Navigation Tabs -->
-    <div class="border-b border-neutral-800 bg-neutral-900 px-4 md:px-8 pt-4">
+    <div class="border-b border-slate-200 bg-white px-4 md:px-8 pt-4">
       <div class="flex gap-6 overflow-x-auto">
-        <button id="tab-dashboard" onclick="switchAppTab('dashboard')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold whitespace-nowrap">Dashboard</button>
-        <button id="tab-new-customer" onclick="switchAppTab('new-customer')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">+ New Order</button>
-        <button id="tab-history" onclick="switchAppTab('history')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">Customer Database & History</button>
-        <button id="tab-sales" onclick="switchAppTab('sales')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">Sales Report</button>
-        <button id="tab-inventory" onclick="switchAppTab('inventory')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">Store / Inventory</button>
-        <button id="tab-account" onclick="switchAppTab('account')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap">Profile & Settings</button>
+        <button id="tab-dashboard" onclick="switchAppTab('dashboard')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-blue-800 text-blue-800 font-bold whitespace-nowrap">Dashboard</button>
+        <button id="tab-new-customer" onclick="switchAppTab('new-customer')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-slate-500 hover:text-slate-700 font-semibold whitespace-nowrap">+ New Order</button>
+        <button id="tab-history" onclick="switchAppTab('history')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-slate-500 hover:text-slate-700 font-semibold whitespace-nowrap">Customer Database & History</button>
+        <button id="tab-sales" onclick="switchAppTab('sales')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-slate-500 hover:text-slate-700 font-semibold whitespace-nowrap">Sales Report</button>
+        <button id="tab-inventory" onclick="switchAppTab('inventory')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-slate-500 hover:text-slate-700 font-semibold whitespace-nowrap">Store / Inventory</button>
+        <button id="tab-account" onclick="switchAppTab('account')" class="pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-slate-500 hover:text-slate-700 font-semibold whitespace-nowrap">Profile & Settings</button>
       </div>
     </div>
 
     <!-- Main Content Container -->
-    <main class="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto space-y-6">
+    <main class="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto space-y-8">
       
       <!-- TAB 1: DASHBOARD VIEW -->
       <div id="view-tab-dashboard" class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
-            <p id="lbl-active-orders" class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Active Pending Orders</p>
-            <h3 id="stat-active-count" class="text-3xl font-black text-amber-400 mt-2">0</h3>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+            <p id="lbl-active-orders" class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Active Pending Orders</p>
+            <h3 id="stat-active-count" class="text-3xl font-black text-blue-800 mt-2">0</h3>
           </div>
-          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
-            <p id="lbl-outstanding-dues" class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Total Outstanding Dues</p>
-            <h3 id="stat-total-due" class="text-3xl font-black text-stone-100 mt-2">PKR 0</h3>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+            <p id="lbl-outstanding-dues" class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Total Outstanding Dues</p>
+            <h3 id="stat-total-due" class="text-3xl font-black text-slate-800 mt-2">PKR 0</h3>
           </div>
-          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
-            <p id="lbl-completed-orders" class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Completed Orders</p>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+            <p id="lbl-completed-orders" class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Completed Orders</p>
             <h3 id="stat-delivered-count" class="text-3xl font-black text-emerald-400 mt-2">0</h3>
           </div>
         </div>
 
         <div class="space-y-4">
-          <h3 id="hdr-current-active" class="text-sm font-bold uppercase tracking-wider text-stone-300">Current Active Orders</h3>
+          <h3 id="hdr-current-active" class="text-sm font-bold uppercase tracking-wider text-slate-600">Current Active Orders</h3>
           <div id="dashboard-active-list" class="space-y-3">
             <!-- Active order items render dynamically -->
           </div>
@@ -211,50 +211,50 @@
       </div>
 
       <!-- TAB 2: NEW CUSTOMER / ORDER FORM -->
-      <div id="view-tab-new-customer" class="hidden bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6">
-        <h3 id="hdr-patient-entry" class="text-lg font-bold text-stone-100">Patient Prescription & Order Entry</h3>
+      <div id="view-tab-new-customer" class="hidden bg-white border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
+        <h3 id="hdr-patient-entry" class="text-lg font-bold text-slate-800">Patient Prescription & Order Entry</h3>
         <form id="customer-form" onsubmit="handleSaveCustomer(event)" class="space-y-6">
           <input type="hidden" id="editing-cust-id">
           <input type="hidden" id="editing-order-id">
           
           <!-- Primary Account Holder Info -->
           <div class="space-y-2">
-            <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Primary Account Holder Info</h4>
+            <h4 class="text-xs font-bold text-blue-800 uppercase tracking-wider">Primary Account Holder Info</h4>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label id="lbl-cust-name" class="block text-xs font-semibold text-stone-400 mb-1">Primary Customer Name *</label>
-                <input id="cust-name" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                <label id="lbl-cust-name" class="block text-xs font-semibold text-slate-500 mb-1">Primary Customer Name *</label>
+                <input id="cust-name" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
               </div>
               <div>
-                <label id="lbl-cust-phone" class="block text-xs font-semibold text-stone-400 mb-1">Phone / Mobile *</label>
-                <input id="cust-phone" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                <label id="lbl-cust-phone" class="block text-xs font-semibold text-slate-500 mb-1">Phone / Mobile *</label>
+                <input id="cust-phone" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
               </div>
               <div>
-                <label id="lbl-cust-email" class="block text-xs font-semibold text-stone-400 mb-1">Email (Optional)</label>
-                <input id="cust-email" type="email" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                <label id="lbl-cust-email" class="block text-xs font-semibold text-slate-500 mb-1">Email (Optional)</label>
+                <input id="cust-email" type="email" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
               </div>
               <div>
-                <label id="lbl-cust-address" class="block text-xs font-semibold text-stone-400 mb-1">Address</label>
-                <input id="cust-address" type="text" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                <label id="lbl-cust-address" class="block text-xs font-semibold text-slate-500 mb-1">Address</label>
+                <input id="cust-address" type="text" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
               </div>
             </div>
           </div>
 
           <!-- Family Member / Patient Section -->
-          <div class="border-t border-neutral-800 pt-6 space-y-4">
-            <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Order Recipient Details (Self or Family Member)</h4>
+          <div class="border-t border-slate-200 pt-6 space-y-4">
+            <h4 class="text-xs font-bold text-blue-800 uppercase tracking-wider">Order Recipient Details (Self or Family Member)</h4>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label class="block text-xs font-semibold text-stone-400 mb-1">Order For *</label>
-                <select id="order-for-type" onchange="toggleFamilyMemberFields(this.value)" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Order For *</label>
+                <select id="order-for-type" onchange="toggleFamilyMemberFields(this.value)" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
                   <option value="Self">Self (Primary Customer)</option>
                   <option value="Family Member">Family Member</option>
                 </select>
               </div>
 
               <div id="family-rel-box" class="hidden">
-                <label class="block text-xs font-semibold text-stone-400 mb-1">Relationship</label>
-                <select id="family-relation" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Relationship</label>
+                <select id="family-relation" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
                   <option value="Son">Son</option>
                   <option value="Daughter">Daughter</option>
                   <option value="Wife">Wife</option>
@@ -268,101 +268,105 @@
               </div>
 
               <div id="family-name-box" class="hidden">
-                <label class="block text-xs font-semibold text-stone-400 mb-1">Family Member Name *</label>
-                <input id="family-member-name" type="text" placeholder="e.g. Ali / Sara" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Family Member Name *</label>
+                <input id="family-member-name" type="text" placeholder="e.g. Ali / Sara" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
               </div>
 
               <div>
-                <label id="lbl-cust-age" class="block text-xs font-semibold text-stone-400 mb-1">Patient Age</label>
-                <input id="cust-age" type="number" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                <label id="lbl-cust-age" class="block text-xs font-semibold text-slate-500 mb-1">Patient Age</label>
+                <input id="cust-age" type="number" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
               </div>
             </div>
           </div>
 
           <!-- Prescription Section -->
-          <div class="border-t border-neutral-800 pt-6 space-y-4">
+          <div class="border-t border-slate-200 pt-8 space-y-5">
             <div class="flex justify-between items-center flex-wrap gap-2">
-              <h4 id="hdr-rx-details" class="text-sm font-bold text-amber-400 uppercase tracking-wider">Prescription Details (Rx / Eyesight Numbers)</h4>
-              <span class="text-[11px] text-stone-400">Prescriptions saved per person in customer ID</span>
+              <h4 id="hdr-rx-details" class="text-sm font-bold text-blue-800 uppercase tracking-wider">Prescription Details (Rx / Eyesight Numbers)</h4>
+              <span class="text-[11px] text-slate-500">Prescriptions saved per person in customer ID</span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <!-- LEFT EYE - shown on the left, matches OS -->
-              <div class="p-3 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2">
-                <p class="text-[11px] font-bold text-stone-300 uppercase tracking-wider">OS &middot; Left Eye</p>
-                <div class="grid grid-cols-2 gap-2">
-                  <div><label class="text-[10px] text-stone-400 uppercase">SPH</label><input id="rx-os-sph" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-xs"></div>
-                  <div><label class="text-[10px] text-stone-400 uppercase">CYL</label><input id="rx-os-cyl" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-xs"></div>
-                  <div><label class="text-[10px] text-stone-400 uppercase">AXIS</label><input id="rx-os-axis" type="text" placeholder="180" class="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-xs"></div>
-                  <div><label class="text-[10px] text-stone-400 uppercase">ADD</label><input id="rx-os-add" type="text" placeholder="+1.00" class="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-xs"></div>
+            <div class="space-y-4">
+              <!-- RIGHT EYE - shown on top -->
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                <p class="text-xs font-bold text-slate-700 uppercase tracking-wider">OD &middot; Right Eye</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div><label class="text-[10px] text-slate-500 uppercase">SPH</label><input id="rx-od-sph" type="text" placeholder="0.00" class="w-full px-3 py-2.5 rounded-lg bg-white border border-slate-200 text-sm"></div>
+                  <div><label class="text-[10px] text-slate-500 uppercase">CYL</label><input id="rx-od-cyl" type="text" placeholder="0.00" class="w-full px-3 py-2.5 rounded-lg bg-white border border-slate-200 text-sm"></div>
+                  <div><label class="text-[10px] text-slate-500 uppercase">AXIS</label><input id="rx-od-axis" type="text" placeholder="180" class="w-full px-3 py-2.5 rounded-lg bg-white border border-slate-200 text-sm"></div>
+                  <div><label class="text-[10px] text-slate-500 uppercase">ADD</label><input id="rx-od-add" type="text" placeholder="+1.00" class="w-full px-3 py-2.5 rounded-lg bg-white border border-slate-200 text-sm"></div>
                 </div>
               </div>
 
-              <!-- RIGHT EYE - shown on the right, matches OD -->
-              <div class="p-3 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2">
-                <p class="text-[11px] font-bold text-stone-300 uppercase tracking-wider">OD &middot; Right Eye</p>
-                <div class="grid grid-cols-2 gap-2">
-                  <div><label class="text-[10px] text-stone-400 uppercase">SPH</label><input id="rx-od-sph" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-xs"></div>
-                  <div><label class="text-[10px] text-stone-400 uppercase">CYL</label><input id="rx-od-cyl" type="text" placeholder="0.00" class="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-xs"></div>
-                  <div><label class="text-[10px] text-stone-400 uppercase">AXIS</label><input id="rx-od-axis" type="text" placeholder="180" class="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-xs"></div>
-                  <div><label class="text-[10px] text-stone-400 uppercase">ADD</label><input id="rx-od-add" type="text" placeholder="+1.00" class="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-xs"></div>
+              <!-- LEFT EYE - shown below -->
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                <p class="text-xs font-bold text-slate-700 uppercase tracking-wider">OS &middot; Left Eye</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div><label class="text-[10px] text-slate-500 uppercase">SPH</label><input id="rx-os-sph" type="text" placeholder="0.00" class="w-full px-3 py-2.5 rounded-lg bg-white border border-slate-200 text-sm"></div>
+                  <div><label class="text-[10px] text-slate-500 uppercase">CYL</label><input id="rx-os-cyl" type="text" placeholder="0.00" class="w-full px-3 py-2.5 rounded-lg bg-white border border-slate-200 text-sm"></div>
+                  <div><label class="text-[10px] text-slate-500 uppercase">AXIS</label><input id="rx-os-axis" type="text" placeholder="180" class="w-full px-3 py-2.5 rounded-lg bg-white border border-slate-200 text-sm"></div>
+                  <div><label class="text-[10px] text-slate-500 uppercase">ADD</label><input id="rx-os-add" type="text" placeholder="+1.00" class="w-full px-3 py-2.5 rounded-lg bg-white border border-slate-200 text-sm"></div>
                 </div>
               </div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div><label class="text-[10px] text-stone-400 uppercase">PD (mm)</label><input id="rx-pd" type="text" placeholder="63" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
-              <div class="col-span-2 md:col-span-3"><label id="lbl-prescribed-by" class="text-[10px] text-stone-400 uppercase">Prescribed By</label><input id="rx-doctor" type="text" placeholder="Dr. Name" class="w-full px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-xs"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><label class="text-[10px] text-slate-500 uppercase">PD (mm)</label><input id="rx-pd" type="text" placeholder="63" class="w-full px-3 py-2.5 rounded-lg bg-slate-50 border border-slate-200 text-sm"></div>
+              <div><label id="lbl-prescribed-by" class="text-[10px] text-slate-500 uppercase">Prescribed By</label><input id="rx-doctor" type="text" placeholder="Dr. Name" class="w-full px-3 py-2.5 rounded-lg bg-slate-50 border border-slate-200 text-sm"></div>
             </div>
           </div>
 
           <!-- Order & Billing Section -->
-          <div class="border-t border-neutral-800 pt-6 space-y-4">
-            <h4 id="hdr-order-billing" class="text-sm font-bold text-amber-400 uppercase tracking-wider">Order & Billing Details</h4>
+          <div class="border-t border-slate-200 pt-8 space-y-5">
+            <h4 id="hdr-order-billing" class="text-sm font-bold text-blue-800 uppercase tracking-wider">Order & Billing Details</h4>
 
             <!-- Frame + Lens picked separately, auto-filled from Inventory if a matching model is typed -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="p-4 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2.5">
-                <p class="text-xs font-bold text-amber-400 uppercase tracking-wider">🕶️ Frame</p>
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
+                <p class="text-xs font-bold text-blue-800 uppercase tracking-wider">🕶️ Frame</p>
                 <div>
-                  <label class="block text-[10px] font-semibold text-stone-400 mb-1">Model / SKU (type to auto-fill from Inventory)</label>
-                  <input id="order-frame-model" list="frame-model-options" type="text" oninput="autofillFromInventory('Frame', this.value)" placeholder="e.g. RB-2140" class="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-stone-100 text-xs">
+                  <label class="block text-[10px] font-semibold text-slate-500 mb-1">Model / SKU (type to auto-fill from Inventory)</label>
+                  <input id="order-frame-model" list="frame-model-options" type="text" oninput="autofillFromInventory('Frame', this.value)" placeholder="e.g. RB-2140" class="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 text-xs">
                   <datalist id="frame-model-options"></datalist>
                 </div>
                 <div>
-                  <label class="block text-[10px] font-semibold text-stone-400 mb-1">Frame Name / Description</label>
-                  <input id="order-frame-name" type="text" placeholder="e.g. Ray-Ban Wayfarer - Black" class="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-stone-100 text-xs">
+                  <label class="block text-[10px] font-semibold text-slate-500 mb-1">Frame Name / Description</label>
+                  <input id="order-frame-name" type="text" placeholder="e.g. Ray-Ban Wayfarer - Black" class="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 text-xs">
                 </div>
-                <p id="frame-price-hint" class="text-[10px] text-stone-500"></p>
+                <p id="frame-price-hint" class="text-[10px] text-slate-400"></p>
               </div>
 
-              <div class="p-4 rounded-xl bg-neutral-950 border border-neutral-800 space-y-2.5">
-                <p class="text-xs font-bold text-amber-400 uppercase tracking-wider">🔎 Lens</p>
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
+                <p class="text-xs font-bold text-blue-800 uppercase tracking-wider">🔎 Lens</p>
                 <div>
-                  <label class="block text-[10px] font-semibold text-stone-400 mb-1">Model / SKU (type to auto-fill from Inventory)</label>
-                  <input id="order-lens-model" list="lens-model-options" type="text" oninput="autofillFromInventory('Lens', this.value)" placeholder="e.g. AR-COAT-1.56" class="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-stone-100 text-xs">
+                  <label class="block text-[10px] font-semibold text-slate-500 mb-1">Model / SKU (type to auto-fill from Inventory)</label>
+                  <input id="order-lens-model" list="lens-model-options" type="text" oninput="autofillFromInventory('Lens', this.value)" placeholder="e.g. AR-COAT-1.56" class="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 text-xs">
                   <datalist id="lens-model-options"></datalist>
                 </div>
                 <div>
-                  <label class="block text-[10px] font-semibold text-stone-400 mb-1">Lens Name / Description</label>
-                  <input id="order-lens-name" type="text" placeholder="e.g. Anti-Reflective 1.56 Lenses" class="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-stone-100 text-xs">
+                  <label class="block text-[10px] font-semibold text-slate-500 mb-1">Lens Name / Description</label>
+                  <input id="order-lens-name" type="text" placeholder="e.g. Anti-Reflective 1.56 Lenses" class="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 text-xs">
                 </div>
-                <p id="lens-price-hint" class="text-[10px] text-stone-500"></p>
+                <p id="lens-price-hint" class="text-[10px] text-slate-400"></p>
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label id="lbl-total-amount" class="block text-xs font-semibold text-stone-400 mb-1">Total Amount</label>
-                <input id="order-total" type="number" oninput="calcBalance()" placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+                <label id="lbl-total-amount" class="block text-xs font-semibold text-slate-500 mb-1">Total Amount</label>
+                <input id="order-total" type="number" oninput="calcBalance()" placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm">
               </div>
               <div>
-                <label id="lbl-amount-paid" class="block text-xs font-semibold text-stone-400 mb-1">Amount Paid</label>
-                <input id="order-paid" type="number" oninput="calcBalance()" placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Discount</label>
+                <input id="order-discount" type="number" oninput="calcBalance()" placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm">
               </div>
               <div>
-                <label id="lbl-order-status" class="block text-xs font-semibold text-stone-400 mb-1">Status</label>
-                <select id="order-status" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+                <label id="lbl-amount-paid" class="block text-xs font-semibold text-slate-500 mb-1">Amount Paid</label>
+                <input id="order-paid" type="number" oninput="calcBalance()" placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm">
+              </div>
+              <div>
+                <label id="lbl-order-status" class="block text-xs font-semibold text-slate-500 mb-1">Status</label>
+                <select id="order-status" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm">
                   <option value="In Progress">In Progress</option>
                   <option value="Ready for Pickup">Ready for Pickup</option>
                   <option value="Delivered">Delivered</option>
@@ -370,24 +374,30 @@
                 </select>
               </div>
             </div>
-            <p class="text-xs text-stone-400"><span id="lbl-remaining-bal">Remaining Balance</span>: <strong id="order-due-display" class="text-amber-400">PKR 0</strong></p>
+            <div class="flex flex-wrap gap-x-8 gap-y-2 p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm">
+              <p class="text-slate-500">Total <strong id="order-total-display" class="text-slate-800">0</strong></p>
+              <p class="text-slate-500">Discount <strong id="order-discount-display" class="text-slate-800">0</strong></p>
+              <p class="text-slate-500">Actual Price <strong id="order-net-display" class="text-blue-800">0</strong></p>
+              <p class="text-slate-500">Paid <strong id="order-paid-display" class="text-slate-800">0</strong></p>
+              <p class="text-slate-500"><span id="lbl-remaining-bal">Remaining</span> <strong id="order-due-display" class="text-blue-800">0</strong></p>
+            </div>
           </div>
 
           <div class="flex justify-end gap-3 pt-4">
-            <button id="btn-form-cancel" type="button" onclick="switchAppTab('dashboard')" class="px-6 py-3 rounded-xl bg-neutral-800 text-stone-300 font-semibold text-xs">Cancel</button>
-            <button id="btn-form-save" type="submit" class="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider">Save Customer Record</button>
+            <button id="btn-form-cancel" type="button" onclick="switchAppTab('dashboard')" class="px-6 py-3 rounded-xl bg-slate-100 text-slate-600 font-semibold text-xs">Cancel</button>
+            <button id="btn-form-save" type="submit" class="px-6 py-3 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold text-xs uppercase tracking-wider">Save Customer Record</button>
           </div>
         </form>
       </div>
 
       <!-- TAB 3: CUSTOMER HISTORY & COMPLETE DATABASE -->
       <div id="view-tab-history" class="hidden space-y-4">
-        <input id="history-search-input" type="text" onkeyup="filterCustomerHistory()" placeholder="Search by primary customer, family member name, or phone..." class="w-full px-4 py-3 rounded-2xl bg-neutral-900 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+        <input id="history-search-input" type="text" onkeyup="filterCustomerHistory()" placeholder="Search by primary customer, family member name, or phone..." class="w-full px-4 py-3 rounded-2xl bg-white border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
 
-        <div class="flex flex-wrap items-center gap-3 p-4 rounded-2xl bg-neutral-900 border border-neutral-800">
+        <div class="flex flex-wrap items-center gap-3 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
           <div>
-            <label class="block text-[10px] font-semibold uppercase tracking-wider text-stone-500 mb-1">Status</label>
-            <select id="filter-status" onchange="filterCustomerHistory()" class="px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-stone-100 text-xs focus:outline-none focus:border-amber-500">
+            <label class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Status</label>
+            <select id="filter-status" onchange="filterCustomerHistory()" class="px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 text-xs focus:outline-none focus:border-blue-700">
               <option value="">All Statuses</option>
               <option value="In Progress">In Progress</option>
               <option value="Ready for Pickup">Ready for Pickup</option>
@@ -395,18 +405,18 @@
             </select>
           </div>
           <div>
-            <label class="block text-[10px] font-semibold uppercase tracking-wider text-stone-500 mb-1">From Date</label>
-            <input id="filter-date-from" type="date" onchange="filterCustomerHistory()" class="px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-stone-100 text-xs focus:outline-none focus:border-amber-500">
+            <label class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">From Date</label>
+            <input id="filter-date-from" type="date" onchange="filterCustomerHistory()" class="px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 text-xs focus:outline-none focus:border-blue-700">
           </div>
           <div>
-            <label class="block text-[10px] font-semibold uppercase tracking-wider text-stone-500 mb-1">To Date</label>
-            <input id="filter-date-to" type="date" onchange="filterCustomerHistory()" class="px-3 py-2 rounded-lg bg-neutral-950 border border-neutral-800 text-stone-100 text-xs focus:outline-none focus:border-amber-500">
+            <label class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">To Date</label>
+            <input id="filter-date-to" type="date" onchange="filterCustomerHistory()" class="px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 text-xs focus:outline-none focus:border-blue-700">
           </div>
           <div class="flex items-center gap-2 mt-4">
-            <input id="filter-dues-only" type="checkbox" onchange="filterCustomerHistory()" class="w-4 h-4 accent-amber-500">
-            <label for="filter-dues-only" class="text-xs text-stone-300 font-medium">Only orders with dues</label>
+            <input id="filter-dues-only" type="checkbox" onchange="filterCustomerHistory()" class="w-4 h-4 accent-blue-800">
+            <label for="filter-dues-only" class="text-xs text-slate-600 font-medium">Only orders with dues</label>
           </div>
-          <button onclick="clearHistoryFilters()" class="mt-4 px-3 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-300 text-xs font-semibold">Clear Filters</button>
+          <button onclick="clearHistoryFilters()" class="mt-4 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold">Clear Filters</button>
         </div>
 
         <div id="history-results-list" class="space-y-4">
@@ -423,57 +433,61 @@
 
       <!-- TAB 6: STORE / INVENTORY -->
       <div id="view-tab-inventory" class="hidden space-y-6">
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-5">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 space-y-5">
           <div>
-            <h3 id="inv-form-title" class="text-lg font-bold text-stone-100">Add New Inventory Item</h3>
-            <p class="text-xs text-stone-400 mt-1">When new stock (frames or lenses) arrives, add it here. Type its Model/SKU on the New Order form and its name, price, and details will fill in automatically.</p>
+            <h3 id="inv-form-title" class="text-lg font-bold text-slate-800">Add New Inventory Item</h3>
+            <p class="text-xs text-slate-500 mt-1">When new stock (frames or lenses) arrives, add it here. Type its Model/SKU on the New Order form and its name, price, and details will fill in automatically.</p>
           </div>
           <form id="inventory-form" onsubmit="handleSaveInventoryItem(event)" class="space-y-4">
             <input type="hidden" id="editing-inv-id">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div>
-                <label class="block text-xs font-semibold text-stone-400 mb-1">Type *</label>
-                <select id="inv-type" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Type *</label>
+                <select id="inv-type" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm">
                   <option value="Frame">Frame</option>
                   <option value="Lens">Lens</option>
                 </select>
               </div>
               <div>
-                <label class="block text-xs font-semibold text-stone-400 mb-1">Model / SKU *</label>
-                <input id="inv-model" type="text" required placeholder="e.g. RB-2140" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Model / SKU *</label>
+                <input id="inv-model" type="text" required placeholder="e.g. RB-2140" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-stone-400 mb-1">Brand</label>
-                <input id="inv-brand" type="text" placeholder="e.g. Ray-Ban" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Brand</label>
+                <input id="inv-brand" type="text" placeholder="e.g. Ray-Ban" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-stone-400 mb-1">Stock Quantity *</label>
-                <input id="inv-qty" type="number" required min="0" placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Color</label>
+                <input id="inv-color" type="text" placeholder="e.g. Black / Tortoise" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Stock Quantity *</label>
+                <input id="inv-qty" type="number" required min="0" placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm">
               </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div class="md:col-span-2">
-                <label class="block text-xs font-semibold text-stone-400 mb-1">Details / Description</label>
-                <input id="inv-details" type="text" placeholder="e.g. Black Wayfarer, Medium, Acetate" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Other Details / Description</label>
+                <input id="inv-details" type="text" placeholder="e.g. Medium size, Acetate material" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-stone-400 mb-1">Cost Price</label>
-                <input id="inv-cost" type="number" placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Cost Price</label>
+                <input id="inv-cost" type="number" placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-stone-400 mb-1">Selling Price *</label>
-                <input id="inv-price" type="number" required placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Selling Price *</label>
+                <input id="inv-price" type="number" required placeholder="0" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm">
               </div>
             </div>
             <div class="flex justify-end gap-3">
-              <button type="button" onclick="resetInventoryForm()" class="px-6 py-2.5 rounded-xl bg-neutral-800 text-stone-300 font-semibold text-xs">Clear</button>
-              <button id="btn-inv-save" type="submit" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider">Save Item</button>
+              <button type="button" onclick="resetInventoryForm()" class="px-6 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-semibold text-xs">Clear</button>
+              <button id="btn-inv-save" type="submit" class="px-6 py-2.5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold text-xs uppercase tracking-wider">Save Item</button>
             </div>
           </form>
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3">
-          <input id="inventory-search-input" type="text" onkeyup="renderInventory()" placeholder="Search by model, brand, or type..." class="flex-1 px-4 py-3 rounded-2xl bg-neutral-900 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+          <input id="inventory-search-input" type="text" onkeyup="renderInventory()" placeholder="Search by model, brand, or type..." class="flex-1 px-4 py-3 rounded-2xl bg-white border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
         </div>
 
         <div id="inventory-list" class="space-y-3">
@@ -483,82 +497,82 @@
 
       <!-- PRINT OPTIONS MODAL -->
       <div id="print-options-overlay" class="hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-6">
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-2xl">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-2xl">
           <div>
-            <h3 class="text-sm font-bold text-stone-100">Choose what to print</h3>
-            <p id="print-options-subtitle" class="text-xs text-stone-400 mt-1">This customer has multiple people on file.</p>
+            <h3 class="text-sm font-bold text-slate-800">Choose what to print</h3>
+            <p id="print-options-subtitle" class="text-xs text-slate-500 mt-1">This customer has multiple people on file.</p>
           </div>
           <div id="print-options-list" class="space-y-2"></div>
-          <button onclick="closePrintOptions()" class="w-full py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-stone-300 text-xs font-semibold">Cancel</button>
+          <button onclick="closePrintOptions()" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold">Cancel</button>
         </div>
       </div>
 
       <!-- TAB 4: ACCOUNT PROFILE & DATA MANAGEMENT -->
       <div id="view-tab-account" class="hidden space-y-6">
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-6">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
           <div>
-            <h3 class="text-lg font-bold text-stone-100">Logged-in Profile & App Info</h3>
-            <p class="text-xs text-stone-400 mt-1">Review or update your shop details connected to this email account.</p>
+            <h3 class="text-lg font-bold text-slate-800">Logged-in Profile & App Info</h3>
+            <p class="text-xs text-slate-500 mt-1">Review or update your shop details connected to this email account.</p>
           </div>
 
           <form onsubmit="handleUpdateProfile(event)" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-xs font-semibold text-stone-400 mb-1">Logged-In Gmail / Email</label>
-                <input id="profile-email-disp" type="text" disabled class="w-full px-4 py-2.5 rounded-xl bg-neutral-950/60 border border-neutral-800 text-amber-400 text-sm font-mono cursor-not-allowed">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Logged-In Gmail / Email</label>
+                <input id="profile-email-disp" type="text" disabled class="w-full px-4 py-2.5 rounded-xl bg-slate-100/60 border border-slate-200 text-blue-800 text-sm font-mono cursor-not-allowed">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-stone-400 mb-1">Shop / Practice Name</label>
-                <input id="profile-shop-input" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Shop / Practice Name</label>
+                <input id="profile-shop-input" type="text" required class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-stone-400 mb-1">Mobile Contact</label>
-                <input id="profile-mobile-input" type="text" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Mobile Contact</label>
+                <input id="profile-mobile-input" type="text" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-stone-400 mb-1">Shop Address</label>
-                <input id="profile-address-input" type="text" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">Shop Address</label>
+                <input id="profile-address-input" type="text" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
               </div>
             </div>
 
-            <div class="border-t border-neutral-800 pt-5 space-y-2">
-              <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Payment Details (Bank & Easypaisa)</h4>
-              <p class="text-[11px] text-stone-500 mb-2">Shown on printed receipts when a customer has a due balance, so they know where to send payment.</p>
+            <div class="border-t border-slate-200 pt-5 space-y-2">
+              <h4 class="text-xs font-bold text-blue-800 uppercase tracking-wider">Payment Details (Bank & Easypaisa)</h4>
+              <p class="text-[11px] text-slate-400 mb-2">Shown on printed receipts when a customer has a due balance, so they know where to send payment.</p>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-semibold text-stone-400 mb-1">Bank Name</label>
-                  <input id="profile-bank-name" type="text" placeholder="e.g. Meezan Bank" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                  <label class="block text-xs font-semibold text-slate-500 mb-1">Bank Name</label>
+                  <input id="profile-bank-name" type="text" placeholder="e.g. Meezan Bank" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-stone-400 mb-1">Account Title</label>
-                  <input id="profile-bank-title" type="text" placeholder="Account holder name" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                  <label class="block text-xs font-semibold text-slate-500 mb-1">Account Title</label>
+                  <input id="profile-bank-title" type="text" placeholder="Account holder name" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-stone-400 mb-1">Bank Account Number / IBAN</label>
-                  <input id="profile-bank-account" type="text" placeholder="PKxx xxxx xxxx xxxx" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                  <label class="block text-xs font-semibold text-slate-500 mb-1">Bank Account Number / IBAN</label>
+                  <input id="profile-bank-account" type="text" placeholder="PKxx xxxx xxxx xxxx" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-stone-400 mb-1">Easypaisa Number</label>
-                  <input id="profile-easypaisa" type="text" placeholder="03xx xxxxxxx" class="w-full px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+                  <label class="block text-xs font-semibold text-slate-500 mb-1">Easypaisa Number</label>
+                  <input id="profile-easypaisa" type="text" placeholder="03xx xxxxxxx" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
                 </div>
               </div>
             </div>
 
-            <button type="submit" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider">
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold text-xs uppercase tracking-wider">
               Update Profile Details
             </button>
           </form>
         </div>
 
         <!-- Security -->
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 space-y-4">
           <div>
-            <h3 class="text-lg font-bold text-stone-100">Security</h3>
-            <p class="text-xs text-stone-400 mt-1">Automatically sign this device out after a period of no activity - useful if the shop counter is left unattended with customer prescriptions and payment details on screen.</p>
+            <h3 class="text-lg font-bold text-slate-800">Security</h3>
+            <p class="text-xs text-slate-500 mt-1">Automatically sign this device out after a period of no activity - useful if the shop counter is left unattended with customer prescriptions and payment details on screen.</p>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-stone-400 mb-1">Auto-logout after inactivity</label>
-            <select id="select-auto-logout" onchange="changeAutoLogout(this.value)" class="w-full md:w-64 px-4 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-stone-100 text-sm focus:outline-none focus:border-amber-500">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Auto-logout after inactivity</label>
+            <select id="select-auto-logout" onchange="changeAutoLogout(this.value)" class="w-full md:w-64 px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
               <option value="0">Off</option>
               <option value="5">5 minutes</option>
               <option value="15">15 minutes</option>
@@ -569,39 +583,39 @@
         </div>
 
         <!-- Install App -->
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 space-y-4">
           <div>
-            <h3 class="text-lg font-bold text-stone-100">Install as an App</h3>
-            <p class="text-xs text-stone-400 mt-1">Add this to your phone or tablet's home screen so it opens full-screen, like a real app - no browser bar, faster to open.</p>
+            <h3 class="text-lg font-bold text-slate-800">Install as an App</h3>
+            <p class="text-xs text-slate-500 mt-1">Add this to your phone or tablet's home screen so it opens full-screen, like a real app - no browser bar, faster to open.</p>
           </div>
-          <button onclick="handleInstallClick()" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider">
+          <button onclick="handleInstallClick()" class="px-6 py-2.5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold text-xs uppercase tracking-wider">
             📲 Install App
           </button>
         </div>
 
         <!-- Notifications -->
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 space-y-4">
           <div>
-            <h3 class="text-lg font-bold text-stone-100">Notifications</h3>
-            <p class="text-xs text-stone-400 mt-1">Get alerts sent to this device (browser notification) when orders are saved or delivered. This is a device notification, not WhatsApp or SMS.</p>
+            <h3 class="text-lg font-bold text-slate-800">Notifications</h3>
+            <p class="text-xs text-slate-500 mt-1">Get alerts sent to this device (browser notification) when orders are saved or delivered. This is a device notification, not WhatsApp or SMS.</p>
           </div>
-          <div class="flex items-center justify-between p-4 rounded-xl bg-neutral-950 border border-neutral-800">
+          <div class="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200">
             <div>
-              <p class="text-sm font-semibold text-stone-200">Enable Notifications</p>
-              <p id="notif-status-text" class="text-xs text-stone-500 mt-0.5">Currently off</p>
+              <p class="text-sm font-semibold text-slate-700">Enable Notifications</p>
+              <p id="notif-status-text" class="text-xs text-slate-400 mt-0.5">Currently off</p>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" id="toggle-notifications" onchange="toggleNotifications(this.checked)" class="sr-only peer">
-              <div class="w-11 h-6 bg-neutral-700 rounded-full peer peer-checked:bg-amber-500 transition-all after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+              <div class="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:bg-blue-800 transition-all after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
             </label>
           </div>
         </div>
 
         <!-- Data & Backup -->
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 md:p-8 space-y-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 space-y-4">
           <div>
-            <h3 class="text-lg font-bold text-stone-100">Data & Backup</h3>
-            <p class="text-xs text-stone-400 mt-1">Download your full customer & order database as an Excel-compatible file.</p>
+            <h3 class="text-lg font-bold text-slate-800">Data & Backup</h3>
+            <p class="text-xs text-slate-500 mt-1">Download your full customer & order database as an Excel-compatible file.</p>
           </div>
           <button onclick="exportToExcel()" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider">
             📊 Export to Excel (CSV)
@@ -609,22 +623,22 @@
         </div>
 
         <!-- Danger Zone Controls -->
-        <div class="bg-neutral-900 border border-red-900/30 rounded-2xl p-6 md:p-8 space-y-4">
+        <div class="bg-white border border-red-900/30 rounded-2xl p-6 md:p-8 space-y-4">
           <h3 class="text-lg font-bold text-red-400">Database & Dashboard Clear Options</h3>
-          <p class="text-xs text-stone-400">Manage data retention for your account.</p>
+          <p class="text-xs text-slate-500">Manage data retention for your account.</p>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-            <div class="p-4 rounded-xl bg-neutral-950 border border-neutral-800 space-y-3">
-              <h4 class="text-sm font-bold text-stone-200">1. Clear Orders Data Only</h4>
-              <p class="text-xs text-stone-400">Deletes active orders & customer history, but keeps shop profile settings.</p>
-              <button onclick="clearDashboardDataOnly()" class="w-full py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold text-xs uppercase tracking-wider">
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <h4 class="text-sm font-bold text-slate-700">1. Clear Orders Data Only</h4>
+              <p class="text-xs text-slate-500">Deletes active orders & customer history, but keeps shop profile settings.</p>
+              <button onclick="clearDashboardDataOnly()" class="w-full py-2.5 rounded-xl bg-blue-800/10 hover:bg-blue-800/20 text-blue-800 border border-blue-800/30 font-bold text-xs uppercase tracking-wider">
                 Clear Orders Data Only
               </button>
             </div>
 
-            <div class="p-4 rounded-xl bg-neutral-950 border border-neutral-800 space-y-3">
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
               <h4 class="text-sm font-bold text-red-400">2. Wipe Entire Database</h4>
-              <p class="text-xs text-stone-400">Permanently clears all customers, family members, prescriptions, and settings.</p>
+              <p class="text-xs text-slate-500">Permanently clears all customers, family members, prescriptions, and settings.</p>
               <button onclick="clearEntireAccountDatabase()" class="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider">
                 Wipe Entire Database
               </button>
@@ -1108,7 +1122,7 @@
       container.appendChild(renderer.domElement);
 
       const geometry = new THREE.TorusGeometry(1.8, 0.4, 16, 100);
-      const material = new THREE.MeshBasicMaterial({ color: 0xd4af37, wireframe: true });
+      const material = new THREE.MeshBasicMaterial({ color: 0x1e3a8a, wireframe: true });
       const torus = new THREE.Mesh(geometry, material);
       scene.add(torus);
 
@@ -1297,11 +1311,11 @@
       document.getElementById('view-tab-account').classList.add('hidden');
 
       ['tab-dashboard', 'tab-new-customer', 'tab-history', 'tab-sales', 'tab-inventory', 'tab-account'].forEach(id => {
-        document.getElementById(id).className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-stone-400 hover:text-stone-200 font-semibold whitespace-nowrap";
+        document.getElementById(id).className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-transparent text-slate-500 hover:text-slate-700 font-semibold whitespace-nowrap";
       });
 
       document.getElementById(`view-tab-${tabName}`).classList.remove('hidden');
-      document.getElementById(`tab-${tabName}`).className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-amber-500 text-amber-400 font-bold whitespace-nowrap";
+      document.getElementById(`tab-${tabName}`).className = "pb-4 text-xs uppercase tracking-widest border-b-2 border-blue-800 text-blue-800 font-bold whitespace-nowrap";
 
       if (tabName === 'history') renderHistory();
       if (tabName === 'sales') renderSalesReport();
@@ -1312,9 +1326,22 @@
 
     function calcBalance() {
       const total = Number(document.getElementById('order-total').value || 0);
+      const discount = Number(document.getElementById('order-discount').value || 0);
       const paid = Number(document.getElementById('order-paid').value || 0);
-      const due = Math.max(0, total - paid);
+      const net = Math.max(0, total - discount);
+      const due = Math.max(0, net - paid);
+
+      document.getElementById('order-total-display').innerText = `${appConfig.currSymbol} ${total.toLocaleString()}`;
+      document.getElementById('order-discount-display').innerText = `${appConfig.currSymbol} ${discount.toLocaleString()}`;
+      document.getElementById('order-net-display').innerText = `${appConfig.currSymbol} ${net.toLocaleString()}`;
+      document.getElementById('order-paid-display').innerText = `${appConfig.currSymbol} ${paid.toLocaleString()}`;
       document.getElementById('order-due-display').innerText = `${appConfig.currSymbol} ${due.toLocaleString()}`;
+    }
+
+    // Net payable amount for an order, after discount. Use this everywhere instead of
+    // p.total directly, since p.total is the price BEFORE discount.
+    function netAmount(p) {
+      return Math.max(0, (Number(p.total) || 0) - (Number(p.discount) || 0));
     }
 
     async function deliverOrder(custId, orderId) {
@@ -1349,30 +1376,30 @@
       return `
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Arial, Helvetica, sans-serif; margin:0; padding:0; color:#292524; background:#fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .letterhead { background: linear-gradient(120deg, #b8860b, #d4af37 55%, #f0c14b); padding: 30px 40px; color:#1a1508; }
+        .letterhead { background: linear-gradient(120deg, #1e3a8a, #1e40af 55%, #3b82f6); padding: 30px 40px; color:#ffffff; }
         .letterhead h1 { margin:0; font-size:28px; font-weight:800; letter-spacing:0.3px; }
         .letterhead .tag { font-size:11px; text-transform:uppercase; letter-spacing:1.6px; opacity:0.75; margin-top:4px; font-weight:700; }
         .letterhead .contact { margin-top:12px; font-size:12.5px; opacity:0.9; }
-        .meta-strip { display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; background:#fdf6e3; border-bottom:3px solid #d4af37; padding:10px 40px; font-size:12px; color:#7a5f10; font-weight:700; }
+        .meta-strip { display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; background:#eff6ff; border-bottom:3px solid #1e40af; padding:10px 40px; font-size:12px; color:#1e3a8a; font-weight:700; }
         .content { padding: 26px 40px 40px; }
-        .customer-box { background:#faf9f7; border:1px solid #eee; border-left:4px solid #d4af37; border-radius:10px; padding:16px 20px; margin-top:6px; }
+        .customer-box { background:#f8fafc; border:1px solid #eee; border-left:4px solid #1e40af; border-radius:10px; padding:16px 20px; margin-top:6px; }
         .customer-box h3 { margin:0 0 4px; font-size:18px; color:#1a1a1a; }
         .customer-box p { margin:2px 0; font-size:12.5px; color:#555; }
-        h2.section-title { font-size:13px; text-transform:uppercase; letter-spacing:0.08em; color:#b8860b; border-bottom:2px solid #f0dca0; padding-bottom:6px; margin: 24px 0 10px; }
+        h2.section-title { font-size:13px; text-transform:uppercase; letter-spacing:0.08em; color:#1e40af; border-bottom:2px solid #bfdbfe; padding-bottom:6px; margin: 24px 0 10px; }
         table { width:100%; border-collapse:collapse; margin-top:6px; }
-        th { background:#d4af37; color:#1a1508; font-size:11.5px; text-transform:uppercase; letter-spacing:0.03em; padding:9px 10px; text-align:left; }
+        th { background:#1e40af; color:#ffffff; font-size:11.5px; text-transform:uppercase; letter-spacing:0.03em; padding:9px 10px; text-align:left; }
         td { padding:9px 10px; font-size:12.5px; border-bottom:1px solid #eee; vertical-align: top; }
-        tr:nth-child(even) td { background:#fdf9ee; }
+        tr:nth-child(even) td { background:#f8fafc; }
         .status-pill { display:inline-block; padding:3px 11px; border-radius:999px; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.02em; }
         .status-delivered { background:#dcfce7; color:#166534; }
         .status-progress { background:#fef3c7; color:#92400e; }
-        .status-pickup { background:#dbeafe; color:#1e40af; }
-        .rx-box { background:#fffaf0; border:1px solid #f0dca0; border-radius:8px; padding:12px 16px; margin-top:8px; font-family: 'Courier New', monospace; font-size:11.5px; color:#5c4a12; }
+        .status-pickup { background:#e0e7ff; color:#4338ca; }
+        .rx-box { background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:12px 16px; margin-top:8px; font-family: 'Courier New', monospace; font-size:11.5px; color:#1e3a8a; }
         .rx-box .rx-row { margin-bottom:3px; }
-        .totals-box { margin-top:20px; background:#1c1917; color:#f0c14b; border-radius:12px; padding:18px 22px; display:flex; justify-content:space-around; flex-wrap:wrap; gap:14px; text-align:center; }
+        .totals-box { margin-top:20px; background:#0f172a; color:#93c5fd; border-radius:12px; padding:18px 22px; display:flex; justify-content:space-around; flex-wrap:wrap; gap:14px; text-align:center; }
         .totals-box .item-label { font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em; opacity:0.7; margin-bottom:4px; }
         .totals-box .item-value { font-size:16px; font-weight:800; }
-        .totals-box .due .item-value { color:#ffd76a; font-size:19px; }
+        .totals-box .due .item-value { color:#93c5fd; font-size:19px; }
         .footer-note { margin-top:30px; text-align:center; font-size:10.5px; color:#999; border-top:1px dashed #ddd; padding-top:12px; }
         @media print { body { padding:0; } }
       `;
@@ -1391,7 +1418,7 @@
       if (!hasSplit) {
         return variant === 'print'
           ? `<div class="rx-row" style="font-weight:700;">${p.item || '-'}</div>`
-          : `<p class="text-xs text-amber-400 font-medium">${p.item || '-'}</p>`;
+          : `<p class="text-xs text-blue-800 font-medium">${p.item || '-'}</p>`;
       }
       if (variant === 'print') {
         const rows = [];
@@ -1400,8 +1427,8 @@
         return rows.join('');
       }
       const boxes = [];
-      if (p.frameName) boxes.push(`<span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-neutral-800 border border-neutral-700 text-[11px] text-stone-200"><span>🕶️</span>${p.frameName}</span>`);
-      if (p.lensName) boxes.push(`<span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-neutral-800 border border-neutral-700 text-[11px] text-stone-200"><span>🔎</span>${p.lensName}</span>`);
+      if (p.frameName) boxes.push(`<span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-100 border border-slate-300 text-[11px] text-slate-700"><span>🕶️</span>${p.frameName}</span>`);
+      if (p.lensName) boxes.push(`<span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-100 border border-slate-300 text-[11px] text-slate-700"><span>🔎</span>${p.lensName}</span>`);
       return `<div class="flex flex-wrap gap-1.5 mt-1">${boxes.join('')}</div>`;
     }
 
@@ -1431,7 +1458,7 @@
       const shopMobile = (appConfig.owner && appConfig.owner.mobile) || '';
       const shopEmail = (appConfig.owner && appConfig.owner.email) || '';
       const rx = p.rx || {};
-      const due = Math.max(0, p.total - p.paid);
+      const due = Math.max(0, netAmount(p) - p.paid);
 
       const printWindow = window.open('', '_blank');
       if (!printWindow) { alert('Please allow pop-ups for this site to print.'); return; }
@@ -1481,6 +1508,7 @@
 
             <div class="totals-box">
               <div><div class="item-label">Total</div><div class="item-value">${appConfig.currSymbol} ${Number(p.total || 0).toLocaleString()}</div></div>
+              ${p.discount ? `<div><div class="item-label">Discount</div><div class="item-value">${appConfig.currSymbol} ${Number(p.discount).toLocaleString()}</div></div>` : ''}
               <div><div class="item-label">Paid</div><div class="item-value">${appConfig.currSymbol} ${Number(p.paid || 0).toLocaleString()}</div></div>
               <div class="due"><div class="item-label">Due</div><div class="item-value">${appConfig.currSymbol} ${due.toLocaleString()}</div></div>
             </div>
@@ -1529,7 +1557,7 @@
 
       const makeBtn = (label, filterVal) => {
         const btn = document.createElement('button');
-        btn.className = "w-full text-left px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-amber-500/50 text-stone-100 text-sm font-semibold transition-all";
+        btn.className = "w-full text-left px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-800/50 text-slate-800 text-sm font-semibold transition-all";
         btn.innerText = label;
         btn.onclick = () => { closePrintOptions(); printCustomerRecord(custId, filterVal); };
         return btn;
@@ -1568,8 +1596,8 @@
 
       let totalAll = 0, paidAll = 0;
       const purchaseRows = purchasesToPrint.map(p => {
-        const due = Math.max(0, p.total - p.paid);
-        totalAll += Number(p.total) || 0;
+        const due = Math.max(0, netAmount(p) - p.paid);
+        totalAll += netAmount(p);
         paidAll += Number(p.paid) || 0;
         const rx = p.rx || {};
         return `
@@ -1580,11 +1608,12 @@
             <td>${p.lensName || '-'}</td>
             <td><span class="status-pill ${statusPillClass(p.status)}">${p.status || '-'}</span></td>
             <td style="text-align:right">${appConfig.currSymbol} ${Number(p.total || 0).toLocaleString()}</td>
+            <td style="text-align:right">${p.discount ? appConfig.currSymbol + ' ' + Number(p.discount).toLocaleString() : '-'}</td>
             <td style="text-align:right">${appConfig.currSymbol} ${Number(p.paid || 0).toLocaleString()}</td>
             <td style="text-align:right">${appConfig.currSymbol} ${due.toLocaleString()}</td>
           </tr>
           <tr>
-            <td colspan="8" style="padding-top:0; padding-bottom:14px;">
+            <td colspan="9" style="padding-top:0; padding-bottom:14px;">
               <div class="rx-box" style="margin-top:2px;">
                 <div class="rx-row">OS (Left): &nbsp;SPH ${rx.osSph || '-'}, CYL ${rx.osCyl || '-'}, AXIS ${rx.osAxis || '-'}, ADD ${rx.osAdd || '-'}</div>
                 <div class="rx-row">OD (Right): SPH ${rx.odSph || '-'}, CYL ${rx.odCyl || '-'}, AXIS ${rx.odAxis || '-'}, ADD ${rx.odAdd || '-'}</div>
@@ -1646,8 +1675,8 @@
 
             <h2 class="section-title">Order &amp; Prescription History ${filterName && filterName !== 'ALL' ? '&mdash; ' + filterLabel : ''}</h2>
             <table>
-              <tr><th>Date</th><th>Recipient</th><th>Frame</th><th>Lens</th><th>Status</th><th style="text-align:right">Total</th><th style="text-align:right">Paid</th><th style="text-align:right">Due</th></tr>
-              ${purchaseRows || '<tr><td colspan="8">No orders recorded.</td></tr>'}
+              <tr><th>Date</th><th>Recipient</th><th>Frame</th><th>Lens</th><th>Status</th><th style="text-align:right">Total</th><th style="text-align:right">Discount</th><th style="text-align:right">Paid</th><th style="text-align:right">Due</th></tr>
+              ${purchaseRows || '<tr><td colspan="9">No orders recorded.</td></tr>'}
             </table>
 
             <div class="totals-box">
@@ -1694,6 +1723,7 @@
         document.getElementById('order-lens-model').value = order.lensModel || '';
         document.getElementById('order-lens-name').value = order.lensName || '';
         document.getElementById('order-total').value = order.total || 0;
+        document.getElementById('order-discount').value = order.discount || 0;
         document.getElementById('order-paid').value = order.paid || 0;
         document.getElementById('order-status').value = order.status || 'In Progress';
 
@@ -1725,6 +1755,7 @@
       const existingCustId = document.getElementById('editing-cust-id').value;
       const existingOrderId = document.getElementById('editing-order-id').value;
       const total = Number(document.getElementById('order-total').value || 0);
+      const discount = Number(document.getElementById('order-discount').value || 0);
       const paid = Number(document.getElementById('order-paid').value || 0);
 
       const forType = document.getElementById('order-for-type').value;
@@ -1767,6 +1798,7 @@
         lensName: lensName,
         item: combinedItem,
         total: total,
+        discount: discount,
         paid: paid,
         status: document.getElementById('order-status').value,
         rx: rxData
@@ -1866,39 +1898,39 @@
 
       customerDatabase.forEach(cust => {
         cust.purchases.forEach(purchase => {
-          const due = Math.max(0, purchase.total - purchase.paid);
+          const due = Math.max(0, netAmount(purchase) - purchase.paid);
           if (purchase.status !== 'Delivered') {
             activeCount++;
             totalDue += due;
 
             const isFamily = purchase.forType === 'Family Member';
-            const displayTag = `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[10px] uppercase ml-1">${purchase.patientDisplayName}</span>`;
+            const displayTag = `<span class="px-2 py-0.5 rounded bg-blue-800/20 text-blue-700 font-bold text-[10px] uppercase ml-1">${purchase.patientDisplayName}</span>`;
 
             const itemCard = document.createElement('div');
-            itemCard.className = "flex flex-col md:flex-row justify-between items-start md:items-center p-4 rounded-xl bg-neutral-900 border border-neutral-800 gap-4";
+            itemCard.className = "flex flex-col md:flex-row justify-between items-start md:items-center p-4 rounded-xl bg-white border border-slate-200 gap-4";
             itemCard.innerHTML = `
               <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-full bg-neutral-800 border gold-border flex items-center justify-center font-bold text-amber-400 text-sm">${cust.name.charAt(0)}</div>
+                <div class="w-12 h-12 rounded-full bg-slate-100 border gold-border flex items-center justify-center font-bold text-blue-800 text-sm">${cust.name.charAt(0)}</div>
                 <div>
-                  <h4 class="font-bold text-stone-100 text-sm">${cust.name} ${displayTag} <span class="text-xs text-stone-400 font-normal">(${cust.phone})</span></h4>
+                  <h4 class="font-bold text-slate-800 text-sm">${cust.name} ${displayTag} <span class="text-xs text-slate-500 font-normal">(${cust.phone})</span></h4>
                   ${frameLensBoxesHtml(purchase, 'card')}
-                  <p class="text-[11px] text-stone-400 mt-1">Date: ${purchase.date} | Status: <span class="text-amber-400 font-semibold">${purchase.status}</span></p>
-                  <p class="text-[10px] text-stone-500 font-mono mt-0.5">ID: ${displayCustomerId(cust)}</p>
+                  <p class="text-[11px] text-slate-500 mt-1">Date: ${purchase.date} | Status: <span class="text-blue-800 font-semibold">${purchase.status}</span></p>
+                  <p class="text-[10px] text-slate-400 font-mono mt-0.5">ID: ${displayCustomerId(cust)}</p>
                 </div>
               </div>
               <div class="flex flex-col md:flex-row items-end md:items-center gap-3 w-full md:w-auto justify-between md:justify-end">
                 <div class="text-right">
-                  <p class="text-xs text-stone-400">Due: <span class="font-bold text-amber-400">${appConfig.currSymbol} ${due.toLocaleString()}</span></p>
-                  <p class="text-[10px] text-stone-500">Total: ${appConfig.currSymbol} ${purchase.total.toLocaleString()}</p>
+                  <p class="text-xs text-slate-500">Due: <span class="font-bold text-blue-800">${appConfig.currSymbol} ${due.toLocaleString()}</span></p>
+                  <p class="text-[10px] text-slate-400">Total: ${appConfig.currSymbol} ${purchase.total.toLocaleString()}${purchase.discount ? ` &middot; Discount: ${appConfig.currSymbol} ${purchase.discount.toLocaleString()}` : ''}</p>
                 </div>
                 <div class="flex flex-col gap-2 w-full md:w-auto">
                   <button onclick="deliverOrder(${cust.id}, ${purchase.orderId})" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider">
                     ${dict.btnMarkDelivered}
                   </button>
-                  <button onclick="editCustomerFromDashboard(${cust.id}, ${purchase.orderId})" class="px-4 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-semibold text-xs border border-amber-500/30">
+                  <button onclick="editCustomerFromDashboard(${cust.id}, ${purchase.orderId})" class="px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-blue-800 font-semibold text-xs border border-blue-800/30">
                     ${dict.btnEditRecord}
                   </button>
-                  <button onclick="printSingleOrder(${cust.id}, ${purchase.orderId})" class="px-4 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-200 font-semibold text-xs border border-neutral-700">
+                  <button onclick="printSingleOrder(${cust.id}, ${purchase.orderId})" class="px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-300">
                     🖨️ Print
                   </button>
                   <button onclick="shareOrderReceipt(${cust.id}, ${purchase.orderId})" class="px-4 py-1.5 rounded-lg bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 font-semibold text-xs border border-emerald-600/30">
@@ -1918,7 +1950,7 @@
       });
 
       if (activeCount === 0) {
-        activeListContainer.innerHTML = `<p class="text-xs text-stone-500 py-4 text-center">No active orders right now.</p>`;
+        activeListContainer.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">No active orders right now.</p>`;
       }
 
       document.getElementById('stat-active-count').innerText = activeCount;
@@ -1957,7 +1989,7 @@
         if (statusFilter && p.status !== statusFilter) return false;
         if (dateFrom && p.date < dateFrom) return false;
         if (dateTo && p.date > dateTo) return false;
-        if (duesOnly && Math.max(0, p.total - p.paid) <= 0) return false;
+        if (duesOnly && Math.max(0, netAmount(p) - p.paid) <= 0) return false;
         return true;
       };
 
@@ -1970,86 +2002,87 @@
         .filter(row => !filtersActive || row.purchases.length > 0);
 
       if (rows.length === 0) {
-        container.innerHTML = `<p class="text-xs text-stone-500 py-6 text-center">No customer record found.</p>`;
+        container.innerHTML = `<p class="text-xs text-slate-400 py-6 text-center">No customer record found.</p>`;
         return;
       }
 
       rows.forEach(({ cust, purchases }) => {
         const custCard = document.createElement('div');
-        custCard.className = "rounded-2xl bg-neutral-900 border border-neutral-800 overflow-hidden";
+        custCard.className = "rounded-2xl bg-white border border-slate-200 overflow-hidden";
 
         let familyPills = '';
         if (cust.familyMembers && cust.familyMembers.length > 0) {
-          familyPills = cust.familyMembers.map(f => `<span class="px-2.5 py-1 rounded-full bg-neutral-800 text-amber-400 text-[11px] font-semibold border border-neutral-700">${f.name} <span class="text-stone-500 font-normal">(${f.relation})</span></span>`).join(' ');
+          familyPills = cust.familyMembers.map(f => `<span class="px-2.5 py-1 rounded-full bg-slate-100 text-blue-800 text-[11px] font-semibold border border-slate-300">${f.name} <span class="text-slate-400 font-normal">(${f.relation})</span></span>`).join(' ');
         }
 
         const sortedPurchases = [...purchases].sort((a, b) => (b.orderId || 0) - (a.orderId || 0));
 
         let purchasesHtml = sortedPurchases.map(p => {
-          const due = Math.max(0, p.total - p.paid);
+          const due = Math.max(0, netAmount(p) - p.paid);
           const statusClasses = p.status === 'Delivered'
             ? 'bg-emerald-950 text-emerald-400 border-emerald-900'
             : (p.status === 'Ready for Pickup' ? 'bg-sky-950 text-sky-400 border-sky-900' : 'bg-amber-950 text-amber-400 border-amber-900');
           return `
-          <div class="rounded-xl border border-neutral-800 bg-neutral-950/50 p-3.5 space-y-3">
+          <div class="rounded-xl border border-slate-200 bg-slate-50/50 p-3.5 space-y-3">
             <div class="flex items-start justify-between gap-3 flex-wrap">
               <div class="min-w-0">
-                <p class="text-[11px] text-stone-400">${p.date} &nbsp;·&nbsp; <span class="text-stone-300 font-medium">${p.patientDisplayName || cust.name}</span>${p.patientAge ? ' · Age ' + p.patientAge : ''}</p>
+                <p class="text-[11px] text-slate-500">${p.date} &nbsp;·&nbsp; <span class="text-slate-600 font-medium">${p.patientDisplayName || cust.name}</span>${p.patientAge ? ' · Age ' + p.patientAge : ''}</p>
                 ${frameLensBoxesHtml(p, 'card')}
               </div>
               <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border shrink-0 ${statusClasses}">${p.status}</span>
             </div>
 
-            <div class="flex items-center justify-between flex-wrap gap-2 pt-2.5 border-t border-neutral-800/80">
-              <p class="text-xs text-stone-300">
-                Total <span class="font-semibold text-stone-100">${appConfig.currSymbol} ${p.total.toLocaleString()}</span>
-                &nbsp;·&nbsp; Paid <span class="font-semibold text-stone-100">${appConfig.currSymbol} ${p.paid.toLocaleString()}</span>
-                &nbsp;·&nbsp; Due <span class="font-bold text-amber-400">${appConfig.currSymbol} ${due.toLocaleString()}</span>
+            <div class="flex items-center justify-between flex-wrap gap-2 pt-2.5 border-t border-slate-200/80">
+              <p class="text-xs text-slate-600">
+                Total <span class="font-semibold text-slate-800">${appConfig.currSymbol} ${p.total.toLocaleString()}</span>
+                ${p.discount ? `&nbsp;·&nbsp; Discount <span class="font-semibold text-slate-800">${appConfig.currSymbol} ${p.discount.toLocaleString()}</span>` : ''}
+                &nbsp;·&nbsp; Paid <span class="font-semibold text-slate-800">${appConfig.currSymbol} ${p.paid.toLocaleString()}</span>
+                &nbsp;·&nbsp; Due <span class="font-bold text-blue-800">${appConfig.currSymbol} ${due.toLocaleString()}</span>
               </p>
               <div class="flex gap-1.5 shrink-0">
-                <button onclick="editCustomerFromDashboard(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-400 text-[10px] font-semibold border border-amber-500/30">Edit</button>
-                <button onclick="printSingleOrder(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-stone-200 text-[10px] font-semibold border border-neutral-700">🖨️ Print</button>
+                <button onclick="editCustomerFromDashboard(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-blue-800 text-[10px] font-semibold border border-blue-800/30">Edit</button>
+                <button onclick="printSingleOrder(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold border border-slate-300">🖨️ Print</button>
                 <button onclick="shareOrderReceipt(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 text-[10px] font-semibold border border-emerald-600/30">📤 Share</button>
                 <button onclick="deleteOrder(${cust.id}, ${p.orderId})" class="px-2.5 py-1 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-400 text-[10px] font-semibold border border-red-600/30">Delete</button>
               </div>
             </div>
 
-            <div class="bg-neutral-950 p-2.5 rounded-lg border border-neutral-800/80 font-mono text-[11px] text-stone-400 space-y-1">
+            <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200/80 font-mono text-[11px] text-slate-500 space-y-1">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-1">
                 <div>OS (Left): SPH ${p.rx.osSph || '-'}, CYL ${p.rx.osCyl || '-'}, AXIS ${p.rx.osAxis || '-'}, ADD ${p.rx.osAdd || '-'}</div>
                 <div>OD (Right): SPH ${p.rx.odSph || '-'}, CYL ${p.rx.odCyl || '-'}, AXIS ${p.rx.odAxis || '-'}, ADD ${p.rx.odAdd || '-'}</div>
               </div>
-              <div class="text-stone-500">PD: ${p.rx.pd || '-'} mm &nbsp;·&nbsp; Prescribed by: ${p.rx.doctor || '-'}</div>
+              <div class="text-slate-400">PD: ${p.rx.pd || '-'} mm &nbsp;·&nbsp; Prescribed by: ${p.rx.doctor || '-'}</div>
             </div>
           </div>
         `}).join('');
 
         custCard.innerHTML = `
-          <div class="p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-neutral-800">
+          <div class="p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-slate-200">
             <div class="flex items-start gap-3 min-w-0">
-              <div class="w-11 h-11 shrink-0 rounded-full bg-neutral-800 border gold-border flex items-center justify-center font-bold text-amber-400 text-sm">${cust.name.charAt(0)}</div>
+              <div class="w-11 h-11 shrink-0 rounded-full bg-slate-100 border gold-border flex items-center justify-center font-bold text-blue-800 text-sm">${cust.name.charAt(0)}</div>
               <div class="min-w-0">
                 <div class="flex items-center flex-wrap gap-2">
-                  <h4 class="font-bold text-stone-100 text-base truncate">${cust.name}</h4>
-                  <span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 text-[10px] font-mono font-bold border border-amber-500/20 shrink-0">${displayCustomerId(cust)}</span>
+                  <h4 class="font-bold text-slate-800 text-base truncate">${cust.name}</h4>
+                  <span class="px-2 py-0.5 rounded-full bg-blue-800/10 text-blue-800 text-[10px] font-mono font-bold border border-blue-800/20 shrink-0">${displayCustomerId(cust)}</span>
                 </div>
-                <p class="text-xs text-stone-400 mt-0.5">${cust.phone}${cust.email ? ' · ' + cust.email : ''}</p>
-                <p class="text-xs text-stone-500">${cust.address || 'No address provided'}</p>
+                <p class="text-xs text-slate-500 mt-0.5">${cust.phone}${cust.email ? ' · ' + cust.email : ''}</p>
+                <p class="text-xs text-slate-400">${cust.address || 'No address provided'}</p>
                 ${familyPills ? `<div class="flex flex-wrap gap-1.5 mt-2.5">${familyPills}</div>` : ''}
               </div>
             </div>
             <div class="flex sm:flex-col gap-2 shrink-0 w-full sm:w-auto">
-              <button onclick="openPrintOptions(${cust.id})" class="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-stone-200 border border-neutral-700 font-semibold text-xs whitespace-nowrap">
+              <button onclick="openPrintOptions(${cust.id})" class="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-semibold text-xs whitespace-nowrap">
                 🖨️ Print Record
               </button>
-              <button onclick="prepareNewPurchaseForCustomer(${cust.id})" class="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-semibold text-xs whitespace-nowrap">
+              <button onclick="prepareNewPurchaseForCustomer(${cust.id})" class="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-blue-800/10 hover:bg-blue-800/20 text-blue-800 border border-blue-800/30 font-semibold text-xs whitespace-nowrap">
                 + New Order
               </button>
             </div>
           </div>
           <div class="p-5 space-y-3">
-            <h5 class="text-[11px] font-bold uppercase tracking-wider text-stone-500">Orders (${sortedPurchases.length})</h5>
-            <div class="space-y-3">${purchasesHtml || '<p class="text-xs text-stone-500 py-2">No matching orders.</p>'}</div>
+            <h5 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Orders (${sortedPurchases.length})</h5>
+            <div class="space-y-3">${purchasesHtml || '<p class="text-xs text-slate-400 py-2">No matching orders.</p>'}</div>
           </div>
         `;
         container.appendChild(custCard);
@@ -2063,7 +2096,7 @@
       const p = (cust.purchases || []).find(o => o.orderId === orderId);
       if (!p) return;
 
-      const due = Math.max(0, p.total - p.paid);
+      const due = Math.max(0, netAmount(p) - p.paid);
       const shopName = (appConfig.owner && appConfig.owner.shop) || 'Optical Shop';
       const owner = appConfig.owner || {};
 
@@ -2123,7 +2156,7 @@
             'Frame': p.frameName || (!p.lensName ? (p.item || '') : ''),
             'Lens': p.lensName || '',
             'Date': p.date, 'Status': p.status,
-            'Total': p.total, 'Paid': p.paid, 'Due': Math.max(0, p.total - p.paid),
+            'Total': p.total, 'Discount': p.discount || 0, 'Net Payable': netAmount(p), 'Paid': p.paid, 'Due': Math.max(0, netAmount(p) - p.paid),
             'OS SPH': rx.osSph || '', 'OS CYL': rx.osCyl || '', 'OS AXIS': rx.osAxis || '', 'OS ADD': rx.osAdd || '',
             'OD SPH': rx.odSph || '', 'OD CYL': rx.odCyl || '', 'OD AXIS': rx.odAxis || '', 'OD ADD': rx.odAdd || '',
             'PD': rx.pd || '', 'Doctor': rx.doctor || ''
@@ -2149,39 +2182,61 @@
       const inRange = dateStr => !cutoff || (dateStr && new Date(dateStr) >= cutoff);
 
       let totalRevenue = 0, totalPaid = 0, orderCount = 0;
+      let totalCost = 0, ordersWithKnownCost = 0;
       const monthly = {};
       const customerStats = [];
+
+      // Look up an inventory item's cost price by type + model (case-insensitive).
+      const findCost = (type, model) => {
+        if (!model) return null;
+        const item = inventoryDatabase.find(i => i.type === type && i.model.toLowerCase() === String(model).trim().toLowerCase());
+        return item ? Number(item.costPrice) || 0 : null;
+      };
 
       customerDatabase.forEach(cust => {
         let custOrders = 0, custSpend = 0;
         (cust.purchases || []).forEach(p => {
           if (!inRange(p.date)) return;
-          totalRevenue += Number(p.total) || 0;
+          totalRevenue += netAmount(p);
           totalPaid += Number(p.paid) || 0;
           orderCount++;
           custOrders++;
-          custSpend += Number(p.total) || 0;
+          custSpend += netAmount(p);
+
+          const frameCost = findCost('Frame', p.frameModel);
+          const lensCost = findCost('Lens', p.lensModel);
+          const knownCost = (frameCost !== null || lensCost !== null);
+          const orderCost = (frameCost || 0) + (lensCost || 0);
+          if (knownCost) { totalCost += orderCost; ordersWithKnownCost++; }
 
           const monthKey = (p.date || '').slice(0, 7) || 'Unknown';
-          if (!monthly[monthKey]) monthly[monthKey] = { count: 0, revenue: 0, collected: 0 };
+          if (!monthly[monthKey]) monthly[monthKey] = { count: 0, revenue: 0, collected: 0, cost: 0, knownCostCount: 0 };
           monthly[monthKey].count++;
-          monthly[monthKey].revenue += Number(p.total) || 0;
+          monthly[monthKey].revenue += netAmount(p);
           monthly[monthKey].collected += Number(p.paid) || 0;
+          if (knownCost) { monthly[monthKey].cost += orderCost; monthly[monthKey].knownCostCount++; }
         });
         if (custOrders > 0) customerStats.push({ cust, orders: custOrders, spend: custSpend });
       });
 
       const totalDue = Math.max(0, totalRevenue - totalPaid);
       const avgOrderValue = orderCount ? Math.round(totalRevenue / orderCount) : 0;
+      const grossProfit = totalRevenue - totalCost;
+      const profitMargin = totalRevenue ? Math.round((grossProfit / totalRevenue) * 100) : 0;
+      const costCoverage = orderCount ? Math.round((ordersWithKnownCost / orderCount) * 100) : 0;
 
-      const monthRows = Object.keys(monthly).sort().reverse().map(m => `
+      const monthRows = Object.keys(monthly).sort().reverse().map(m => {
+        const rowProfit = monthly[m].revenue - monthly[m].cost;
+        return `
         <tr>
-          <td class="py-2 px-3 text-xs text-stone-300">${m}</td>
-          <td class="py-2 px-3 text-xs text-stone-300 text-right">${monthly[m].count}</td>
-          <td class="py-2 px-3 text-xs text-stone-100 text-right font-semibold">${appConfig.currSymbol} ${monthly[m].revenue.toLocaleString()}</td>
+          <td class="py-2 px-3 text-xs text-slate-600">${m}</td>
+          <td class="py-2 px-3 text-xs text-slate-600 text-right">${monthly[m].count}</td>
+          <td class="py-2 px-3 text-xs text-slate-800 text-right font-semibold">${appConfig.currSymbol} ${monthly[m].revenue.toLocaleString()}</td>
           <td class="py-2 px-3 text-xs text-emerald-400 text-right font-semibold">${appConfig.currSymbol} ${monthly[m].collected.toLocaleString()}</td>
+          <td class="py-2 px-3 text-xs text-slate-500 text-right">${monthly[m].knownCostCount > 0 ? appConfig.currSymbol + ' ' + monthly[m].cost.toLocaleString() : '—'}</td>
+          <td class="py-2 px-3 text-xs text-blue-800 text-right font-bold">${monthly[m].knownCostCount > 0 ? appConfig.currSymbol + ' ' + rowProfit.toLocaleString() : '—'}</td>
         </tr>
-      `).join('');
+      `}).join('');
 
       const repeatCustomers = customerStats
         .filter(cs => cs.orders > 1)
@@ -2190,18 +2245,18 @@
 
       const repeatRows = repeatCustomers.map(cs => `
         <tr>
-          <td class="py-2 px-3 text-xs text-stone-100 font-semibold">${cs.cust.name} <span class="text-amber-400/80 font-mono text-[10px]">(${displayCustomerId(cs.cust)})</span></td>
-          <td class="py-2 px-3 text-xs text-stone-400">${cs.cust.phone}</td>
-          <td class="py-2 px-3 text-xs text-stone-300 text-right">${cs.orders}</td>
-          <td class="py-2 px-3 text-xs text-amber-400 text-right font-semibold">${appConfig.currSymbol} ${cs.spend.toLocaleString()}</td>
+          <td class="py-2 px-3 text-xs text-slate-800 font-semibold">${cs.cust.name} <span class="text-blue-800/80 font-mono text-[10px]">(${displayCustomerId(cs.cust)})</span></td>
+          <td class="py-2 px-3 text-xs text-slate-500">${cs.cust.phone}</td>
+          <td class="py-2 px-3 text-xs text-slate-600 text-right">${cs.orders}</td>
+          <td class="py-2 px-3 text-xs text-blue-800 text-right font-semibold">${appConfig.currSymbol} ${cs.spend.toLocaleString()}</td>
         </tr>
       `).join('');
 
       container.innerHTML = `
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <label class="block text-[10px] font-semibold uppercase tracking-wider text-stone-500 mb-1">Time Range</label>
-            <select id="sales-range" onchange="renderSalesReport()" class="px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-stone-100 text-xs focus:outline-none focus:border-amber-500">
+            <label class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Time Range</label>
+            <select id="sales-range" onchange="renderSalesReport()" class="px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 text-xs focus:outline-none focus:border-blue-700">
               <option value="0">All Time</option>
               <option value="30">Last 30 Days</option>
               <option value="90">Last 90 Days</option>
@@ -2214,51 +2269,73 @@
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
-            <p class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Total Revenue</p>
-            <h3 class="text-2xl font-black text-amber-400 mt-2">${appConfig.currSymbol} ${totalRevenue.toLocaleString()}</h3>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Total Revenue</p>
+            <h3 class="text-2xl font-black text-blue-800 mt-2">${appConfig.currSymbol} ${totalRevenue.toLocaleString()}</h3>
           </div>
-          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
-            <p class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Total Collected</p>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Total Collected</p>
             <h3 class="text-2xl font-black text-emerald-400 mt-2">${appConfig.currSymbol} ${totalPaid.toLocaleString()}</h3>
           </div>
-          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
-            <p class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Outstanding Dues</p>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Outstanding Dues</p>
             <h3 class="text-2xl font-black text-red-400 mt-2">${appConfig.currSymbol} ${totalDue.toLocaleString()}</h3>
           </div>
-          <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
-            <p class="text-xs text-stone-400 uppercase tracking-wider font-semibold">Orders / Avg Value</p>
-            <h3 class="text-2xl font-black text-stone-100 mt-2">${orderCount} <span class="text-sm text-stone-500 font-semibold">/ ${appConfig.currSymbol} ${avgOrderValue.toLocaleString()}</span></h3>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Orders / Avg Value</p>
+            <h3 class="text-2xl font-black text-slate-800 mt-2">${orderCount} <span class="text-sm text-slate-400 font-semibold">/ ${appConfig.currSymbol} ${avgOrderValue.toLocaleString()}</span></h3>
           </div>
         </div>
 
-        <div class="rounded-2xl bg-neutral-900 border border-neutral-800 overflow-hidden">
-          <h4 class="px-5 pt-5 pb-2 text-sm font-bold text-stone-100">Monthly Breakdown</h4>
+        <div class="rounded-2xl bg-gradient-to-br from-white to-slate-50 border border-blue-800/20 p-6 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <h4 class="text-sm font-bold text-slate-800">💰 Profit Report</h4>
+            <span class="text-[10px] text-slate-400">${costCoverage < 100 ? `Cost known for ${costCoverage}% of orders (add Inventory cost prices to improve accuracy)` : 'Cost known for all orders in this range'}</span>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div>
+              <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Cost of Goods</p>
+              <h3 class="text-xl font-black text-slate-600 mt-1">${appConfig.currSymbol} ${totalCost.toLocaleString()}</h3>
+            </div>
+            <div>
+              <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Gross Profit</p>
+              <h3 class="text-xl font-black text-emerald-400 mt-1">${appConfig.currSymbol} ${grossProfit.toLocaleString()}</h3>
+            </div>
+            <div>
+              <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Profit Margin</p>
+              <h3 class="text-xl font-black text-blue-800 mt-1">${profitMargin}%</h3>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-400">Profit is only calculated for orders whose Frame/Lens Model matches an item in your Store/Inventory with a Cost Price set. Orders with no matching inventory item aren't counted in cost, so profit may be understated until you add cost prices for more items.</p>
+        </div>
+
+        <div class="rounded-2xl bg-white border border-slate-200 overflow-hidden">
+          <h4 class="px-5 pt-5 pb-2 text-sm font-bold text-slate-800">Monthly Breakdown</h4>
           <div class="overflow-x-auto">
             <table class="w-full">
-              <thead><tr class="border-b border-neutral-800 text-left">
-                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-stone-500">Month</th>
-                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-stone-500 text-right">Orders</th>
-                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-stone-500 text-right">Revenue</th>
-                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-stone-500 text-right">Collected</th>
+              <thead><tr class="border-b border-slate-200 text-left">
+                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-slate-400">Month</th>
+                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-slate-400 text-right">Orders</th>
+                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-slate-400 text-right">Revenue</th>
+                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-slate-400 text-right">Collected</th>
               </tr></thead>
-              <tbody>${monthRows || `<tr><td colspan="4" class="py-4 px-3 text-xs text-stone-500 text-center">No orders in this range.</td></tr>`}</tbody>
+              <tbody>${monthRows || `<tr><td colspan="4" class="py-4 px-3 text-xs text-slate-400 text-center">No orders in this range.</td></tr>`}</tbody>
             </table>
           </div>
         </div>
 
-        <div class="rounded-2xl bg-neutral-900 border border-neutral-800 overflow-hidden">
-          <h4 class="px-5 pt-5 pb-1 text-sm font-bold text-stone-100">Repeat Customer Insights</h4>
-          <p class="px-5 pb-3 text-[11px] text-stone-500">Customers with more than one order in this range, ranked by order count.</p>
+        <div class="rounded-2xl bg-white border border-slate-200 overflow-hidden">
+          <h4 class="px-5 pt-5 pb-1 text-sm font-bold text-slate-800">Repeat Customer Insights</h4>
+          <p class="px-5 pb-3 text-[11px] text-slate-400">Customers with more than one order in this range, ranked by order count.</p>
           <div class="overflow-x-auto">
             <table class="w-full">
-              <thead><tr class="border-b border-neutral-800 text-left">
-                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-stone-500">Customer</th>
-                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-stone-500">Phone</th>
-                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-stone-500 text-right">Orders</th>
-                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-stone-500 text-right">Total Spend</th>
+              <thead><tr class="border-b border-slate-200 text-left">
+                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-slate-400">Customer</th>
+                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-slate-400">Phone</th>
+                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-slate-400 text-right">Orders</th>
+                <th class="py-2 px-3 text-[10px] uppercase tracking-wider text-slate-400 text-right">Total Spend</th>
               </tr></thead>
-              <tbody>${repeatRows || `<tr><td colspan="4" class="py-4 px-3 text-xs text-stone-500 text-center">No repeat customers yet in this range.</td></tr>`}</tbody>
+              <tbody>${repeatRows || `<tr><td colspan="4" class="py-4 px-3 text-xs text-slate-400 text-center">No repeat customers yet in this range.</td></tr>`}</tbody>
             </table>
           </div>
         </div>
@@ -2284,6 +2361,7 @@
         type: document.getElementById('inv-type').value,
         model: model,
         brand: document.getElementById('inv-brand').value.trim(),
+        color: document.getElementById('inv-color').value.trim(),
         details: document.getElementById('inv-details').value.trim(),
         costPrice: Number(document.getElementById('inv-cost').value || 0),
         sellingPrice: Number(document.getElementById('inv-price').value || 0),
@@ -2307,6 +2385,7 @@
       document.getElementById('inv-type').value = item.type;
       document.getElementById('inv-model').value = item.model;
       document.getElementById('inv-brand').value = item.brand || '';
+      document.getElementById('inv-color').value = item.color || '';
       document.getElementById('inv-details').value = item.details || '';
       document.getElementById('inv-cost').value = item.costPrice || 0;
       document.getElementById('inv-price').value = item.sellingPrice || 0;
@@ -2331,38 +2410,41 @@
       const filtered = inventoryDatabase.filter(i =>
         i.model.toLowerCase().includes(query) ||
         (i.brand || '').toLowerCase().includes(query) ||
+        (i.color || '').toLowerCase().includes(query) ||
         i.type.toLowerCase().includes(query)
       );
 
       if (filtered.length === 0) {
-        container.innerHTML = `<p class="text-xs text-stone-500 py-6 text-center">No inventory items yet. Add your first frame or lens above.</p>`;
+        container.innerHTML = `<p class="text-xs text-slate-400 py-6 text-center">No inventory items yet. Add your first frame or lens above.</p>`;
         return;
       }
 
       container.innerHTML = filtered.map(item => {
-        const lowStock = item.stockQty <= 2;
+        const soldOut = item.stockQty <= 0;
+        const lowStock = !soldOut && item.stockQty <= 2;
         const typeIcon = item.type === 'Frame' ? '🕶️' : '🔎';
         return `
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-neutral-900 border border-neutral-800">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-white border ${soldOut ? 'border-red-900/60' : 'border-slate-200'}">
             <div class="flex items-start gap-3 min-w-0">
-              <div class="w-10 h-10 shrink-0 rounded-lg bg-neutral-800 border gold-border flex items-center justify-center text-lg">${typeIcon}</div>
+              <div class="w-10 h-10 shrink-0 rounded-lg bg-slate-100 border gold-border flex items-center justify-center text-lg">${typeIcon}</div>
               <div class="min-w-0">
                 <div class="flex items-center flex-wrap gap-2">
-                  <h4 class="font-bold text-stone-100 text-sm truncate">${item.model}</h4>
-                  <span class="px-2 py-0.5 rounded-full bg-neutral-800 text-stone-400 text-[10px] font-semibold border border-neutral-700">${item.type}</span>
+                  <h4 class="font-bold text-slate-800 text-sm truncate">${item.model}</h4>
+                  <span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[10px] font-semibold border border-slate-300">${item.type}</span>
+                  ${soldOut ? `<span class="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold">SOLD OUT</span>` : ''}
                   ${lowStock ? `<span class="px-2 py-0.5 rounded-full bg-red-950 text-red-400 text-[10px] font-bold border border-red-900">LOW STOCK</span>` : ''}
                 </div>
-                <p class="text-xs text-stone-400 mt-0.5">${item.brand || ''}${item.brand && item.details ? ' · ' : ''}${item.details || ''}</p>
-                <p class="text-xs text-stone-500 mt-0.5">Cost ${appConfig.currSymbol} ${item.costPrice.toLocaleString()} &nbsp;·&nbsp; Selling <span class="text-amber-400 font-semibold">${appConfig.currSymbol} ${item.sellingPrice.toLocaleString()}</span></p>
+                <p class="text-xs text-slate-500 mt-0.5">${[item.brand, item.color, item.details].filter(Boolean).join(' · ')}</p>
+                <p class="text-xs text-slate-400 mt-0.5">Cost ${appConfig.currSymbol} ${item.costPrice.toLocaleString()} &nbsp;·&nbsp; Selling <span class="text-blue-800 font-semibold">${appConfig.currSymbol} ${item.sellingPrice.toLocaleString()}</span></p>
               </div>
             </div>
             <div class="flex items-center gap-3 shrink-0">
               <div class="text-right">
-                <p class="text-[10px] text-stone-500 uppercase tracking-wider">In Stock</p>
-                <p class="text-lg font-black ${lowStock ? 'text-red-400' : 'text-emerald-400'}">${item.stockQty}</p>
+                <p class="text-[10px] text-slate-400 uppercase tracking-wider">In Stock</p>
+                <p class="text-lg font-black ${soldOut ? 'text-red-500' : (lowStock ? 'text-red-400' : 'text-emerald-400')}">${item.stockQty}</p>
               </div>
               <div class="flex flex-col gap-1.5">
-                <button onclick="editInventoryItem(${item.id})" class="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-amber-400 text-[10px] font-semibold border border-amber-500/30">Edit</button>
+                <button onclick="editInventoryItem(${item.id})" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-blue-800 text-[10px] font-semibold border border-blue-800/30">Edit</button>
                 <button onclick="deleteInventoryItem(${item.id})" class="px-3 py-1.5 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-400 text-[10px] font-semibold border border-red-600/30">Delete</button>
               </div>
             </div>
@@ -2379,18 +2461,24 @@
       const hintFieldId = type === 'Frame' ? 'frame-price-hint' : 'lens-price-hint';
       const hintEl = document.getElementById(hintFieldId);
 
-      if (!match) { hintEl.innerText = ''; return; }
+      if (!match) { hintEl.innerText = ''; hintEl.className = 'text-[10px] text-slate-400'; return; }
 
       const nameField = document.getElementById(nameFieldId);
       if (!nameField.value.trim()) {
-        nameField.value = [match.brand, match.details].filter(Boolean).join(' - ') || match.model;
+        nameField.value = [match.brand, match.color, match.details].filter(Boolean).join(' - ') || match.model;
       }
-      hintEl.innerText = `${match.brand || match.type} · Selling ${appConfig.currSymbol} ${match.sellingPrice.toLocaleString()} · ${match.stockQty} in stock`;
+
+      if (match.stockQty <= 0) {
+        hintEl.innerText = `⚠️ SOLD OUT — 0 left in stock. This model is currently unavailable.`;
+        hintEl.className = 'text-[11px] text-red-500 font-bold';
+      } else {
+        const stockNote = match.stockQty <= 2 ? ` (only ${match.stockQty} left!)` : ` · ${match.stockQty} in stock`;
+        hintEl.innerText = `${[match.brand, match.color].filter(Boolean).join(' ') || match.type} · Selling ${appConfig.currSymbol} ${match.sellingPrice.toLocaleString()}${stockNote}`;
+        hintEl.className = match.stockQty <= 2 ? 'text-[10px] text-red-400 font-semibold' : 'text-[10px] text-slate-400';
+      }
 
       // Suggest a total if the order total is still empty/zero.
       const totalField = document.getElementById('order-total');
-      const frameHint = document.getElementById('frame-price-hint').innerText;
-      const lensHint = document.getElementById('lens-price-hint').innerText;
       if (Number(totalField.value || 0) === 0) {
         const framePrice = inventoryDatabase.find(i => i.type === 'Frame' && i.model.toLowerCase() === document.getElementById('order-frame-model').value.trim().toLowerCase());
         const lensPrice = inventoryDatabase.find(i => i.type === 'Lens' && i.model.toLowerCase() === document.getElementById('order-lens-model').value.trim().toLowerCase());
