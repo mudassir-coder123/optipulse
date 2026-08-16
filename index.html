@@ -533,6 +533,10 @@
                 <label class="block text-xs font-semibold text-slate-500 mb-1">Shop Address</label>
                 <input id="profile-address-input" type="text" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
               </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">VAT Number <span class="text-slate-400 font-normal normal-case">(optional)</span></label>
+                <input id="profile-vat-input" type="text" placeholder="e.g. VAT-123456789" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-blue-700">
+              </div>
             </div>
 
             <div class="border-t border-slate-200 pt-5 space-y-2">
@@ -920,6 +924,7 @@
       document.getElementById('profile-shop-input').value = appConfig.owner.shop || '';
       document.getElementById('profile-mobile-input').value = appConfig.owner.mobile || '';
       document.getElementById('profile-address-input').value = appConfig.owner.address || '';
+      document.getElementById('profile-vat-input').value = appConfig.owner.vatNo || '';
       document.getElementById('profile-bank-name').value = appConfig.owner.bankName || '';
       document.getElementById('profile-bank-title').value = appConfig.owner.bankTitle || '';
       document.getElementById('profile-bank-account').value = appConfig.owner.bankAccount || '';
@@ -938,6 +943,7 @@
       appConfig.owner.shop = document.getElementById('profile-shop-input').value;
       appConfig.owner.mobile = document.getElementById('profile-mobile-input').value;
       appConfig.owner.address = document.getElementById('profile-address-input').value;
+      appConfig.owner.vatNo = document.getElementById('profile-vat-input').value.trim();
       appConfig.owner.bankName = document.getElementById('profile-bank-name').value;
       appConfig.owner.bankTitle = document.getElementById('profile-bank-title').value;
       appConfig.owner.bankAccount = document.getElementById('profile-bank-account').value;
@@ -1457,6 +1463,7 @@
       const shopAddress = (appConfig.owner && appConfig.owner.address) || '';
       const shopMobile = (appConfig.owner && appConfig.owner.mobile) || '';
       const shopEmail = (appConfig.owner && appConfig.owner.email) || '';
+      const shopVat = (appConfig.owner && appConfig.owner.vatNo) || '';
       const rx = p.rx || {};
       const due = Math.max(0, netAmount(p) - p.paid);
 
@@ -1473,6 +1480,7 @@
         <body>
           <div class="letterhead">
             <h1>${shopName}</h1>
+            ${shopVat ? `<div class="tag" style="opacity:0.95; margin-top:2px;">VAT No: ${shopVat}</div>` : ''}
             <div class="tag">Optical Practice &amp; Eyewear</div>
             <div class="contact">${[shopAddress, shopMobile, shopEmail].filter(Boolean).join(' &nbsp;&bull;&nbsp; ')}</div>
           </div>
@@ -1582,6 +1590,7 @@
       const shopAddress = (appConfig.owner && appConfig.owner.address) || '';
       const shopMobile = (appConfig.owner && appConfig.owner.mobile) || '';
       const shopEmail = (appConfig.owner && appConfig.owner.email) || '';
+      const shopVat = (appConfig.owner && appConfig.owner.vatNo) || '';
 
       const filterLabel = !filterName || filterName === 'ALL'
         ? 'All Family Members'
@@ -1653,6 +1662,7 @@
         <body>
           <div class="letterhead">
             <h1>${shopName}</h1>
+            ${shopVat ? `<div class="tag" style="opacity:0.95; margin-top:2px;">VAT No: ${shopVat}</div>` : ''}
             <div class="tag">Optical Practice &amp; Eyewear</div>
             <div class="contact">${[shopAddress, shopMobile, shopEmail].filter(Boolean).join(' &nbsp;&bull;&nbsp; ')}</div>
           </div>
